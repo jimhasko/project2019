@@ -13,7 +13,7 @@ typedef struct Table_Info{
 }Table_Info;
 
 
-typedef struct listnode{
+typedef struct Listnode{
 
     int id;
     struct Listnode* next;

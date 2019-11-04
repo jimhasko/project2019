@@ -26,13 +26,35 @@ Head* init_List(){
 }
 
 
+
+
+/*
 int bithash(int hash_value,int hash_key){
+int r;
+    r = createMask(0,hash_value);
+    unsigned result = r & hash_key;
+    return result;
+}
+*/
 
-    return   hash_value & ((1<<hash_key)-1);
 
+int bithash(int64_t hash_value,int hash_key){
+
+  // return   hash_value & ((1<<hash_key)-1);
+    return   hash_value & ((1>>(hash_key))-1);
+}
+
+int bithash2(int64_t hash_value,int from,int to){
+
+    // return   hash_value & ((1<<hash_key)-1);
+    // return   hash_value >>(64-hash_key);
+    if(from==0)
+        return   hash_value >>(64-to);
+    return   hash_value >>(64-to)&((1 << from)-1);
 }
 
 
+//return (byteFlag & (1<<(whichBit-1)));
 Table_Info* getrow(Table_Info* pi,int column){
     int i;
     Table_Info* retur=malloc(sizeof(Table_Info));

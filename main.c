@@ -4,7 +4,7 @@
 #include <stdlib.h>
 //#include "relations.h"
 #define BUF_SIZE 33
-
+#include <inttypes.h>
 
 
 
@@ -46,6 +46,9 @@ int main() {
 
     Combined_Structs* combined_structs;
     combined_structs = radix_Sort(n, retur);
+
+
+
 
 
     return 0;

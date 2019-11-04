@@ -5,6 +5,7 @@
 #ifndef RADIX_RADIX_H
 #define RADIX_RADIX_H
 
+#include <stdint.h>
 typedef struct Table_Info{
 
     int** Table;
@@ -41,7 +42,8 @@ typedef struct Combined_Struct{
 
 void list_Add_Id(Head **head1, int id);
 Head* init_List();
-int bithash(int hash_value,int hash_key);
+int bithash2(int64_t hash_value,int from,int to);
+int bithash(int64_t hash_value,int hash_key);
 void init(Table_Info*table,int colum,int row);
 void print(Table_Info* table);
 Table_Info* getrow(Table_Info* pi,int column);

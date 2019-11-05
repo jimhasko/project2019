@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <inttypes.h>
 void list_Add_Id(Head **head1, int id){
 
     Listnode * temp=malloc(sizeof(Listnode));
@@ -25,17 +25,26 @@ Head* init_List(){
 
 }
 
+int64_t Sto64(const char *s) {
+    int64_t i;
+    char c ;
+    int scanned = sscanf(s, "%" SCNd64 "%c", &i, &c);
+    if (scanned == 1) return i;
 
 
-
-/*
-int bithash(int hash_value,int hash_key){
-int r;
-    r = createMask(0,hash_value);
-    unsigned result = r & hash_key;
-    return result;
+    return 0;
 }
-*/
+
+
+int bithash3(int hash_value,int time){ //time starts at 0 and ads by one
+    int from,to;
+    from=time*8;
+    to=from+8;
+    if(from==0)
+        return   hash_value >>(64-to);
+    return   hash_value >>(64-to)&((1 << from)-1);
+}
+
 
 
 int bithash(int64_t hash_value,int hash_key){
@@ -44,17 +53,17 @@ int bithash(int64_t hash_value,int hash_key){
     return   hash_value & ((1>>(hash_key))-1);
 }
 
-int bithash2(int64_t hash_value,int from,int to){
-
-    // return   hash_value & ((1<<hash_key)-1);
-    // return   hash_value >>(64-hash_key);
+int bithash2(uint64_t hash_value,int time){ //time starts at 0 and ads by one
+int from,to;
+    from=time*8;
+    to=from+8;
     if(from==0)
         return   hash_value >>(64-to);
     return   hash_value >>(64-to)&((1 << from)-1);
 }
 
 
-//return (byteFlag & (1<<(whichBit-1)));
+
 Table_Info* getrow(Table_Info* pi,int column){
     int i;
     Table_Info* retur=malloc(sizeof(Table_Info));
@@ -136,7 +145,8 @@ Combined_Structs* radix_Sort(int n, Table_Info *table){
     int location=0;
     for(i=0;i<table->rows;i++){
         printf("ADDING num  %d  to ",table->Table[i][1]);
-        location=bithash(table->Table[i][1],n);
+       // location=bithash(table->Table[i][1],n);
+        location=bithash3(table->Table[i][1],n);
         // list_add_id(&refarray[bithash(test[i][1],n)],test[i][0]);
         list_Add_Id(&refarray[location], table->Table[i][0]);
 
@@ -147,27 +157,7 @@ Combined_Structs* radix_Sort(int n, Table_Info *table){
 
     printf("REFFLIST!\n");
     Listnode * kl;                   //printing reff
-    /*for(i=0;i<hist_size;i++) {
-        kl=refarray[i]->first;
-        printf(" \n i= %d <  ",i);
-        while(kl!=NULL){
-            printf("  -> %d ",kl->id);
-            kl=kl->next;}
 
-    }
-
-
-    printf(" \n size->%d",hist_size);
-
-
-    for(i=0;i<hist_size;i++) {
-        //  hist[i][0] = bithash(i, n);
-        //  sumlist[i][0]=bithash(i,n);
-        //  printf("   <<%d >>", hist[i][0])
-        // hist[i][1] = refarray[i]->size;
-        // printf("   <<%d >> \n", hist[i][1]);
-
-    }*/
     printf("\n////////////////////////\n HISTOGRAM\n");
 
     for(i=0;i<hist_size;i++){
@@ -233,12 +223,6 @@ Combined_Structs* radix_Sort(int n, Table_Info *table){
 
 
 
-    //reordered free
-    /*  for(i=0;i<table->rows;i++)
-          free(reordered[i]);
-      free(reordered);
-  */
-    //reffarray free
     Listnode * deleter;                   //printing reff
     for(i=0;i<hist_size;i++) {
         kl=refarray[i]->first;
@@ -293,9 +277,60 @@ void init(Table_Info*table,int colum,int row){
 
 
 
-//void init_tables(Tables_Table lista_pinakon){
-//   lista_pinakon.num_of_tables=0;
-// lista_pinakon.tables=(Tables_Table_Node*)malloc(10*sizeof(Tables_Table_Node));
-//}
+Table_Info get_table(char* filename){
+
+    char ch;
+    int i;
+    int col,lines,one=1;
+    col=1;
+    lines=0;
+    FILE* fp = fopen (filename, "r");
+
+  // i = fgetc(fp);
+  //  printf("%d ", i);
+
+    while(!feof(fp))
+    {
+        ch = fgetc(fp);
+//printf("%s ", ch);
+        if(one==1 && ch==',')
+        col++;
+        if(ch == '\n' )
+        {
+            lines++;
+            one=0;
+        }
+    }
+
+    printf("lines %d , col %d   \n",lines,col);
+rewind(fp);
+char line[500];
+   uint64_t  big1,big2;
+    uint64_t table[lines][col];
+char usless[60];
+    char usless2[60];
+    int k,count=0;
+    while (fgets(line,500,fp)!=NULL) {
+
+        //fscanf(fp, "%30[^,],%30[^,]", usless, usless2);
+        //fscanf(fp,"%lld,%lld" , &big1, &big2);
+        sscanf(line,"%s,",usless);
+        table[count][0]=Sto64(usless);
+
+        for(k=0;k<col-2;k++){
+            sscanf(line,"%s,",usless);
+            table[count][k+1]=Sto64(usless);
+
+        }
+        sscanf(line,"%s\n",usless);
+        table[count][k-1]=Sto64(usless);
+
+    }
+        fclose(fp);
+
+
+
+
+}
 
 

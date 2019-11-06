@@ -17,7 +17,7 @@ char  filename[]="/home/dimitris/CLionProjects/jj2019/relA";
 int size;
 size= sizeof(uint64_t);
 
-   get_table(filename);
+ //  get_table(filename);
 
     int rows,nedded_column,columns,n;
 
@@ -29,7 +29,7 @@ size= sizeof(uint64_t);
     buffer[BUF_SIZE - 1] = '\0';
 
 
-    int i;
+ /*   int i;
 
     Table_Info* retur=malloc(sizeof(Table_Info));
     retur->Table=malloc(sizeof(int*)*rows);
@@ -49,9 +49,10 @@ size= sizeof(uint64_t);
         retur->Table[i][1]=test[i][nedded_column];
         retur->Table[i][0]=i;
     }
-
+*/
+ Table_Info* table;
     Combined_Structs* combined_structs;
-    combined_structs = radix_Sort(n, retur);
+    combined_structs = radix_Sort(n, get_table(filename));
 
 
 

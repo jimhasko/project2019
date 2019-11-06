@@ -25,11 +25,15 @@ Head* init_List(){
 
 }
 
-int64_t Sto64(const char *s) {
-    int64_t i;
+uint64_t Sto64(const char *s) {
+    uint64_t i;
     char c ;
-    int scanned = sscanf(s, "%" SCNd64 "%c", &i, &c);
-    if (scanned == 1) return i;
+    printf(" s: %s \n", s);
+    int scanned = sscanf(s, "%" SCNu64 "%c", &i, &c);
+
+    printf(" i: %" PRIu64 "\n", i);
+  //  if (scanned == 1) return i;
+    if (scanned ) return i;
 
 
     return 0;
@@ -45,8 +49,6 @@ int bithash3(int hash_value,int time){ //time starts at 0 and ads by one
     return   hash_value >>(64-to)&((1 << from)-1);
 }
 
-
-
 int bithash(int64_t hash_value,int hash_key){
 
   // return   hash_value & ((1<<hash_key)-1);
@@ -61,8 +63,6 @@ int from,to;
         return   hash_value >>(64-to);
     return   hash_value >>(64-to)&((1 << from)-1);
 }
-
-
 
 Table_Info* getrow(Table_Info* pi,int column){
     int i;
@@ -85,17 +85,17 @@ Table_Info* getrow(Table_Info* pi,int column){
 
 }
 
-
-
 void print(Table_Info* table){
     printf("PRINTING!!\n");
     int i,j;
+    i=table->rows;
+    j=table->columns;
     for(i=0;i<table->rows;i++)
     {
 
         for(j=0;j<table->columns;j++){
 
-            printf(" %d ",table->Table[i][j]);
+            printf(" %" PRIu64 "  ",table->Table[i][j]);
 
         }
         printf("\n");
@@ -106,11 +106,8 @@ void print(Table_Info* table){
 
 }
 
-
-
-
 Combined_Structs* radix_Sort(int n, Table_Info *table){
-
+    print(table);
     // int test[10][2]={{1,3},{2,4},{3,7},{4,7},{5,2},{6,2},{7,1},{8,5},{9,5},{10,2}};
     // int test[6][3]={{12,3,67},{67,4,90},{56,5,78},{123,6,89},{67,7,78},{45,8,765}};
     int i,hist_size=1;
@@ -122,18 +119,18 @@ Combined_Structs* radix_Sort(int n, Table_Info *table){
         hist[i]=malloc(sizeof(int)*2);
 
 
-    int** sumlist=malloc(sizeof(int*)*hist_size);   //sumlist
+    uint64_t ** sumlist=malloc(sizeof(int*)*hist_size);   //sumlist
     for(i=0;i<hist_size;i++)
-        sumlist[i]=malloc(sizeof(int)*2);
+        sumlist[i]=malloc(sizeof(uint64_t)*2);
 
     Head** refarray;                    //original array
     refarray = malloc(sizeof(Head) * hist_size);
 
 
 
-    int** reordered=malloc(sizeof(int*)*table->rows);   //reordered
+    uint64_t ** reordered=malloc(sizeof(uint64_t*)*table->rows);   //reordered
     for(i=0;i<table->rows;i++)
-        reordered[i]=malloc(sizeof(int)*2);
+        reordered[i]=malloc(sizeof(uint64_t)*2);
 
 
 
@@ -144,9 +141,9 @@ Combined_Structs* radix_Sort(int n, Table_Info *table){
         sumlist[i][0]=i;}
     int location=0;
     for(i=0;i<table->rows;i++){
-        printf("ADDING num  %d  to ",table->Table[i][1]);
+        printf("ADDING num  %" PRIu64  " to " ,table->Table[i][1]);
        // location=bithash(table->Table[i][1],n);
-        location=bithash3(table->Table[i][1],n);
+        location=bithash2(table->Table[i][1],n);
         // list_add_id(&refarray[bithash(test[i][1],n)],test[i][0]);
         list_Add_Id(&refarray[location], table->Table[i][0]);
 
@@ -174,7 +171,7 @@ Combined_Structs* radix_Sort(int n, Table_Info *table){
     printf("\n////////////////////////\n SUMMED_HISTOGRAM\n");
 
     for(i=0;i<hist_size;i++){
-        printf("[%d , %d] \n",sumlist[i][0], sumlist[i][1]);
+        printf("[%"PRIu64 ", %"PRIu64"] \n",sumlist[i][0], sumlist[i][1]);
     }
 
 
@@ -199,13 +196,13 @@ Combined_Structs* radix_Sort(int n, Table_Info *table){
     printf("ORIGINAL\n");
 
     for(i=0;i<table->rows;i++){
-        printf("[%d %d] \n",table->Table[i][0], table->Table[i][1]);
+        printf("[%" PRIu64 "%"PRIu64 "] \n"   ,table->Table[i][0], table->Table[i][1]);
     }
 
     printf("\n");
     printf("REORDERED\n");
     for(i=0;i<table->rows;i++){
-        printf("[%d %d] \n",reordered[i][0], reordered[i][1]);
+        printf("[%"PRIu64" %"PRIu64"] \n",reordered[i][0], reordered[i][1]);
     }
 
 
@@ -250,85 +247,82 @@ Combined_Structs* radix_Sort(int n, Table_Info *table){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-void init(Table_Info*table,int colum,int row){
-    table->columns=colum;
-    table->rows=row;
-    table->Table=(int**)malloc(table->rows*sizeof(int*));
-    int i;
-
-
-    for (i=0; i<table->rows; i++)
-        table->Table[i] = (int *)malloc(table->columns * sizeof(int));
-
-
-
-
-}
-
-
-
-Table_Info get_table(char* filename){
+Table_Info* get_table(char* filename){
 
     char ch;
     int i;
     int col,lines,one=1;
-    col=1;
+    col=2;
     lines=0;
     FILE* fp = fopen (filename, "r");
 
   // i = fgetc(fp);
   //  printf("%d ", i);
 
-    while(!feof(fp))
+    while(!feof(fp))//get lines and columns
     {
         ch = fgetc(fp);
-//printf("%s ", ch);
+
         if(one==1 && ch==',')
         col++;
-        if(ch == '\n' )
-        {
+        if(ch == '\n' ){
             lines++;
-            one=0;
-        }
+             one=0;}
+
     }
 
     printf("lines %d , col %d   \n",lines,col);
 rewind(fp);
 char line[500];
-   uint64_t  big1,big2;
-    uint64_t table[lines][col];
-char usless[60];
-    char usless2[60];
-    int k,count=0;
-    while (fgets(line,500,fp)!=NULL) {
+  // uint64_t  big1,big2;
+   // uint64_t table[lines][col];
+char* usless;
 
+    int64_t a;
+    int k,count=0;
+
+    Table_Info* retur=malloc(sizeof(Table_Info));
+    retur->Table=malloc(sizeof(uint64_t*)*lines);
+    for(i=0;i<lines;i++)
+        retur->Table[i]=malloc(sizeof(int)*col);
+    retur->rows=lines;
+    retur->columns=col;
+
+
+
+
+    while (fgets(line,500,fp)!=NULL) {
+        printf("line: %s :",line);
         //fscanf(fp, "%30[^,],%30[^,]", usless, usless2);
         //fscanf(fp,"%lld,%lld" , &big1, &big2);
-        sscanf(line,"%s,",usless);
-        table[count][0]=Sto64(usless);
+        retur->Table[count][0]=count;//pass id
+        k=1;
+        usless = strtok(line, ",");
+        retur->Table[count][k]=Sto64(usless);// pass values
+        printf( "value  %s in k: %d\n", usless,k );
+        k++;
 
-        for(k=0;k<col-2;k++){
-            sscanf(line,"%s,",usless);
-            table[count][k+1]=Sto64(usless);
+        while( usless != NULL ) {
 
+
+            usless = strtok(NULL, ",");
+            printf( " %s\n", usless );
+        if(usless!=NULL){
+           retur->Table[count][k]=Sto64(usless);
+
+            printf( "value  %s in k: %d\n", usless,k );
+            printf("in table value :[%" PRIu64 "] \n"   ,Sto64(usless));
+            k++;}
         }
-        sscanf(line,"%s\n",usless);
-        table[count][k-1]=Sto64(usless);
-
+       // printf("[%" PRIu64 " ,%"PRIu64 "] \n"   ,retur->Table[count][0], retur->Table[count][1]);
+        count++;
+        printf("count: %d \n",count);
+        if(count==1000)
+            printf("debug");
     }
         fclose(fp);
-
-
+print(retur);
+return retur;
 
 
 }

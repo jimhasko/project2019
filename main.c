@@ -13,13 +13,13 @@
 
 
 int main() {
-char  filename[]="/home/dimitris/CLionProjects/jj2019/relA";
+char  filename[]="/home/dimitris/CLionProjects/jj2019/relC";
 int size;
 size= sizeof(uint64_t);
 
  //  get_table(filename);
 
-    int rows,nedded_column,columns,n;
+    int rows,nedded_column,columns,n,time=7;
 
     n=0;
     rows=10;
@@ -27,6 +27,14 @@ size= sizeof(uint64_t);
     columns=2;
     char buffer[BUF_SIZE];
     buffer[BUF_SIZE - 1] = '\0';
+ //int i;
+
+uint64_t i,a;
+a=6932635952696987497;
+i=bithash2(a,7);
+
+    a=16825117127882417238;
+    i=bithash2(a,7);
 
 
  /*   int i;
@@ -52,7 +60,7 @@ size= sizeof(uint64_t);
 */
  Table_Info* table;
     Combined_Structs* combined_structs;
-    combined_structs = radix_Sort(n, get_table(filename));
+    combined_structs = radix_Sort(get_table(filename), time, nedded_column);
 
 
 

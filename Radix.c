@@ -59,9 +59,12 @@ int bithash2(uint64_t hash_value,int time){ //time starts at 0 and ads by one
 int from,to;
     from=time*8;
     to=from+8;
-    if(from==0)
-        return   hash_value >>(64-to);
-    return   hash_value >>(64-to)&((1 << from)-1);
+    //if(from==0) return   hash_value >>(64-to);
+    //if(time==7) return hash_value & ((1<<8)-1);
+   // return   hash_value >>(64-to-1)&((1 << from+1)-1);
+   return (hash_value << from) >>64-8;
+
+    //return (hash_value>>(64-to))&((1<<from)-1);
 }
 
 Table_Info* getrow(Table_Info* pi,int column){
@@ -106,22 +109,19 @@ void print(Table_Info* table){
 
 }
 
-Combined_Structs* radix_Sort(int n, Table_Info *table){
+Combined_Structs *radix_Sort(Table_Info *table, int time, int needed) {// table kai pia 8ada bits na pari kai pia kolona
     print(table);
-    // int test[10][2]={{1,3},{2,4},{3,7},{4,7},{5,2},{6,2},{7,1},{8,5},{9,5},{10,2}};
-    // int test[6][3]={{12,3,67},{67,4,90},{56,5,78},{123,6,89},{67,7,78},{45,8,765}};
-    int i,hist_size=1;
-    for(i=0;i<n;i++)
-        hist_size=hist_size*2;
+
+    int i,hist_size=256;
 
     int** hist=malloc(sizeof(int*)*hist_size);      //historylist
     for(i=0;i<hist_size;i++)
         hist[i]=malloc(sizeof(int)*2);
 
 
-    uint64_t ** sumlist=malloc(sizeof(int*)*hist_size);   //sumlist
+    int ** sumlist=malloc(sizeof(int*)*hist_size);   //sumlist
     for(i=0;i<hist_size;i++)
-        sumlist[i]=malloc(sizeof(uint64_t)*2);
+        sumlist[i]=malloc(sizeof(int)*2);
 
     Head** refarray;                    //original array
     refarray = malloc(sizeof(Head) * hist_size);
@@ -139,20 +139,25 @@ Combined_Structs* radix_Sort(int n, Table_Info *table){
         hist[i][0] = i;
         hist[i][1]=0;
         sumlist[i][0]=i;}
+
+
     int location=0;
     for(i=0;i<table->rows;i++){
-        printf("ADDING num  %" PRIu64  " to " ,table->Table[i][1]);
+        uint64_t test;
+        test=table->Table[i][needed];
+        printf("ADDING num  %" PRIu64  " to " ,table->Table[i][needed]);
        // location=bithash(table->Table[i][1],n);
-        location=bithash2(table->Table[i][1],n);
+        location=bithash2(table->Table[i][needed],time);
         // list_add_id(&refarray[bithash(test[i][1],n)],test[i][0]);
         list_Add_Id(&refarray[location], table->Table[i][0]);
 
         hist[location][1]++;
     }
 
+
     printf("%d \n", table->rows );
 
-    printf("REFFLIST!\n");
+   // printf("REFFLIST!\n");
     Listnode * kl;                   //printing reff
 
     printf("\n////////////////////////\n HISTOGRAM\n");
@@ -171,7 +176,7 @@ Combined_Structs* radix_Sort(int n, Table_Info *table){
     printf("\n////////////////////////\n SUMMED_HISTOGRAM\n");
 
     for(i=0;i<hist_size;i++){
-        printf("[%"PRIu64 ", %"PRIu64"] \n",sumlist[i][0], sumlist[i][1]);
+        printf("[%d , %d] \n",sumlist[i][0], sumlist[i][1]);
     }
 
 
@@ -196,7 +201,7 @@ Combined_Structs* radix_Sort(int n, Table_Info *table){
     printf("ORIGINAL\n");
 
     for(i=0;i<table->rows;i++){
-        printf("[%" PRIu64 "%"PRIu64 "] \n"   ,table->Table[i][0], table->Table[i][1]);
+        printf("[%" PRIu64 "  %"PRIu64 "] \n"   ,table->Table[i][0], table->Table[i][1]);
     }
 
     printf("\n");

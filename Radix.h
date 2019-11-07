@@ -43,11 +43,11 @@ typedef struct Combined_Struct{
 void list_Add_Id(Head **head1, int id);
 Head* init_List();
 int bithash2(uint64_t hash_value,int time);
-int bithash(int64_t hash_value,int hash_key);
+//int bithash(int64_t hash_value,int hash_key);
 //void init(Table_Info*table,int colum,int row);
 void print(Table_Info* table);
 Table_Info* getrow(Table_Info* pi,int column);
-Combined_Structs *radix_Sort(Table_Info *table, int time, int needed);
+Combined_Structs *radix_Sort(Table_Info *table, int time, int needed,int from,int to);
 Table_Info* get_table(char* filename);
 uint64_t Sto64(const char *s);
 #endif //RADIX_RADIX_H

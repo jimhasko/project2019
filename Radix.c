@@ -28,10 +28,10 @@ Head* init_List(){
 uint64_t Sto64(const char *s) {
     uint64_t i;
     char c ;
-    printf(" s: %s \n", s);
+  //  printf(" s: %s \n", s);
     int scanned = sscanf(s, "%" SCNu64 "%c", &i, &c);
 
-    printf(" i: %" PRIu64 "\n", i);
+   // printf(" i: %" PRIu64 "\n", i);
   //  if (scanned == 1) return i;
     if (scanned ) return i;
 
@@ -39,7 +39,7 @@ uint64_t Sto64(const char *s) {
     return 0;
 }
 
-
+/*
 int bithash3(int hash_value,int time){ //time starts at 0 and ads by one
     int from,to;
     from=time*8;
@@ -54,7 +54,7 @@ int bithash(int64_t hash_value,int hash_key){
   // return   hash_value & ((1<<hash_key)-1);
     return   hash_value & ((1>>(hash_key))-1);
 }
-
+*/
 int bithash2(uint64_t hash_value,int time){ //time starts at 0 and ads by one
 int from,to;
     from=time*8;
@@ -109,8 +109,8 @@ void print(Table_Info* table){
 
 }
 
-Combined_Structs *radix_Sort(Table_Info *table, int time, int needed) {// table kai pia 8ada bits na pari kai pia kolona
-    print(table);
+Combined_Structs *radix_Sort(Table_Info *table, int time, int needed,int from ,int to) {// table kai pia 8ada bits na pari kai pia kolona
+  //  print(table);
 
     int i,hist_size=256;
 
@@ -142,7 +142,7 @@ Combined_Structs *radix_Sort(Table_Info *table, int time, int needed) {// table 
 
 
     int location=0;
-    for(i=0;i<table->rows;i++){
+    for(i=from;i<to;i++){
         uint64_t test;
         test=table->Table[i][needed];
         printf("ADDING num  %" PRIu64  " to " ,table->Table[i][needed]);
@@ -159,7 +159,14 @@ Combined_Structs *radix_Sort(Table_Info *table, int time, int needed) {// table 
 
    // printf("REFFLIST!\n");
     Listnode * kl;                   //printing reff
+    for(i=0;i<hist_size;i++) {
+        kl=refarray[i]->first;
+        printf(" \n i= %d <  ",i);
+        while(kl!=NULL){
+            printf("  -> %d ",kl->id);
+            kl=kl->next;}
 
+    }
     printf("\n////////////////////////\n HISTOGRAM\n");
 
     for(i=0;i<hist_size;i++){
@@ -181,15 +188,17 @@ Combined_Structs *radix_Sort(Table_Info *table, int time, int needed) {// table 
 
 
     //listnode * kl;
-    int j=0;//printing reff
+    int j=from;//printing reff
     for(i=0;i<hist_size;i++) {
         kl=refarray[i]->first;
         // printf(" \n j== %d <  ",j);
         while(kl!=NULL){
             //printf(" CHECKED IN %d \n",);
-
+int a=kl->id;
+uint64_t cc,b=table->Table[kl->id][needed];
             reordered[j][0]=table->Table[kl->id][0];
-            reordered[j][1]=table->Table[kl->id][1];
+            reordered[j][1]=table->Table[kl->id][needed];
+            cc=reordered[j][1];
             j++;
             kl=kl->next;}
 
@@ -200,13 +209,13 @@ Combined_Structs *radix_Sort(Table_Info *table, int time, int needed) {// table 
 
     printf("ORIGINAL\n");
 
-    for(i=0;i<table->rows;i++){
-        printf("[%" PRIu64 "  %"PRIu64 "] \n"   ,table->Table[i][0], table->Table[i][1]);
+    for(i=from;i<to;i++){
+        printf("[%" PRIu64 "  %"PRIu64 "] \n"   ,table->Table[i][0], table->Table[i][needed]);
     }
 
     printf("\n");
     printf("REORDERED\n");
-    for(i=0;i<table->rows;i++){
+    for(i=from;i<to;i++){
         printf("[%"PRIu64" %"PRIu64"] \n",reordered[i][0], reordered[i][1]);
     }
 
@@ -297,36 +306,36 @@ char* usless;
 
 
     while (fgets(line,500,fp)!=NULL) {
-        printf("line: %s :",line);
+      //  printf("line: %s :",line);
         //fscanf(fp, "%30[^,],%30[^,]", usless, usless2);
         //fscanf(fp,"%lld,%lld" , &big1, &big2);
         retur->Table[count][0]=count;//pass id
         k=1;
         usless = strtok(line, ",");
         retur->Table[count][k]=Sto64(usless);// pass values
-        printf( "value  %s in k: %d\n", usless,k );
+       // printf( "value  %s in k: %d\n", usless,k );
         k++;
 
         while( usless != NULL ) {
 
 
             usless = strtok(NULL, ",");
-            printf( " %s\n", usless );
+        //    printf( " %s\n", usless );
         if(usless!=NULL){
            retur->Table[count][k]=Sto64(usless);
 
-            printf( "value  %s in k: %d\n", usless,k );
-            printf("in table value :[%" PRIu64 "] \n"   ,Sto64(usless));
+          //  printf( "value  %s in k: %d\n", usless,k );
+          //  printf("in table value :[%" PRIu64 "] \n"   ,Sto64(usless));
             k++;}
         }
        // printf("[%" PRIu64 " ,%"PRIu64 "] \n"   ,retur->Table[count][0], retur->Table[count][1]);
         count++;
-        printf("count: %d \n",count);
+     //   printf("count: %d \n",count);
         if(count==1000)
-            printf("debug");
+            printf("debug \n");
     }
         fclose(fp);
-print(retur);
+//print(retur);
 return retur;
 
 

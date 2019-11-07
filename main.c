@@ -17,7 +17,7 @@ char  filename[]="/home/dimitris/CLionProjects/jj2019/relA";
 
 int size;
 size= sizeof(uint64_t);
-//i added this yay!
+//i added this yay!!!!
  //  get_table(filename);
 
     int rows,nedded_column,columns,n,time=0;

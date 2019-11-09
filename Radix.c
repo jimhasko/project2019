@@ -405,30 +405,39 @@ table=get_table(filename,needed);
 from=0;
 to=table->rows;
 
-    sumlist = radix_Sort(table, table->time, from,to);//mandatory radix
+    sumlist = radix_Sort(table, table->time, from,to);          //mandatory radix
   // printf("\n sumlist!1 \n");
    // for(i=0;i<hist_size;i++)
      //   printf(" %d || %d \n",sumlist[i][0], sumlist[i][1]);
 
     for(i=0;i<hist_size;i++){
-
+    if(i==255){
+        int gg;
+    }
          if(i<hist_size-1){//get from to
              to=sumlist[i+1][1];}
         if(i==hist_size-1)
             to=table->rows;
         from=sumlist[i][1];
 
-        if(from<to&&(table->TableB[to-1][1] != table->TableB[from][1])) {
-            if (to - from+1 > quick_short) {
-                printf("bigger at %d \n",from);
-                list_Add_Bucket(&table->Bucket_list[0], from, to, 1);//add the buckets to be radixed to teh bucket list
-            }
-            else {
 
-                    quicksort(table->TableB, from, to-1);
 
+        if(from<to) {
+            if ((table->TableB[to - 1][1] != table->TableB[from][1])) {
+                if (to - from + 1 > quick_short) {
+                    printf("bigger at %d \n", from);
+                    list_Add_Bucket(&table->Bucket_list[0], from, to,
+                                    1);//add the buckets to be radixed to teh bucket list
+                } else {
+
+                    quicksort(table->TableB, from, to - 1);
+
+                }
             }
+
         }
+
+
 
     }
 
@@ -436,17 +445,20 @@ to=table->rows;
           free(sumlist[i]);
       free(sumlist);
 
-for(j=0;j<8;j++){
+for(j=0;j<8;j++){       ////////////the rest of sumlists
     flip_tables(table);
    Radix_List* kl=table->Bucket_list[j]->first;
 
     while(kl!=NULL){
-        printf("called another sumlist at line :%d : %d  \n",kl->from,kl->to);
-      //  print(table,kl->from,kl->to);
+
+
+        ////printf("called another sumlist at line :%d : %d  \n",kl->from,kl->to);
+                                                                          //// print(table,kl->from,kl->to);
         sumlist=radix_Sort(table,table->time,kl->from,kl->to);
-      //  printf("\n sumlist!2 \n");
-      //  for(i=0;i<hist_size;i++)
-        //    printf(" %d || %d \n",sumlist[i][0], sumlist[i][1]);
+                                                                      ///  printf("\n sumlist!2 \n");
+                                                                      /// for(i=0;i<hist_size;i++)
+                                                                           ///    printf(" %d || %d \n",sumlist[i][0], sumlist[i][1]);
+
         for(i=kl->from;i<kl->to;i++){
             table->location[i]=1-table->location[i];//change matrix location
         }
@@ -454,23 +466,38 @@ for(j=0;j<8;j++){
 
         for(i=0;i<hist_size;i++){
 
-            if(i<hist_size-1){
-                to=sumlist[i+1][1];}
-            if(i==hist_size-1)
+                  if(i<hist_size-1){
+                      to=sumlist[i+1][1];}
+              if(i==hist_size-1)
                 to=kl->to;
             from=sumlist[i][1];
-            if((table->TableB[to][1]!=table->TableB[from][1])&&from<to) {// if it isnt the same number
-                if (to - from +1 > quick_short) {
-                    list_Add_Bucket(&table->Bucket_list[j + 1], from, to, 1);
-                } else {
-                        if(table->location[from]==0){
-                            quicksort(table->TableA, from, to-1);}
-                        else{
-                            quicksort(table->TableB, from, to-1);
-                         }
 
+
+
+            if(from<to) {
+                if (((table->TableB[to - 1][1] != table->TableB[from][1])&&table->location[from] == 1)||((table->TableA[to - 1][1] != table->TableA[from][1])&&table->location[from] == 0) ) {// if it isnt the same number
+
+                    if (((to - from + 1) > quick_short)&&j<7) {
+                        list_Add_Bucket(&table->Bucket_list[j + 1], from, to, 1);
+                    } else {
+                        printf("before!\n");
+                        print(table,from,to);
+                      /*
+                        if (table->location[from] == 0) {
+                            quicksort(table->TableA, from, to - 1);
+                        } else {
+                            quicksort(table->TableB, from, to - 1);
+                        }
+                        */
+                        quicksort(table->TableB, from, to - 1);
+                        printf("not_before!\n");
+                        print(table,from,to);
+                    }
                 }
+
+
             }
+
         }
 
 
@@ -534,7 +561,29 @@ kl=kl->next;
     printf("loc %d \n",j);
 
 
+
+int zeros=0;
+int ones=0;
+    for(i=0;i<table->rows;i++){
+
+
+        printf("|| %"PRIu64" , %"PRIu64" || %d ::%d loc:%d",not_yet[i][1], not_yet[i][0],i,bithash2(not_yet[i][1],0),table->location[i]);
+        if(i<table->rows-1) {
+            if (not_yet[i][1] > not_yet[i + 1][1]){
+                if(table->location[i]==0){
+                    zeros++;}else{
+                    ones++;
+                }
+                printf("  fuck ");}
+            printf("\n");
+        }
+    }
+printf("\n zer0s %d : ones %d \n",zeros,ones);
+
     free_table(table);
+
+
+
 
 
 

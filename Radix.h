@@ -1,5 +1,5 @@
 //
-// Created by dimitris on 01/11/2018.
+
 //
 
 #ifndef RADIX_RADIX_H

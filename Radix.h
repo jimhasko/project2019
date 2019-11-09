@@ -1,6 +1,3 @@
-//
-
-//
 
 #ifndef RADIX_RADIX_H
 #define RADIX_RADIX_H
@@ -58,7 +55,7 @@ typedef struct results{
 
 //void radix(int n,int size);
 
-
+Radix_Head* init_radix_List();
 void list_Add_Id(Head **head1, int id);
 void list_Add_Bucket(Radix_Head **head1, int from,int to, int location);
 Table_Info* flip_tables(Table_Info * table);

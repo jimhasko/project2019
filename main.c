@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include"Radix.h"
-//#include "Hashed_Index.h"
 #include <stdlib.h>
-//#include "relations.h"
-#define BUF_SIZE 33
 #include <inttypes.h>
+#include "quicjshort.h"
+#include <time.h>
 
 
 
@@ -13,60 +12,44 @@
 
 
 int main() {
+    clock_t start = clock();
 char  filename[]="/home/dimitris/CLionProjects/jj2019/relA";
 
-int size;
-size= sizeof(uint64_t);
-//i added this yay!!!!
- //  get_table(filename);
-
-    int rows,nedded_column,columns,n,time=0;
-int from,to;
-    n=0;
-    rows=10;
-    nedded_column=2;
-    columns=2;
-    char buffer[BUF_SIZE];
-    buffer[BUF_SIZE - 1] = '\0';
- //int i;
-
-uint64_t i,a;
-a=6932635952696987497;
-i=bithash2(a,7);
-
-    a=16825117127882417238;
-    i=bithash2(a,7);
 
 
- /*   int i;
 
-    Table_Info* retur=malloc(sizeof(Table_Info));
-    retur->Table=malloc(sizeof(int*)*rows);
-    for(i=0;i<rows;i++)
-        retur->Table[i]=malloc(sizeof(int)*columns);
-    retur->rows=rows;
-    retur->columns=2;
-
-
-    int test[10][2]={{1,3},{2,4},{3,7},{4,7},{5,2},{6,2},{7,1},{8,5},{9,5},{10,2}};
+   int i,needed_column,j;
+   needed_column=2;
 
 
 
 
+Table_Info* table;
+table=get_table(filename,needed_column);
+results* not_yet;
 
-    for(i=0;i<rows;i++){
-        retur->Table[i][1]=test[i][nedded_column];
-        retur->Table[i][0]=i;
+    not_yet=big_short(filename,needed_column);
+//printf("\n \n \n");
+
+
+
+j=0;
+for(i=0;i<table->rows-1;i++){
+    if(not_yet->matrix[i][1]<=not_yet->matrix[i+1][1]){
+        j++;
+    }else{
+     //   printf("fuuuckkkk  %d \n",i);
     }
-*/
- from=450;//from row to row
- to=500;
- Table_Info* table;
-    Combined_Structs* combined_structs;
-    combined_structs = radix_Sort(get_table(filename), time, nedded_column,from,to);
 
 
+}
 
+printf("j %d rows %d",j,table->rows);
+
+    clock_t stop = clock();
+    double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
+    printf("not yet %d ",not_yet->rows);
+    printf("\nTime elapsed: %.5f\n", elapsed*10);
 
 
     return 0;

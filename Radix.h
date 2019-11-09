@@ -50,10 +50,10 @@ typedef struct Table_Info{
 }Table_Info;
 
 
-typedef struct Combined_Struct{
-   // Table_Info* TableB;
-    Table_Info* histogram;
-}Combined_Structs;
+typedef struct results{
+   int rows;
+   uint64_t** matrix;
+}results;
 
 
 //void radix(int n,int size);
@@ -67,10 +67,10 @@ int bithash2(uint64_t hash_value,int time);
 //int bithash(int64_t hash_value,int hash_key);
 //void init(Table_Info*table,int colum,int row);
 void print(Table_Info* table,int from, int to);
-Table_Info* getrow(Table_Info* pi,int column);
+//Table_Info* getrow(Table_Info* pi,int column);
 int ** radix_Sort(Table_Info *table, int time, int from,int to);
 Table_Info* get_table(char* filename,int needed);
 uint64_t Sto64(const char *s);
-uint64_t ** big_short(char* filename,int needed);
+results* big_short(char* filename,int needed);
 void free_table(Table_Info* table);
 #endif //RADIX_RADIX_H

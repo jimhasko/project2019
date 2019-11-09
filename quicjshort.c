@@ -49,9 +49,9 @@ void quicksort(uint64_t ** partition,int from,int to){
         quicksort(partition,j+1,to);
 
     }
-    printf("quickshort from %d to %d || %d\n",from ,to,i);
-    for(i=from;i<=to;i++){
-        printf("%d : %"PRIu64 " || %d  \n",partition[i][0],partition[i][1],i);
-    }
+
+   // for(i=from;i<=to;i++){
+    //    printf("%d : %"PRIu64 " || %d  \n",partition[i][0],partition[i][1],i);
+  //  }
 printf("\n");
 }

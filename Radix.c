@@ -4,6 +4,9 @@
 #include <string.h>
 #include <inttypes.h>
 #include "quicjshort.h"
+
+#define  quick_short 10
+
 void list_Add_Id(Head **head1, int id){
 
     Listnode * temp=malloc(sizeof(Listnode));
@@ -89,7 +92,7 @@ int from;
 
     //return (hash_value>>(64-to))&((1<<from)-1);
 }
-
+/*
 Table_Info* getrow(Table_Info* pi,int column){
     int i;
     Table_Info* retur=malloc(sizeof(Table_Info));
@@ -109,7 +112,7 @@ Table_Info* getrow(Table_Info* pi,int column){
 
     return  retur;
 
-}
+}*/
 
 void print(Table_Info* table,int from, int to){
     printf("PRINTING!!\n\n");
@@ -193,9 +196,9 @@ int ** radix_Sort(Table_Info *table, int time, int from ,int to) {// table kai p
     }
    // printf("\n////////////////////////\n HISTOGRAM\n");
 
-    for(i=0;i<hist_size;i++){
+   // for(i=0;i<hist_size;i++){
       //  printf("[%d %d] \n",hist[i][0], hist[i][1]);
-    }
+   // }
 
 
     sumlist[0][1]=from;
@@ -234,15 +237,15 @@ int ** radix_Sort(Table_Info *table, int time, int from ,int to) {// table kai p
 
    // printf("ORIGINAL\n");
 
-    for(i=from;i<to;i++){
+    //for(i=from;i<to;i++){
        // printf("[%" PRIu64 "  %"PRIu64 "] \n"   ,table->TableA[i][0], table->TableA[i][needed]);
-    }
+  //  }
 
    // printf("\n");
    // printf("REORDERED\n");
-    for(i=from;i<to;i++){
+  //  for(i=from;i<to;i++){
       //  printf("[%"PRIu64" %"PRIu64"] \n",table->TableB[i][0], table->TableB[i][1]);
-    }
+  //  }
 
 
 /*
@@ -394,8 +397,8 @@ Table_Info* flip_tables(Table_Info * table){
     return table;
 }
 
-uint64_t ** big_short(char* filename,int needed){
-    int quick_short=10;
+results* big_short(char* filename,int needed){
+  // int quick_short=10;
 
 int from,to,i,j,hist_size=256;
 
@@ -411,9 +414,7 @@ to=table->rows;
      //   printf(" %d || %d \n",sumlist[i][0], sumlist[i][1]);
 
     for(i=0;i<hist_size;i++){
-    if(i==255){
-        int gg;
-    }
+
          if(i<hist_size-1){//get from to
              to=sumlist[i+1][1];}
         if(i==hist_size-1)
@@ -423,17 +424,17 @@ to=table->rows;
 
 
         if(from<to) {
-            if ((table->TableB[to - 1][1] != table->TableB[from][1])) {
+           // if ((table->TableB[to - 1][1] != table->TableB[from][1])) {
                 if (to - from + 1 > quick_short) {
-                    printf("bigger at %d \n", from);
+                    printf("bigger from %d to %d with hash %d\n", from,to,i);
                     list_Add_Bucket(&table->Bucket_list[0], from, to,
                                     1);//add the buckets to be radixed to teh bucket list
                 } else {
-
+                    printf("quickshort from %d to %d with hash %d\n",from ,to,i);
                     quicksort(table->TableB, from, to - 1);
-
+//print(table,from,to);
                 }
-            }
+          //  }
 
         }
 
@@ -449,10 +450,11 @@ for(j=0;j<8;j++){       ////////////the rest of sumlists
     flip_tables(table);
    Radix_List* kl=table->Bucket_list[j]->first;
 
+
     while(kl!=NULL){
 
 
-        ////printf("called another sumlist at line :%d : %d  \n",kl->from,kl->to);
+        printf("called another sumlist at line from %d to %d  \n",kl->from,kl->to);
                                                                           //// print(table,kl->from,kl->to);
         sumlist=radix_Sort(table,table->time,kl->from,kl->to);
                                                                       ///  printf("\n sumlist!2 \n");
@@ -475,13 +477,14 @@ for(j=0;j<8;j++){       ////////////the rest of sumlists
 
 
             if(from<to) {
-                if (((table->TableB[to - 1][1] != table->TableB[from][1])&&table->location[from] == 1)||((table->TableA[to - 1][1] != table->TableA[from][1])&&table->location[from] == 0) ) {// if it isnt the same number
+              //  if (((table->TableB[to - 1][1] != table->TableB[from][1])&&table->location[from] == 1)||((table->TableA[to - 1][1] != table->TableA[from][1])&&table->location[from] == 0) ) {// if it isnt the same number
 
                     if (((to - from + 1) > quick_short)&&j<7) {
+                        printf("add in bucket from %d to %d with hash %d\n",from ,to,i);
                         list_Add_Bucket(&table->Bucket_list[j + 1], from, to, 1);
                     } else {
-                        printf("before!\n");
-                        print(table,from,to);
+                       // printf("before!\n");
+                      //  print(table,from,to);
                       /*
                         if (table->location[from] == 0) {
                             quicksort(table->TableA, from, to - 1);
@@ -489,11 +492,12 @@ for(j=0;j<8;j++){       ////////////the rest of sumlists
                             quicksort(table->TableB, from, to - 1);
                         }
                         */
+                        printf("quickshort from %d to %d with hash %d\n",from ,to,i);
                         quicksort(table->TableB, from, to - 1);
-                        printf("not_before!\n");
-                        print(table,from,to);
+                      //  printf("not_before!\n");
+                       // print(table,from,to);
                     }
-                }
+            //    }
 
 
             }
@@ -522,33 +526,24 @@ kl=kl->next;
 
 
 
+results* not_yet=malloc(sizeof(results));
 
 
-    //for(i=0;i<table->rows;i++)
-       // printf("\n %d || %d",i, table->location[i]);
+not_yet->rows=table->rows;
 
-//printf(" \n");
-
-  //print(table);
-
-
-
-
-    uint64_t** not_yet;
-
-    not_yet=malloc(sizeof(uint64_t*)*table->rows);
+    not_yet->matrix =malloc(sizeof(uint64_t*)*table->rows);
     for(i=0;i<table->rows;i++){
-        not_yet[i]=malloc(sizeof(int)*2);
+        not_yet->matrix[i]=malloc(sizeof(int)*2);
     }
     for(i=0;i<table->rows;i++){//get the data from the correct matrix
         if(table->location[i]==0) {
 
-            not_yet[i][0] = table->TableA[i][0];
-            not_yet[i][1] = table->TableA[i][1];
+            not_yet->matrix[i][0] = table->TableA[i][0];
+            not_yet->matrix[i][1] = table->TableA[i][1];
         }else{
 
-            not_yet[i][0] = table->TableB[i][0];
-            not_yet[i][1] = table->TableB[i][1];
+            not_yet->matrix[i][0] = table->TableB[i][0];
+            not_yet->matrix[i][1] = table->TableB[i][1];
 
         }
 
@@ -567,9 +562,9 @@ int ones=0;
     for(i=0;i<table->rows;i++){
 
 
-        printf("|| %"PRIu64" , %"PRIu64" || %d ::%d loc:%d",not_yet[i][1], not_yet[i][0],i,bithash2(not_yet[i][1],0),table->location[i]);
+        printf("|| %"PRIu64" , %"PRIu64" || %d ::%d loc:%d",not_yet->matrix[i][1], not_yet->matrix[i][0],i,bithash2(not_yet->matrix[i][1],0),table->location[i]);
         if(i<table->rows-1) {
-            if (not_yet[i][1] > not_yet[i + 1][1]){
+            if (not_yet->matrix[i][1] > not_yet->matrix[i + 1][1]){
                 if(table->location[i]==0){
                     zeros++;}else{
                     ones++;

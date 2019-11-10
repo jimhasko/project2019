@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "Result_List.h"
 
-#define  quick_short 10
+#define  quick_short 100
 
 //=================================================================================================================
 typedef struct Listnode {

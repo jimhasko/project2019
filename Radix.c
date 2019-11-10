@@ -55,7 +55,7 @@ uint64_t Sto64(const char *s) {
     uint64_t i;
     char c;
 
-    int scanned = (int)sscanf(s, "%" SCNu64 "%c", &i, &c);
+    int scanned = sscanf(s, "%" SCNu64 "%c", &i, &c);
     if (scanned) return i;
 
     return 0;
@@ -68,7 +68,6 @@ int bithash2(uint64_t hash_value, int time) { //time starts at 0 and ads by one
     from = time * 8;
 
     return hash_value << from >> (64 - 8);
-
 }
 
 //=================================================================================================================

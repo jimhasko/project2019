@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I -Wall
+CFLAGS=-I -Wall -O2
 
 all:  Radix  Quicksort Result_List main
 

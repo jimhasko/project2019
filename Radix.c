@@ -50,7 +50,7 @@ Radix_Head *init_radix_List() {
 }
 
 //=================================================================================================================
-uint64_t Sto64(const char *s) {
+uint64_t Sto64(const char *s) { // string to number
 
     uint64_t i;
     char c;
@@ -72,10 +72,10 @@ int bithash2(uint64_t hash_value, int time) { //time starts at 0 and ads by one
 
 //=================================================================================================================
 void print(Table_Info *table, int from, int to) {
-    printf("PRINTING!!\n\n");
+    printf("PRINTING!! from %d, to %d \n\n",from,to);
     int i;
 
-    printf("TABLE A \n");
+    printf("TABLE A \n \n");
     for (i = from; i < to; i++) {
 
         for (i = from; i < to; i++) {
@@ -85,13 +85,13 @@ void print(Table_Info *table, int from, int to) {
     }
 
     printf("\n");
-    printf("TABLE B\n \n \n");
+    printf("TABLE B\n \n");
     for (i = from; i < to; i++) {
         printf("[%"PRIu64" %"PRIu64"] %d ::%d \n", table->TableB[i][0], table->TableB[i][1], i,
                bithash2(table->TableB[i][1], table->time));
     }
 
-    printf("DONE PRINTING \n\n\n\n");
+    printf("DONE PRINTING!! \n\n\n\n");
 }
 
 //=================================================================================================================
@@ -145,7 +145,7 @@ int **radix_Sort(Table_Info *table, int time, int from, int to) { // table kai p
         sumlist[i][1] = hist[i - 1][1] + sumlist[i - 1][1];
     }
 
-    int j = from;//printing reff
+    int j = from;
     for (i = 0; i < hist_size; i++) {
         kl = refarray[i]->first;
 
@@ -177,12 +177,20 @@ int **radix_Sort(Table_Info *table, int time, int from, int to) { // table kai p
     for (i = 0; i < hist_size; i++)
         free(hist[i]);
     free(hist);
+                                             /*
+                                               printf("RADIX TIME:%d \n",table->time);
+                                              for(i=0;i<table->rows;i++)
+                                                  printf("{ %d , %d } \n",sumlist[i][0],sumlist[i][1]);
+                                                  */
+
+
+
 
     return sumlist;
 }
 
 //=================================================================================================================
-Table_Info *get_table(char *filename, int needed) {
+Table_Info *get_table(char *filename, int needed) {// initialises a table from filename
 
     char ch;
     int i;
@@ -285,7 +293,7 @@ results *big_short(char *filename, int needed) {
     from = 0;
     to = table->rows;
 
-    sumlist = radix_Sort(table, table->time, from, to);          //mandatory radix
+    sumlist = radix_Sort(table, table->time, from, to);          //initial mandatory radix
 
     for (i = 0; i < hist_size; i++) {
 
@@ -302,34 +310,35 @@ results *big_short(char *filename, int needed) {
             if (to - from + 1 > quick_short) {
 
 
-                list_Add_Bucket(&table->Bucket_list[0], from, to);//add the buckets to be radixed to teh bucket list
+                list_Add_Bucket(&table->Bucket_list[0], from, to);//add the buckets to be radixed to the bucket list
 
             }
             else {
 
 
-                quicksort(table->TableB, from, to - 1);
+                quicksort(table->TableB, from, to - 1);  // else quickshort it
 
-
+                                   // printf("quickshorted");
+                                   // print(table,from,to);
             }
         }
     }
 
-    for (i = 0; i < hist_size; i++)
+    for (i = 0; i < hist_size; i++)         //free the last radix result
         free(sumlist[i]);
     free(sumlist);
 
-    for (j = 0; j < 8; j++) {       //the rest of sumlists
+    for (j = 0; j < 8; j++) {                //runs the list of to do radix_short
         flip_tables(table);
         Radix_List *kl = table->Bucket_list[j]->first;
 
 
-        while (kl != NULL) {
+        while (kl != NULL) {                 //for all the radix shorts to be done in that table state & bits
 
             sumlist = radix_Sort(table, table->time, kl->from, kl->to);
 
             for (i = kl->from; i < kl->to; i++) {
-                table->location[i] = 1 - table->location[i];//change matrix location
+                table->location[i] = 1 - table->location[i];            //save data matrix location
             }
 
 
@@ -340,18 +349,21 @@ results *big_short(char *filename, int needed) {
                 }
                 if (i == hist_size - 1)
                     to = kl->to;
-                from = sumlist[i][1];
+                from = sumlist[i][1];       // get from to
 
 
                 if (from < to) {
 
                     if (((to - from + 1) > quick_short) && j < 7) {
 
-                        list_Add_Bucket(&table->Bucket_list[j + 1], from, to);
+                        list_Add_Bucket(&table->Bucket_list[j + 1], from, to);  //if its over the limit add to radix to do list
                     }
                     else {
 
-                        quicksort(table->TableB, from, to - 1);
+                        quicksort(table->TableB, from, to - 1);     //if not quickshort it
+
+                                           // printf("quickshorted hash: %d \n",sumlist[i][0]);
+                                           //  print(table,from,to);
                     }
                 }
             }
@@ -360,13 +372,13 @@ results *big_short(char *filename, int needed) {
 
             for (i = 0; i < hist_size; i++)
                 free(sumlist[i]);
-            free(sumlist);
+            free(sumlist);          //free last radix
 
         }
     }
 
 
-    results *not_yet = (struct results *)malloc(sizeof(results));
+    results *not_yet = (struct results *)malloc(sizeof(results));       //malloc the results
     not_yet->rows = table->rows;
     not_yet->matrix = (uint64_t **) malloc(sizeof(uint64_t *) * table->rows);
 
@@ -375,7 +387,7 @@ results *big_short(char *filename, int needed) {
         not_yet->matrix[i] = (uint64_t*) malloc(sizeof(uint64_t) * 2);
     }
 
-    for (i = 0; i < table->rows; i++) { //get the data from the correct matrix
+    for (i = 0; i < table->rows; i++) {                     //get the data from the correct matrix
 
         if (table->location[i] == 0) {
 
@@ -390,31 +402,32 @@ results *big_short(char *filename, int needed) {
         }
     }
 
-    j = 0;
+                                       /* j = 0;
 
-    for (i = 0; i < 1000; i++)
-        j = table->location[i] + j;
+                                        for (i = 0; i < 1000; i++)
+                                            j = table->location[i] + j;
 
 
-    int zeros = 0;
-    int ones = 0;
-    for (i = 0; i < table->rows; i++) {
+                                        int zeros = 0;
+                                        int ones = 0;
+                                        for (i = 0; i < table->rows; i++) {
 
-        if (i < table->rows - 1) {
+                                            if (i < table->rows - 1) {
 
-            if (not_yet->matrix[i][1] > not_yet->matrix[i + 1][1]) {
+                                                if (not_yet->matrix[i][1] > not_yet->matrix[i + 1][1]) {
 
-                if (table->location[i] == 0) {
+                                                    if (table->location[i] == 0) {
 
-                    zeros++;
-                }
-                else {
+                                                        zeros++;
+                                                    }
+                                                    else {
 
-                    ones++;
-                }
-            }
-        }
-    }
+                                                        ones++;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        printf(" zer0s : %d , ones : %d \n",zeros,ones);*/
 
     free_table(table);
 
@@ -422,10 +435,10 @@ results *big_short(char *filename, int needed) {
 }
 
 //=================================================================================================================
-void free_table(Table_Info *table) {
+void free_table(Table_Info *table) {            // self explanatory
     int i;
 
-    /*for (i = 0; i < table->rows; i++) {
+    /*for (i = 0; i < table->rows; i++) {   // <-- THAT WORKS .FIX YOUR PC!!! and get some bloody linux
         free(table->TableA[i]);
         free(table->TableB[i]);
 
@@ -455,7 +468,7 @@ void free_table(Table_Info *table) {
 }
 
 //=================================================================================================================
-info_node* join_matrices(results* A, results* B) {
+info_node* join_matrices(results* A, results* B) {  //join_matrices
 
     info_node* list;
     node_type* cur_node = NULL;

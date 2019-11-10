@@ -6,6 +6,7 @@
 #include "Result_List.h"
 
 #define  quick_short 100
+#define  SizeofDataFileName 100
 
 //=================================================================================================================
 typedef struct Listnode {

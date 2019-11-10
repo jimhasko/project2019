@@ -177,14 +177,12 @@ int **radix_Sort(Table_Info *table, int time, int from, int to) { // table kai p
     for (i = 0; i < hist_size; i++)
         free(hist[i]);
     free(hist);
-                                             /*
-                                               printf("RADIX TIME:%d \n",table->time);
-                                              for(i=0;i<table->rows;i++)
-                                                  printf("{ %d , %d } \n",sumlist[i][0],sumlist[i][1]);
-                                                  */
 
-
-
+    /*
+    printf("RADIX TIME:%d \n",table->time);
+    for(i=0;i<table->rows;i++)
+        printf("{ %d , %d } \n",sumlist[i][0],sumlist[i][1]);
+    */
 
     return sumlist;
 }
@@ -318,8 +316,8 @@ results *big_short(char *filename, int needed) {
 
                 quicksort(table->TableB, from, to - 1);  // else quickshort it
 
-                                   // printf("quickshorted");
-                                   // print(table,from,to);
+               // printf("quickshorted");
+               // print(table,from,to);
             }
         }
     }
@@ -362,8 +360,8 @@ results *big_short(char *filename, int needed) {
 
                         quicksort(table->TableB, from, to - 1);     //if not quickshort it
 
-                                           // printf("quickshorted hash: %d \n",sumlist[i][0]);
-                                           //  print(table,from,to);
+                       // printf("quickshorted hash: %d \n",sumlist[i][0]);
+                       //  print(table,from,to);
                     }
                 }
             }
@@ -402,32 +400,32 @@ results *big_short(char *filename, int needed) {
         }
     }
 
-                                       /* j = 0;
+   /* j = 0;
 
-                                        for (i = 0; i < 1000; i++)
-                                            j = table->location[i] + j;
+    for (i = 0; i < 1000; i++)
+        j = table->location[i] + j;
 
 
-                                        int zeros = 0;
-                                        int ones = 0;
-                                        for (i = 0; i < table->rows; i++) {
+    int zeros = 0;
+    int ones = 0;
+    for (i = 0; i < table->rows; i++) {
 
-                                            if (i < table->rows - 1) {
+        if (i < table->rows - 1) {
 
-                                                if (not_yet->matrix[i][1] > not_yet->matrix[i + 1][1]) {
+            if (not_yet->matrix[i][1] > not_yet->matrix[i + 1][1]) {
 
-                                                    if (table->location[i] == 0) {
+                if (table->location[i] == 0) {
 
-                                                        zeros++;
-                                                    }
-                                                    else {
+                    zeros++;
+                }
+                else {
 
-                                                        ones++;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        printf(" zer0s : %d , ones : %d \n",zeros,ones);*/
+                    ones++;
+                }
+            }
+        }
+    }
+    printf(" zer0s : %d , ones : %d \n",zeros,ones);*/
 
     free_table(table);
 

@@ -125,7 +125,6 @@ void insert_first(info_node* list_info, int RowID_A, int RowID_B) {
 //=================================================================================================================
 void insert_rest(info_node* list_info, int RowID_A, int RowID_B, node_type** current_pointer) {
 
-    int position;
 	node_type* current;
 
 	current = malloc(sizeof(node_type));
@@ -191,7 +190,7 @@ void list_delete(info_node* list_info, node_type** current_pointer) {
 }
 
 //=================================================================================================================
-void LIST_next_node(node_type* p) {
+void list_next_node(node_type* p) {
 
 	if (p != NULL)
 		p = p->next_node;
@@ -199,7 +198,7 @@ void LIST_next_node(node_type* p) {
 }
 
 //=================================================================================================================
-void LIST_proigoymenos(node_type* p) {
+void list_previous_node(node_type* p) {
 
 	if (p != NULL)
 		p = p->previous_node;

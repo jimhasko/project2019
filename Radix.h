@@ -5,7 +5,9 @@
 #include <stdint.h>
 #include "Result_List.h"
 
+#define  quick_short 10
 
+//=================================================================================================================
 typedef struct Listnode {
 
     int id;
@@ -13,48 +15,53 @@ typedef struct Listnode {
 
 } Listnode;
 
+//=================================================================================================================
 typedef struct head {
 
-    Listnode *first;
     int size;
+    Listnode *first;
 
 } Head;
 
-
+//=================================================================================================================
 typedef struct Radix_List {
 
-    int from, to, location;
-
+    int from;
+    int to;
+    int location;
     struct Radix_List *next;
 
 } Radix_List;
 
+//=================================================================================================================
 typedef struct Radix_Head {
 
-    Radix_List *first;
     int size;
+    Radix_List *first;
 
 } Radix_Head;
 
-
+//=================================================================================================================
 typedef struct Table_Info {
-    uint64_t **TableA;
-    uint64_t **TableB;
+
     int columns;
     int rows;
+    int time;
     int *location;
     Radix_Head **Bucket_list;
-    int time;
+    uint64_t **TableA;
+    uint64_t **TableB;
+
 } Table_Info;
 
-
+//=================================================================================================================
 typedef struct results {
+
     int rows;
     uint64_t **matrix;
 } results;
 
-
-//void radix(int n,int size);
+//=================================================================================================================
 
 Radix_Head *init_radix_List();
 
@@ -68,11 +75,8 @@ Head *init_List();
 
 int bithash2(uint64_t hash_value, int time);
 
-//int bithash(int64_t hash_value,int hash_key);
-//void init(Table_Info*table,int colum,int row);
 void print(Table_Info *table, int from, int to);
 
-//Table_Info* getrow(Table_Info* pi,int column);
 int **radix_Sort(Table_Info *table, int time, int from, int to);
 
 Table_Info *get_table(char *filename, int needed);
@@ -85,5 +89,7 @@ void free_table(Table_Info *table);
 
 info_node* join_matrices(results* A, results* B);
 
+//=================================================================================================================
+//=================================================================================================================
 
 #endif //RADIX_RADIX_H

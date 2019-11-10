@@ -1,7 +1,7 @@
 #ifndef __Return_List__
 #define __Return_List__
 
-#define result_size 125
+#define result_size 125*1024
 
 //=======================================================================================
 

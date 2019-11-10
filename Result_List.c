@@ -80,7 +80,7 @@ void list_insert(info_node* list_info, int RowID_A, int RowID_B, node_type** cur
 	else {
 
 	    insert_rest(list_info, RowID_A, RowID_B, current_pointer);
-        (*current_pointer) =  (*current_pointer)->next_node;
+        (*current_pointer) = (*current_pointer)->next_node;
 	}
 }
 
@@ -170,21 +170,21 @@ void list_delete(info_node* list_info, node_type** current_pointer) {
 	previous->next_node = next;
 	next->previous_node = previous;
 
-	if (list_info->start == current_pointer) {
+	if (list_info->start == (*current_pointer)) {
 
 		list_info->start = next;
 	}
 
-	if (list_info->end == current_pointer) {
+	if (list_info->end == (*current_pointer)) {
 
 		list_info->end = previous;
 	}
 
-	current_pointer = previous;
+    (*current_pointer) = previous;
 	list_info->size--;
 	if (list_info->size == 0) {
 
-		current_pointer = NULL;
+        (*current_pointer) = NULL;
 		list_info->start = NULL;
 		list_info->end = NULL;
 	}

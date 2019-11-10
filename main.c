@@ -6,8 +6,8 @@
 int main() {
 
     clock_t start = clock(); //Start timer
-    char filename1[] = "C:\\UoA\\project2019\\relA";
-    char filename2[] = "C:\\UoA\\project2019\\relB";
+    char filename1[] = "/home/dimitris/CLionProjects/jj2019/relA";
+    char filename2[] = "/home/dimitris/CLionProjects/jj2019/relB";
     int needed_columnA, needed_columnB;
 
     needed_columnA = 2;

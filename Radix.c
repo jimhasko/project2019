@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
-#include "Quickshort.h"
+#include "Quicksort.h"
 
 //=================================================================================================================
 void list_Add_Id(Head **head1, int id) {

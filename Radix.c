@@ -17,12 +17,11 @@ void list_Add_Id(Head **head1, int id) {
 }
 
 //=================================================================================================================
-void list_Add_Bucket(Radix_Head **head1, int from, int to, int location) {
+void list_Add_Bucket(Radix_Head **head1, int from, int to) {
 
     Radix_List *temp = malloc(sizeof(Radix_List));
     temp->from = from;
     temp->to = to;
-    temp->location = location;
     temp->next = NULL;
     temp->next = (*head1)->first;
     (*head1)->first = temp;
@@ -223,7 +222,6 @@ Table_Info *get_table(char *filename, int needed) {
 
     retur->rows = rows;
     retur->time = 0;
-    retur->columns = columls;
     retur->Bucket_list = malloc(sizeof(Radix_Head) * 8);//holds the buckets to re-radix
 
     for (i = 0; i < 8; i++) {
@@ -305,7 +303,7 @@ results *big_short(char *filename, int needed) {
             if (to - from + 1 > quick_short) {
 
 
-                list_Add_Bucket(&table->Bucket_list[0], from, to,1);//add the buckets to be radixed to teh bucket list
+                list_Add_Bucket(&table->Bucket_list[0], from, to);//add the buckets to be radixed to teh bucket list
 
             }
             else {
@@ -350,7 +348,7 @@ results *big_short(char *filename, int needed) {
 
                     if (((to - from + 1) > quick_short) && j < 7) {
 
-                        list_Add_Bucket(&table->Bucket_list[j + 1], from, to, 1);
+                        list_Add_Bucket(&table->Bucket_list[j + 1], from, to);
                     }
                     else {
 

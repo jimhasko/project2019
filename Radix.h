@@ -28,7 +28,6 @@ typedef struct Radix_List {
 
     int from;
     int to;
-    int location;
     struct Radix_List *next;
 
 } Radix_List;
@@ -44,7 +43,6 @@ typedef struct Radix_Head {
 //=================================================================================================================
 typedef struct Table_Info {
 
-    int columns;
     int rows;
     int time;
     int *location;
@@ -67,7 +65,7 @@ Radix_Head *init_radix_List();
 
 void list_Add_Id(Head **head1, int id);
 
-void list_Add_Bucket(Radix_Head **head1, int from, int to, int location);
+void list_Add_Bucket(Radix_Head **head1, int from, int to);
 
 Table_Info *flip_tables(Table_Info *table);
 

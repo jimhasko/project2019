@@ -3,71 +3,91 @@
 #define RADIX_RADIX_H
 
 #include <stdint.h>
+#include "Result_List.h"
 
+#define  quick_short 10
 
-typedef struct Listnode{
+//=================================================================================================================
+typedef struct Listnode {
 
     int id;
-    struct Listnode* next;
+    struct Listnode *next;
 
-}Listnode;
+} Listnode;
 
-typedef struct head{
+//=================================================================================================================
+typedef struct head {
 
-    Listnode* first;
     int size;
+    Listnode *first;
 
-}Head;
+} Head;
 
+//=================================================================================================================
+typedef struct Radix_List {
 
-typedef struct Radix_List{
+    int from;
+    int to;
+    struct Radix_List *next;
 
-    int from,to,location;
+} Radix_List;
 
-    struct Radix_List* next;
+//=================================================================================================================
+typedef struct Radix_Head {
 
-}Radix_List;
-
-typedef struct Radix_Head{
-
-    Radix_List* first;
     int size;
+    Radix_List *first;
 
-}Radix_Head;
+} Radix_Head;
 
+//=================================================================================================================
+typedef struct Table_Info {
 
-typedef struct Table_Info{
-    uint64_t** TableA;
-    uint64_t** TableB;
-    int columns;
     int rows;
-    int * location;
-    Radix_Head** Bucket_list;
     int time;
-}Table_Info;
+    int *location;
+    Radix_Head **Bucket_list;
+    uint64_t **TableA;
+    uint64_t **TableB;
 
+} Table_Info;
 
-typedef struct results{
-   int rows;
-   uint64_t** matrix;
-}results;
+//=================================================================================================================
+typedef struct results {
 
+    int rows;
+    uint64_t **matrix;
+} results;
 
-//void radix(int n,int size);
+//=================================================================================================================
 
-Radix_Head* init_radix_List();
+Radix_Head *init_radix_List();
+
 void list_Add_Id(Head **head1, int id);
-void list_Add_Bucket(Radix_Head **head1, int from,int to, int location);
-Table_Info* flip_tables(Table_Info * table);
-Head* init_List();
-int bithash2(uint64_t hash_value,int time);
-//int bithash(int64_t hash_value,int hash_key);
-//void init(Table_Info*table,int colum,int row);
-void print(Table_Info* table,int from, int to);
-//Table_Info* getrow(Table_Info* pi,int column);
-int ** radix_Sort(Table_Info *table, int time, int from,int to);
-Table_Info* get_table(char* filename,int needed);
+
+void list_Add_Bucket(Radix_Head **head1, int from, int to);
+
+Table_Info *flip_tables(Table_Info *table);
+
+Head *init_List();
+
+int bithash2(uint64_t hash_value, int time);
+
+void print(Table_Info *table, int from, int to);
+
+int **radix_Sort(Table_Info *table, int time, int from, int to);
+
+Table_Info *get_table(char *filename, int needed);
+
 uint64_t Sto64(const char *s);
-results* big_short(char* filename,int needed);
-void free_table(Table_Info* table);
+
+results *big_short(char *filename, int needed);
+
+void free_table(Table_Info *table);
+
+info_node* join_matrices(results* A, results* B);
+
+//=================================================================================================================
+//=================================================================================================================
+
 #endif //RADIX_RADIX_H

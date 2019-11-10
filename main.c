@@ -2,7 +2,7 @@
 #include"Radix.h"
 #include <stdlib.h>
 #include <inttypes.h>
-#include "quicjshort.h"
+#include "Quickshort.h"
 #include <time.h>
 #include "shhh.h"
 
@@ -12,7 +12,7 @@
 
 
 int main() {
-
+    clock_t start = clock();
 char  filename1[]="/home/dimitris/CLionProjects/jj2019/relA";
     char  filename2[]="/home/dimitris/CLionProjects/jj2019/relB";
 
@@ -24,47 +24,15 @@ char  filename1[]="/home/dimitris/CLionProjects/jj2019/relA";
 
 
 
-//Table_Info* table;
-//table=get_table(filename1,needed_column);
 results* one;
     results* two;
     one=big_short(filename1,needed_column);
-    printf("\n A \n");
+
     two=big_short(filename2,needed_column);
-    printf("\n B \n");
-//printf("\n \n \n");
-
-/*
-
-j=0;
-for(i=0;i<table->rows-1;i++){
-    if(not_yet->matrix[i][1]<=not_yet->matrix[i+1][1]){
-        j++;
-    }
-}
-    printf("j %d rows %d \n",j,table->rows);
-j=0;
-uint64_t a,b,c;
-    for(i=0;i<table->rows-1;i++) {
-        a=not_yet->matrix[i][1];
-        b=table->TableA[not_yet->matrix[i][0]][1];
-        c=table->TableA[1948][1];
-      //  print(table,1945,1955);
-        k=not_yet->matrix[i][0];
-        k=table->TableA[not_yet->matrix[i][0]][0];
-
-        if(not_yet->matrix[i][1]==table->TableA[not_yet->matrix[i][0]][needed_column-1]){
-
-                    j++;}
-    }
-printf("j %d ples %d",j,table->rows);
-*/
-//free_table(table);
-
-   // printf("not yet %d ",not_yet->rows);
 
 
-    clock_t start = clock();
+
+
 
 Head_join* test;
 test=join(one,two);

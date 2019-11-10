@@ -1,11 +1,6 @@
 #include <stdio.h>
-#include"Radix.h"
-#include <stdlib.h>
-#include <inttypes.h>
-#include "Quickshort.h"
 #include <time.h>
-#include "shhh.h"
-
+#include"Radix.h"
 
 
 int main() {

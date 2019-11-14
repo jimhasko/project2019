@@ -14,8 +14,8 @@ int main(int argc, char** argv) {
     strcpy(filename2, argv[2]);
     int needed_columnA, needed_columnB;
 
-    needed_columnA = 2;
-    needed_columnB = 2;
+    needed_columnA = 1;
+    needed_columnB = 1;
 
     results *not_yetA, *not_yetB;
 
@@ -28,6 +28,9 @@ int main(int argc, char** argv) {
 
     clock_t stop = clock(); //End timer
     double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
+
+
+
     printf("Time elapsed: %.5f\n", elapsed);
 
     list_destruction(&join_resutl);

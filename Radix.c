@@ -400,7 +400,7 @@ results *big_short(char *filename, int needed) {
         }
     }
 
-   /* j = 0;
+    j = 0;
 
     for (i = 0; i < 1000; i++)
         j = table->location[i] + j;
@@ -425,7 +425,7 @@ results *big_short(char *filename, int needed) {
             }
         }
     }
-    printf(" zer0s : %d , ones : %d \n",zeros,ones);*/
+    printf(" zer0s : %d , ones : %d \n",zeros,ones);
 
     free_table(table);
 
@@ -488,14 +488,25 @@ info_node* join_matrices(results* A, results* B) {  //join_matrices
             if (targetA == targetB) {
 
                 list_insert(list, targetIDA, targetIDB, &cur_node);
+                //printf("%d \n",list->start->size);
             }
-            else if (targetA < targetB) {
-
+            else if ((targetA < targetB)&&(i<A->rows-1)) {
+            if(A->matrix[i][1]<A->matrix[i+1][1]){
                 current_looked = j;
-                break;
+                break;}
             }
         }
     }
+
+    int res=0;
+    struct node_type* cur= list->start;
+
+    for(int i=0; i<list->size; i++) {
+
+        res += cur->size;
+        cur = cur->next_node;
+    }
+    printf("%d\n",res);
 
     return list;
 }

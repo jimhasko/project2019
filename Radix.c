@@ -520,4 +520,61 @@ added++;
 }
 
 //=================================================================================================================
+
+
+
+results *  simple_mesure(results* A,uint64_t num,char operator){
+int i;
+results *croped = (struct results *)malloc(sizeof(results));       //malloc the results
+    croped->rows = 0;
+    croped->matrix = (uint64_t **) malloc(sizeof(uint64_t *) * A->rows);
+    for (i = 0; i < A->rows; i++) {
+
+        croped->matrix[i] = (uint64_t*) malloc(sizeof(uint64_t) * 2);
+    }
+    switch(operator){
+
+        case '>':
+            for(i=0;i<A->rows;i++){
+                if(A->matrix[i][1]>num){
+                    croped->rows++;
+                    croped->matrix[i][0]=A->matrix[i][0];
+                    croped->matrix[i][1]=A->matrix[i][1];
+                }
+
+            }
+            return croped;
+         case '<':
+            for(i=0;i<A->rows;i++){
+                if(A->matrix[i][1]<num){
+                    croped->rows++;
+                    croped->matrix[i][0]=A->matrix[i][0];
+                    croped->matrix[i][1]=A->matrix[i][1];
+                }
+
+            }
+            return croped;
+        case '=':
+            for(i=0;i<A->rows;i++){
+                if(A->matrix[i][1]==num){
+                    croped->rows++;
+                    croped->matrix[i][0]=A->matrix[i][0];
+                    croped->matrix[i][1]=A->matrix[i][1];
+                }
+
+            }
+
+            return croped;
+
+        default:
+            printf("wront character");
+            return NULL;
+    }
+
+
+
+
+}
+
+
 //=================================================================================================================

@@ -78,7 +78,7 @@ void list_insert(info_node* list_info, int RowID_A, int RowID_B, node_type** cur
 
 	}
 	else {
-
+      //  printf(" curent size %d \n",(*current_pointer)->size);
 	    insert_rest(list_info, RowID_A, RowID_B, current_pointer);
         (*current_pointer) = (*current_pointer)->next_node;
 	}
@@ -90,10 +90,11 @@ void insert_first(info_node* list_info, int RowID_A, int RowID_B) {
 	node_type *current, *tmp, *last;
 
 	current = malloc(sizeof(node_type));
+	//printf("added a node of size %d",result_size);
 	if (current == NULL) {
 
 	    printf("Allocation Problem Insert First");
-		return;
+		exit(1);
 	}
 
     current->results[0][0] = RowID_A;
@@ -131,7 +132,7 @@ void insert_rest(info_node* list_info, int RowID_A, int RowID_B, node_type** cur
 	if (current == NULL) {
 
         printf("Allocation Problem Insert Rest");
-		return;
+        exit(1);
 	}
 	else {
 

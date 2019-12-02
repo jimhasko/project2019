@@ -23,9 +23,7 @@ int main(int argc, char** argv) {
 
     not_yetA = big_short(filename1, needed_columnA);
     not_yetB = big_short(filename2, needed_columnB);
-
-    join_resutl = join_matrices(not_yetA, not_yetB);
-
+  
     clock_t stop = clock(); //End timer
     double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
 

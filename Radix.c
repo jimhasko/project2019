@@ -435,7 +435,7 @@ results *big_short(char *filename, int needed) {
 //=================================================================================================================
 void free_table(Table_Info *table) {            // self explanatory
     int i;
-
+    printf("rows %d\n",table->rows);
     /*for (i = 0; i < table->rows; i++) {   // <-- THAT WORKS .FIX YOUR PC!!! and get some bloody linux
         free(table->TableA[i]);
         free(table->TableB[i]);
@@ -476,24 +476,31 @@ info_node* join_matrices(results* A, results* B) {  //join_matrices
 
     list = list_creation();
     current_looked = 0;
-
-    for (i = 0; i < A->rows; i++) {
+int added=0;
+   for (i = 0; i < A->rows; i++) {
 
         targetA = A->matrix[i][1];
         targetIDA = A->matrix[i][0];
         for (j = current_looked;  j < B->rows ; j++) {
 
             targetB = B->matrix[j][1];
-            targetIDB = B->matrix[i][0];
+            targetIDB = B->matrix[j][0];
             if (targetA == targetB) {
-
+added++;
                 list_insert(list, targetIDA, targetIDB, &cur_node);
                 //printf("%d \n",list->start->size);
             }
             else if ((targetA < targetB)&&(i<A->rows-1)) {
             if(A->matrix[i][1]<A->matrix[i+1][1]){
                 current_looked = j;
+                printf(" looked :%d \n", j);
                 break;}
+                else{
+                    break;
+                }
+            }else if((targetA > targetB)&&(j==current_looked)){
+                current_looked++;
+
             }
         }
     }
@@ -505,8 +512,9 @@ info_node* join_matrices(results* A, results* B) {  //join_matrices
 
         res += cur->size;
         cur = cur->next_node;
+        printf(" res size %d\n",cur->size);
     }
-    printf("%d\n",res);
+    printf("\n result: %d added: %d\n",res, added);
 
     return list;
 }

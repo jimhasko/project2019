@@ -87,7 +87,7 @@ results *big_short(char *filename, int needed);
 void free_table(Table_Info *table);
 
 info_node* join_matrices(results* A, results* B);
-results *  simple_mesure(results* A,uint64_t num,char operator);
+//results *  simple_mesure(results* A,uint64_t num,char operator);
 //=================================================================================================================
 //=================================================================================================================
 

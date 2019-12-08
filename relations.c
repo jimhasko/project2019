@@ -523,28 +523,35 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
     for (i = 0; i < priority_number; i++) {         //gia ola ta queries
                 counter=0;
 
+        uint64_t * col1;
+        uint64_t *  col2;
+        int * new;
+        int id,idcounter=0;
+        new=malloc(sizeof(int)*transfer->tables_ids[ht1].size);
+
 
     table1=transfer->priority1[i].master_table1;
     column1=transfer->priority1[i].col1;
     ht1=transfer->priority1[i].here_table1;
-    if(transfer->priority1[i].type==5||transfer->priority1[i].type==1){
+        col1=master_table->tables[table1].Full_Table[column1].Column;
+    if(transfer->priority1[i].type==5||transfer->priority1[i].type==1){// if it needs 2 matrixes
+
         table2=transfer->priority1[i].master_table2;
         column2=transfer->priority1[i].col2;
-        ht2=transfer->priority1[i].here_table2;}
+        ht2=transfer->priority1[i].here_table2;
+        col2=master_table->tables[table2].Full_Table[column2].Column;
+    }
 
 
 
 
         if (transfer->priority1[i].type == 1) {             //self join 111111111111111111111111111111111111111111111111111111111111111
-            uint64_t * col1;
-            uint64_t *  col2;
-            int * new;
-            int id,idcounter=0;
 
-            new=malloc(sizeof(int)*transfer->tables_ids[ht1].size);
 
-            col1=master_table->tables[table1].Full_Table[column1].Column;
-            col2=master_table->tables[table2].Full_Table[column2].Column;
+
+
+
+
             for(j=0;j<transfer->tables_ids[ht1].size;j++){
                 id=transfer->tables_ids[ht1].id_list[j];
                 if(col1[id]==col2[id]){
@@ -555,30 +562,57 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
             }
 
-            transfer->tables_ids[ht1].size=idcounter;
-            free(transfer->tables_ids[ht1].id_list);
-            transfer->tables_ids[ht1].id_list=new;
-            int k=transfer->tables_ids[ht1].id_list[0];
+
+
         }
 
 
 
 
-        else if (transfer->priority1[i].type == 2) {        //column>number     2222222222222222222222222222222222222222222222222222222222
+        else if (transfer->priority1[i].type == 2) {        //column=number     2222222222222222222222222222222222222222222222222222222222
 
-       // simple_mesure(master_table->tables[master_table1],prioti)
+            for(j=0;j<transfer->tables_ids[ht1].size;j++){
+                id=transfer->tables_ids[ht1].id_list[j];
+                if(col1[id]==transfer->priority1[i].number){
+                    new[idcounter]=id;
+                    idcounter++;
+                }
+
+
+            }
 
         }
-        else if (transfer->priority1[i].type == 3) {        //column<number   3333333333333333333333333333333333333333333333333333333333333333333333333
+        else if (transfer->priority1[i].type == 3) {        //column>number   3333333333333333333333333333333333333333333333333333333333333333333333333
+
+            for(j=0;j<transfer->tables_ids[ht1].size;j++){
+                id=transfer->tables_ids[ht1].id_list[j];
+                if(col1[id]>transfer->priority1[i].number){
+                    new[idcounter]=id;
+                    idcounter++;
+                }
+
+
+            }
+
 
         }else
-        if (transfer->priority1[i].type == 4) {                          //column=number     444444444444444444444444444444444444444444444444444444444444444444444444
+        if (transfer->priority1[i].type == 4) {                          //column<number     444444444444444444444444444444444444444444444444444444444444444444444444
+
+            for(j=0;j<transfer->tables_ids[ht1].size;j++){
+                id=transfer->tables_ids[ht1].id_list[j];
+                if(col1[id]<transfer->priority1[i].number){
+                    new[idcounter]=id;
+                    idcounter++;
+                }
 
 
+            }
 
         }
 
-
+        transfer->tables_ids[ht1].size=idcounter;
+        free(transfer->tables_ids[ht1].id_list);
+        transfer->tables_ids[ht1].id_list=new;
 
     }
 

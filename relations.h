@@ -61,38 +61,42 @@ typedef struct priority {
     char *command;
     uint64_t size,number;
     int type;
-    int col1,col2,table1,table2;
+    int col1,col2,master_table1,master_table2,here_table1,here_table2;
 }priority;
 
 
+typedef struct tableid{
+
+    int* id_list;
+    int size;
+
+
+}tableid;
+
 typedef struct just_transfer{
     priority* priority1;
+    int priority_number;
    // List_of_Tables temp_table;
     int num_of_tables;//posa ine ta from tables
     int* tables;// pia einai ta from tables
+    tableid* tables_ids;
 }just_transfer;
 
 
-typedef struct hope_it_helps{
 
-    int* piority_list;
-    int f_size;
-   // int* is_it_on;
-
-}hope_it_helps;
 
 
 Single_Table fill(char* filename,int name);
 Single_Table*  simple_mesure(Single_Table* table,uint64_t num,int type,int column);
 int read_init(char *filename);
 List_of_Tables init_Tables(char*initfile);
-just_transfer analise(char* str,List_of_Tables* master_table);
+just_transfer* analise(char* str,List_of_Tables* master_table);
 //void quicksort(priority* number,int first,int last);
 //middle* run_filters(List_of_Tables temp_table,priority* priority_series,int priority_number, int max_priority);
-middle* run_filters(List_of_Tables* master_table,just_transfer* transfer,int priority_number, int max_priority);
+middle* run_filters(List_of_Tables* master_table,just_transfer* transfer);
 int power(int basi,int pano);
 List_of_Tables run_joins(List_of_Tables* temp_table,middle* mid_table,int priority_number,int max_priority,priority* priority_series);
 int parag(int input);
 List_of_Tables* cost(int table1,int table2,int column1,int column2 ,List_of_Tables* temp_table);
-
+int max(int* from,int from_num,List_of_Tables* master_table);
 void permute(int *array,int i,int length,int** test);

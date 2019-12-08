@@ -40,8 +40,6 @@ typedef struct middle_struct{
     int** id_lists;
     uint64_t size;
 
-
-
 }middle;
 
 typedef struct neibour_node{
@@ -63,6 +61,7 @@ typedef struct priority {
     char *command;
     uint64_t size,number;
     int type;
+    int col1,col2,table1,table2;
 }priority;
 
 

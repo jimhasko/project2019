@@ -360,9 +360,9 @@ from_number=i;
 
     int comparison;
     int inside_counter,inside_counter_guard=500;
-
+    int swap;
     ptr = strtok(katigorima, delimkat);
-int table1,table2,counter=0;
+int table1,table2,column1,column2,counter=0;
 int len,counter_guard=10;
     char *last;
    // Row_table replace;
@@ -371,8 +371,14 @@ int len,counter_guard=10;
         priority_series[counter].command=ptr;
     len=strlen(ptr);
     table1=ptr[0]-48;
+    column1=ptr[2]-48;
+    if(len>6){
     table2=ptr[4]-48;
-
+    column2=ptr[6]-48;}
+    else{
+        table2=-1;
+        column2=-1;
+    }
 
 
 
@@ -398,17 +404,14 @@ int len,counter_guard=10;
 
                 }
 
-                // if(ptr[5]=='.')
-                //    priority_series[counter].type=1;
-
-
-
-
-                // if(((table1)!=(table2)&&(master_table->tables[table1].table_name!=master_table->tables[table2].table_name))){// table join
-
-                //    priority_series[counter].type=5;
-
-                // }
+              if(table2<table1){
+                swap=table2;
+                table2=table1;
+                table1=swap;
+                  swap=column2;
+                  column2=column1;
+                  column1=swap;
+              }
 
                 priority_series[counter].type = 5;
             }
@@ -430,7 +433,10 @@ int len,counter_guard=10;
             priority_series[counter].number=Sto64(last+1);
 
         }
-
+        priority_series[counter].col1=column1;
+        priority_series[counter].col2=column2;
+        priority_series[counter].table1=table1;
+        priority_series[counter].table2=table2;
         counter++;
         if(counter==counter_guard){//if there are more than 10 where cases realloc
 

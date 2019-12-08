@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
 
     char* name="/home/dimitris/CLionProjects/jj2019/workloads/small/r0";
     char* name2="/home/dimitris/CLionProjects/jj2019/workloads/small/r1";
-    char*str="0 1|0.1=1.2&1.0=2.1&0.1>3000|0.0 1.1";
+    char*str="0 1|0.1=1.2&2.1=1.0&0.1>3000|0.0 1.1";
     List_of_Tables master_table;
     master_table.num_of_tables=2;
     master_table.tables=(Single_Table*)malloc(sizeof(Single_Table)*master_table.num_of_tables);

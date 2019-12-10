@@ -7,13 +7,13 @@
 
 #endif //PROJECT2018_RELATIONS_H
 
-
-
+#include "Result_List.h"
+#include <inttypes.h>
 #include <stdio.h>
 #include<stdlib.h>
 #include<string.h>
 #include<stdint.h>
-#include "Radix.h"
+//#include "Radix.h"
 
 typedef struct Row_Table{
 
@@ -37,8 +37,9 @@ typedef struct Single_Table{
 
 typedef struct middle_struct{
 
-    int** id_lists;
-    uint64_t size;
+    info_node start;
+    int* inserted;
+    int num_inserted;
 
 }middle;
 
@@ -76,16 +77,16 @@ typedef struct tableid{
 typedef struct just_transfer{
     priority* priority1;
     int priority_number;
-   // List_of_Tables temp_table;
+
     int num_of_tables;//posa ine ta from tables
     int* tables;// pia einai ta from tables
     tableid* tables_ids;
 }just_transfer;
-
-
-
-
-
+uint64_t Sto64(const char *s);
+void priority_tree(priority* prior,int priority_number);
+int min_priority(priority* prior,int priority_number);
+void swap_priority(priority* prior,int from,int to);
+void short_priority(priority* prior,int prior_num);
 Single_Table fill(char* filename,int name);
 Single_Table*  simple_mesure(Single_Table* table,uint64_t num,int type,int column);
 int read_init(char *filename);

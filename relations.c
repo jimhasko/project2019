@@ -1,6 +1,8 @@
 
 #include "relations.h"
 #define bool_num 50000000
+
+#include "Result_List.h"
 /*void init_tables(List_of_Tables lista_pinakon){
     lista_pinakon.num_of_tables=0;
     lista_pinakon.tables=(Single_Table*)malloc(10*sizeof(Single_Table));
@@ -12,7 +14,93 @@
 
 
 
- Single_Table*  simple_mesure(Single_Table* table,uint64_t num,int type,int column){
+uint64_t Sto64(const char *s) { // string to number
+
+    uint64_t i;
+    char c;
+
+    int scanned = sscanf(s, "%" SCNu64 "%c", &i, &c);
+    if (scanned) return i;
+
+    return 0;
+}
+
+void short_priority(priority* prior,int prior_num){
+    int i,j;
+    int test1,test2;
+    priority temp;
+    for(j=0;j<prior_num;j++){
+        for(i=0;i<prior_num-1;i++){
+            test1=prior[i].type;
+            test2=prior[i+1].type;
+            if(prior[i].type>prior[i+1].type){
+                temp=prior[i];
+                prior[i]=prior[i+1];
+                prior[i+1]=temp;
+            }
+
+        }
+    }
+
+
+}
+
+
+
+
+int min_priority(priority* prior,int priority_number){
+    int i,min;
+    min=priority_number-1;
+    for(i=priority_number-1;i>-1;i--) {
+        if (prior[i].type == 5) {
+            if (prior[min].size < prior[i].size) {
+                min = i;
+            }
+
+        }
+    }
+    return min;
+
+
+
+
+
+}
+
+void swap_priority(priority* prior,int from,int to){
+    priority temp;
+    temp=prior[to];
+    prior[to]=prior[from];
+    prior[from]=temp;
+
+
+}
+
+
+void priority_tree(priority* prior,int priority_number){
+    int i,j,min,now=0;
+    for(j=0;j<priority_number;j++){
+        if(prior[j].type==5)
+            now=j;
+        break;
+    }
+
+    min=min_priority(prior,priority_number);
+    swap_priority(prior,min,now);
+    for(j=0;j<priority_number;j++){
+        for(i=now;i<priority_number;i++){
+            if(prior[j].here_table1==prior[i].here_table1||prior[j].here_table2==prior[i].here_table1||prior[j].here_table1==prior[i].here_table2||prior[j].here_table2==prior[i].here_table2)
+            now++;
+                swap_priority(prior,i,now);
+        }
+    }
+}
+
+
+
+
+
+Single_Table*  simple_mesure(Single_Table* table,uint64_t num,int type,int column){
     int i,j,new_rows=0;
 
    int* new_ids;
@@ -518,16 +606,21 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
   //  }
 
     priority_number=transfer->priority_number;
-
-
+short_priority(transfer->priority1,priority_number);
+    uint64_t * col1;
+    uint64_t *  col2;
+    int * new;
+    int id,idcounter;
+    middle midle;
+    midle.inserted=malloc(sizeof(int)*master_table->num_of_tables);
+    midle.num_inserted=0;
+ //   middle.start  //kane initialize ti lista
     for (i = 0; i < priority_number; i++) {         //gia ola ta queries
                 counter=0;
 
-        uint64_t * col1;
-        uint64_t *  col2;
-        int * new;
-        int id,idcounter=0;
-        new=malloc(sizeof(int)*transfer->tables_ids[ht1].size);
+
+        idcounter=0;
+
 
 
     table1=transfer->priority1[i].master_table1;
@@ -543,7 +636,7 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
     }
 
 
-
+        new=malloc(sizeof(int)*transfer->tables_ids[ht1].size);
 
         if (transfer->priority1[i].type == 1) {             //self join 111111111111111111111111111111111111111111111111111111111111111
 
@@ -608,11 +701,23 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
             }
 
-        }
+        }else{                                              //tablejoin!!!!!!!!!!!!!!5555555555555555555
 
+            priority_tree(transfer->priority1,transfer->priority_number);
+
+
+
+        }
+        if(transfer->priority1[i].type !=5){
         transfer->tables_ids[ht1].size=idcounter;
+        transfer->priority1[i].size=idcounter;
         free(transfer->tables_ids[ht1].id_list);
-        transfer->tables_ids[ht1].id_list=new;
+        transfer->tables_ids[ht1].id_list=new;}
+
+
+
+
+
 
     }
 
@@ -624,6 +729,7 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
 
 ////////////////////////
+
 /*
 List_of_Tables run_joins(List_of_Tables* temp_table,middle* mid_table,int priority_number,int max_priority,priority* priority_series){
     uint64_t i,j,k,master_table1,n,column1,master_table2,column2,temp1,temp2;

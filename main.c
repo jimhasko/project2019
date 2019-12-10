@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include"Radix.h"
-#include "relations.h"
+//#include "relations.h"
 #include <inttypes.h>
 int main(int argc, char** argv) {
 
@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     char* name3="/home/dimitris/CLionProjects/jj2019/workloads/small/r2";
     char* name4="/home/dimitris/CLionProjects/jj2019/workloads/small/r3";
     char* name5="/home/dimitris/CLionProjects/jj2019/workloads/small/r4";
-    char*str="0 2 4|0.1=0.2&1.0=2.1&0.1>3000|0.0 1.1";
+    char*str="0 2 4|0.1=1.2&1.0=2.1&0.1>3000|0.0 1.1";
     List_of_Tables master_table;
     master_table.num_of_tables=5;
     master_table.tables=(Single_Table*)malloc(sizeof(Single_Table)*master_table.num_of_tables);

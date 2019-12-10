@@ -4,6 +4,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include "Quicksort.h"
+#include <stdint.h>
 
 //=================================================================================================================
 void list_Add_Id(Head **head1, int id) {
@@ -50,16 +51,7 @@ Radix_Head *init_radix_List() {
 }
 
 //=================================================================================================================
-uint64_t Sto64(const char *s) { // string to number
 
-    uint64_t i;
-    char c;
-
-    int scanned = sscanf(s, "%" SCNu64 "%c", &i, &c);
-    if (scanned) return i;
-
-    return 0;
-}
 
 //=================================================================================================================
 int bithash2(uint64_t hash_value, int time) { //time starts at 0 and ads by one
@@ -188,6 +180,7 @@ int **radix_Sort(Table_Info *table, int time, int from, int to) { // table kai p
 }
 
 //=================================================================================================================
+/*
 Table_Info *get_table(char *filename, int needed) {// initialises a table from filename
 
     char ch;
@@ -268,6 +261,50 @@ Table_Info *get_table(char *filename, int needed) {// initialises a table from f
     return retur;
 
 }
+*/
+//=================================================================================================================
+Table_Info *get_table(uint64_t* col,tableid* idlist , int needed) {// initialises a table from filename
+
+    char ch;
+    int i;
+    int colum_orig, rows, one = 1;
+    colum_orig = 2;
+    rows = idlist->size;
+
+    int columls, count = 0;
+    columls = 2;
+
+    Table_Info *retur = malloc(sizeof(Table_Info));
+    retur->TableA = malloc(sizeof(uint64_t *) * rows);
+    retur->TableB = malloc(sizeof(uint64_t *) * rows);
+    retur->location = malloc(sizeof(int *) * rows);
+
+    for (i = 0; i < rows; i++) {
+        retur->TableA[i] = malloc(sizeof(int) * columls);
+        retur->TableB[i] = malloc(sizeof(int) * columls);
+    }
+
+    retur->rows = rows;
+    retur->time = 0;
+    retur->Bucket_list = malloc(sizeof(Radix_Head) * 8);//holds the buckets to re-radix
+
+    for (i = 0; i < 8; i++) {
+
+        retur->Bucket_list[i] = init_radix_List();
+    }
+    for(i=0;i<rows;i++){
+        retur->location[i] = 1; //initialise possition matrix
+        retur->TableA[i][0]=idlist->id_list[i];
+        retur->TableA[i][1]=col[idlist->id_list[i]];
+
+
+
+    }
+
+
+    return retur;
+
+}
 
 //=================================================================================================================
 Table_Info *flip_tables(Table_Info *table) {
@@ -281,12 +318,12 @@ Table_Info *flip_tables(Table_Info *table) {
 }
 
 //=================================================================================================================
-results *big_short(char *filename, int needed) {
+results *big_short(uint64_t* col,tableid* idlist, int needed) {
 
     int from, to, i, j, hist_size = 256;
 
     Table_Info *table;
-    table = get_table(filename, needed);
+    table = get_table(col,idlist, needed);
     int **sumlist;
     from = 0;
     to = table->rows;

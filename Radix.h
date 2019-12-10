@@ -3,8 +3,8 @@
 #define RADIX_RADIX_H
 
 #include <stdint.h>
-#include "Result_List.h"
 
+#include "relations.h"
 #define  quick_short 100
 #define  SizeofDataFileName 100
 
@@ -78,11 +78,12 @@ void print(Table_Info *table, int from, int to);
 
 int **radix_Sort(Table_Info *table, int time, int from, int to);
 
-Table_Info *get_table(char *filename, int needed);
+//Table_Info *get_table(char *filename, int needed);
+Table_Info *get_table(uint64_t* col,tableid* idlist, int needed);
+//uint64_t Sto64(const char *s);
 
-uint64_t Sto64(const char *s);
-
-results *big_short(char *filename, int needed);
+//results *big_short(char *filename, int needed);
+results *big_short(uint64_t* col,tableid* idlist, int needed);
 
 void free_table(Table_Info *table);
 

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
-#include "Quicksort.h"
+
 #include <stdint.h>
 
 //=================================================================================================================
@@ -263,7 +263,7 @@ Table_Info *get_table(char *filename, int needed) {// initialises a table from f
 }
 */
 //=================================================================================================================
-Table_Info *get_table(uint64_t* col,tableid* idlist , int needed) {// initialises a table from filename
+Table_Info *get_table(uint64_t* col,tableid* idlist ) {// initialises a table from filename
 
     char ch;
     int i;
@@ -318,12 +318,12 @@ Table_Info *flip_tables(Table_Info *table) {
 }
 
 //=================================================================================================================
-results *big_short(uint64_t* col,tableid* idlist, int needed) {
+results *big_short(uint64_t* col,tableid* idlist) {
 
     int from, to, i, j, hist_size = 256;
 
     Table_Info *table;
-    table = get_table(col,idlist, needed);
+    table = get_table(col,idlist);
     int **sumlist;
     from = 0;
     to = table->rows;
@@ -503,7 +503,7 @@ void free_table(Table_Info *table) {            // self explanatory
 }
 
 //=================================================================================================================
-info_node* join_matrices(results* A, results* B) {  //join_matrices
+info_node* join_matrices(results* A, results* B,middle* midle) {  //join_matrices
 
     info_node* list;
     node_type* cur_node = NULL;
@@ -511,7 +511,7 @@ info_node* join_matrices(results* A, results* B) {  //join_matrices
     uint64_t targetA, targetB;
     int targetIDA, targetIDB, current_looked;
 
-    list = list_creation();
+    list = midle->start;
     current_looked = 0;
 int added=0;
    for (i = 0; i < A->rows; i++) {
@@ -530,9 +530,10 @@ added++;
             else if ((targetA < targetB)&&(i<A->rows-1)) {
             if(A->matrix[i][1]<A->matrix[i+1][1]){
                 current_looked = j;
-                printf(" looked :%d \n", j);
+             //   printf(" looked :%d \n", j);
                 break;}
                 else{
+
                     break;
                 }
             }else if((targetA > targetB)&&(j==current_looked)){

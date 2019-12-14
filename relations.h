@@ -7,19 +7,20 @@
 
 #endif //PROJECT2018_RELATIONS_H
 
-#include "Result_List.h"
+
 #include <inttypes.h>
 #include <stdio.h>
 #include<stdlib.h>
 #include<string.h>
 #include<stdint.h>
-//#include "Radix.h"
+#include "Radix.h"
 
 typedef struct Row_Table{
 
     uint64_t *Column;
 
 }Row_table;
+
 
 
 typedef struct statistics{
@@ -35,13 +36,6 @@ typedef struct Single_Table{
     statistics* stats;
 }Single_Table;
 
-typedef struct middle_struct{
-
-    info_node start;
-    int* inserted;
-    int num_inserted;
-
-}middle;
 
 typedef struct neibour_node{
     int bol;
@@ -66,13 +60,7 @@ typedef struct priority {
 }priority;
 
 
-typedef struct tableid{
 
-    int* id_list;
-    int size;
-
-
-}tableid;
 
 typedef struct just_transfer{
     priority* priority1;
@@ -83,7 +71,7 @@ typedef struct just_transfer{
     tableid* tables_ids;
 }just_transfer;
 uint64_t Sto64(const char *s);
-void priority_tree(priority* prior,int priority_number);
+void priority_tree(priority* prior,int priority_number,just_transfer* just);
 int min_priority(priority* prior,int priority_number);
 void swap_priority(priority* prior,int from,int to);
 void short_priority(priority* prior,int prior_num);
@@ -101,3 +89,4 @@ int parag(int input);
 List_of_Tables* cost(int table1,int table2,int column1,int column2 ,List_of_Tables* temp_table);
 int max(int* from,int from_num,List_of_Tables* master_table);
 void permute(int *array,int i,int length,int** test);
+void get_size(priority* prior,int priority_number,just_transfer* just, int now);

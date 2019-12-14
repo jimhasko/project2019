@@ -1,10 +1,10 @@
 
 #ifndef RADIX_RADIX_H
 #define RADIX_RADIX_H
-
+#include "Quicksort.h"
 #include <stdint.h>
-
-#include "relations.h"
+#include "Result_List.h"
+//#include "relations.h"
 #define  quick_short 100
 #define  SizeofDataFileName 100
 
@@ -62,6 +62,23 @@ typedef struct results {
 
 //=================================================================================================================
 
+typedef struct tableid{
+
+    int* id_list;
+    int size;
+
+
+}tableid;
+
+typedef struct middle_struct{
+
+    info_node* start;
+    int* inserted;
+    int num_inserted;
+
+}middle;
+
+
 Radix_Head *init_radix_List();
 
 void list_Add_Id(Head **head1, int id);
@@ -79,15 +96,15 @@ void print(Table_Info *table, int from, int to);
 int **radix_Sort(Table_Info *table, int time, int from, int to);
 
 //Table_Info *get_table(char *filename, int needed);
-Table_Info *get_table(uint64_t* col,tableid* idlist, int needed);
+Table_Info *get_table(uint64_t* col,tableid* idlist);
 //uint64_t Sto64(const char *s);
 
 //results *big_short(char *filename, int needed);
-results *big_short(uint64_t* col,tableid* idlist, int needed);
+results *big_short(uint64_t* col,tableid* idlist);
 
 void free_table(Table_Info *table);
 
-info_node* join_matrices(results* A, results* B);
+info_node* join_matrices(results* A, results* B,middle* midle);
 //results *  simple_mesure(results* A,uint64_t num,char operator);
 //=================================================================================================================
 //=================================================================================================================

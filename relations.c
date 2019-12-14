@@ -2,6 +2,7 @@
 #include "relations.h"
 #define bool_num 50000000
 
+
 #include "Result_List.h"
 /*void init_tables(List_of_Tables lista_pinakon){
     lista_pinakon.num_of_tables=0;
@@ -53,7 +54,7 @@ int min_priority(priority* prior,int priority_number){
     min=priority_number-1;
     for(i=priority_number-1;i>-1;i--) {
         if (prior[i].type == 5) {
-            if (prior[min].size < prior[i].size) {
+            if (prior[min].size > prior[i].size) {
                 min = i;
             }
 
@@ -75,24 +76,46 @@ void swap_priority(priority* prior,int from,int to){
 
 
 }
+void get_size(priority* prior,int priority_number,just_transfer* just, int now){
+    int i,j,hr1,hr2;
+    for(i=now;i<priority_number;i++){
+        hr1=prior[i].here_table1;
+        hr2=prior[i].here_table2;
+        if(just->tables_ids[hr1].size<=just->tables_ids[hr2].size){
+            prior[i].size=just->tables_ids[hr1].size;
+        }else{
+            prior[i].size=just->tables_ids[hr2].size;
+        }
 
-
-void priority_tree(priority* prior,int priority_number){
-    int i,j,min,now=0;
-    for(j=0;j<priority_number;j++){
-        if(prior[j].type==5)
-            now=j;
-        break;
     }
 
-    min=min_priority(prior,priority_number);
-    swap_priority(prior,min,now);
+
+
+
+}
+
+void priority_tree(priority* prior,int priority_number,just_transfer* just){
+    int i,j,min,k,now=0;
+
     for(j=0;j<priority_number;j++){
-        for(i=now;i<priority_number;i++){
-            if(prior[j].here_table1==prior[i].here_table1||prior[j].here_table2==prior[i].here_table1||prior[j].here_table1==prior[i].here_table2||prior[j].here_table2==prior[i].here_table2)
+        if(prior[j].type==5){
+            now=j;
+        break;}
+    }
+    get_size(prior,priority_number,just,now);
+    min=min_priority(prior,priority_number);
+
+    if(min!=now)
+        swap_priority(prior,min,now);
+    for(;j<priority_number;j++){
+        for(i=now+1;i<priority_number;i++){
+            if(prior[j].here_table1==prior[i].here_table1||prior[j].here_table2==prior[i].here_table1||prior[j].here_table1==prior[i].here_table2||prior[j].here_table2==prior[i].here_table2){
             now++;
-                swap_priority(prior,i,now);
+                swap_priority(prior,i,now);}
         }
+    }
+    for(k=0;k<priority_number;k++){
+        printf(" j:%d ,ptr: %s size:%d \n",k,prior[k].command,(int)prior[k].size);
     }
 }
 
@@ -528,7 +551,7 @@ int len,counter_guard=10;
         priority_series[counter].master_table1=table1;
         priority_series[counter].master_table2=table2;
         priority_series[counter].here_table1=here_table1;
-        priority_series[counter].here_table2=here_table1;
+        priority_series[counter].here_table2=here_table2;
         counter++;
         if(counter==counter_guard){//if there are more than 10 where cases realloc
 
@@ -595,15 +618,10 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
     int size,table1,table2,column1,column2,ht1,ht2,priority_number;
 
-    //size=temp_table.tables[priority_series[0].command[0]-48].tube_num;
+
     middle* middle_matrix;
     int* replacer_matrix;
-    //int* line_matrix;
-  //  middle_matrix=(middle*)calloc(temp_table.num_of_tables,sizeof(middle));//kratai to size tis ka8e kolonas
- //   for(i=0;i<temp_table.num_of_tables;i++){
-  //      middle_matrix[i].size=temp_table.tables[i].tube_num;
 
-  //  }
 
     priority_number=transfer->priority_number;
 short_priority(transfer->priority1,priority_number);
@@ -611,14 +629,16 @@ short_priority(transfer->priority1,priority_number);
     uint64_t *  col2;
     int * new;
     int id,idcounter;
-    middle midle;
-    midle.inserted=malloc(sizeof(int)*master_table->num_of_tables);
-    midle.num_inserted=0;
+    middle* midle;
+    midle=(middle*)malloc(sizeof(middle));
+    midle->inserted=malloc(sizeof(int)*master_table->num_of_tables);
+    midle->num_inserted=0;
+    midle->start=NULL;
  //   middle.start  //kane initialize ti lista
     for (i = 0; i < priority_number; i++) {         //gia ola ta queries
                 counter=0;
 
-
+    printf(" priority %d : %s \n",i, transfer->priority1[i].command);
         idcounter=0;
 
 
@@ -702,10 +722,36 @@ short_priority(transfer->priority1,priority_number);
             }
 
         }else{                                              //tablejoin!!!!!!!!!!!!!!5555555555555555555
+            if(midle->start==NULL) {
+                int k;
+                priority_tree(transfer->priority1, transfer->priority_number,transfer);
+                for (k = 0; k < priority_number; k++)          //gia ola ta queries
+                    printf(" priority %d : %s \n",k, transfer->priority1[k].command);
 
-            priority_tree(transfer->priority1,transfer->priority_number);
+
+                midle->start=list_creation();
+                results * res1;
+                results * res2;
+                res1=big_short(col1,(&transfer->tables_ids[ht1]));
+                res2=big_short(col2,(&transfer->tables_ids[ht2]));
+                join_matrices(res1,res2,midle);
+                midle->num_inserted=2;
+                midle->inserted[0]=ht1;
+                midle->inserted[1]=ht2;
+            }else{
+            for(j=0;j<midle->num_inserted;j++){
+                if(ht1==midle->inserted[i]){
+
+                }
 
 
+            }
+
+
+
+
+
+            }
 
         }
         if(transfer->priority1[i].type !=5){

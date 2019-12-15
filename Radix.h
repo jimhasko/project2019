@@ -7,7 +7,7 @@
 //#include "relations.h"
 #define  quick_short 100
 #define  SizeofDataFileName 100
-
+#define  middle_matrix_size 500
 //=================================================================================================================
 typedef struct Listnode {
 
@@ -42,9 +42,10 @@ typedef struct Radix_Head {
 } Radix_Head;
 
 //=================================================================================================================
+
 typedef struct Table_Info {
 
-    int rows;
+    int rows,needed,columns;
     int time;
     int *location;
     Radix_Head **Bucket_list;
@@ -52,10 +53,9 @@ typedef struct Table_Info {
     uint64_t **TableB;
 
 } Table_Info;
-
 //=================================================================================================================
 typedef struct results {
-
+    int columns;
     int rows;
     uint64_t **matrix;
 } results;
@@ -71,7 +71,7 @@ typedef struct tableid{
 }tableid;
 
 typedef struct middle_struct{
-
+    int ** table;
     info_node* start;
     int* inserted;
     int num_inserted;
@@ -96,15 +96,15 @@ void print(Table_Info *table, int from, int to);
 int **radix_Sort(Table_Info *table, int time, int from, int to);
 
 //Table_Info *get_table(char *filename, int needed);
-Table_Info *get_table(uint64_t* col,tableid* idlist);
+Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed );
 //uint64_t Sto64(const char *s);
 
 //results *big_short(char *filename, int needed);
-results *big_short(uint64_t* col,tableid* idlist);
+results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed );
 
 void free_table(Table_Info *table);
 
-info_node* join_matrices(results* A, results* B,middle* midle);
+info_node* join_matrices(results* A, results* B,middle* midle,int needed);
 //results *  simple_mesure(results* A,uint64_t num,char operator);
 //=================================================================================================================
 //=================================================================================================================

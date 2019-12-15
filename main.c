@@ -35,14 +35,39 @@ int main(int argc, char** argv) {
 just_transfer * test;
    test= analise(str,&master_table);
 
-   run_filters(&master_table,test);
+ //  run_filters(&master_table,test);
      results *not_yetA, *not_yetB;
 
     info_node* join_resutl;
+int i,j;
+    uint64_t * col1;
+    col1=(uint64_t*)malloc(sizeof(uint64_t)*5);
+    int** idlist;
+    idlist=(int**)malloc(sizeof(int*)*5);
+    int cc=3;
+    for(i=0;i<5;i++) {
+    idlist[i]=(int*)malloc(sizeof(int)*cc);
+    }
 
-   // not_yetA = big_short(filename1, needed_columnA);
-  //  not_yetB = big_short(filename2, needed_columnB);
-  //
+    col1[0]=12;
+    col1[1]=10;
+    col1[2]=43;
+    col1[3]=0;
+    col1[4]=27;
+    for(i=0;i<5;i++){
+        for(j=0;j<cc;j++)
+    idlist[i][j]=i;
+    //idlist[i][1]=i*3;
+       // idlist[i][2]=i*3;
+    }
+    not_yetA=big_short(col1,idlist,cc,5,cc);
+    printf("print \n");
+    for(i=0;i<5;i++){
+        for(j=0;j<cc;j++){
+        printf(" id %"PRIu64 ,not_yetA->matrix[i][j]);}
+printf(" ,%"PRIu64 "\n",not_yetA->matrix[i][cc]);
+
+    }
     clock_t stop = clock(); //End timer
     double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
 

@@ -721,20 +721,37 @@ short_priority(transfer->priority1,priority_number);
 
             }
 
-        }else{                                              //tablejoin!!!!!!!!!!!!!!5555555555555555555
+        }else{                                                           //tablejoin!!!!!!!!!!!!!!5555555555555555555
             if(midle->start==NULL) {
                 int k;
+                int ** list1;
+                int ** list2;
+                int needed=1; //<---i kolona pou 8a perni apo to middle
                 priority_tree(transfer->priority1, transfer->priority_number,transfer);
                 for (k = 0; k < priority_number; k++)          //gia ola ta queries
                     printf(" priority %d : %s \n",k, transfer->priority1[k].command);
 
-
+                list1=(int**)malloc(sizeof(int*)*transfer->tables_ids[ht1].size);
+                list2=(int**)malloc(sizeof(int*)*transfer->tables_ids[ht2].size);
+                for(j=0;j<transfer->tables_ids[ht1].size;j++){
+                    list1[j]=malloc(sizeof(int));
+                }
+                for(j=0;j<transfer->tables_ids[ht2].size;j++){
+                    list2[j]=malloc(sizeof(int));
+                }
+                for(j=0;j<transfer->tables_ids[ht1].size;j++){
+                    list1[j][0]=transfer->tables_ids[ht1].id_list[j];
+                }
+                for(j=0;j<transfer->tables_ids[ht2].size;j++){
+                    list2[j][0]=transfer->tables_ids[ht2].id_list[j];
+                }
                 midle->start=list_creation();
                 results * res1;
                 results * res2;
-                res1=big_short(col1,(&transfer->tables_ids[ht1]));
-                res2=big_short(col2,(&transfer->tables_ids[ht2]));
-                join_matrices(res1,res2,midle);
+                res1=big_short(col1,list1,1,transfer->tables_ids[ht1].size,needed);
+                res2=big_short(col2,list2,1,transfer->tables_ids[ht2].size,needed);
+
+                join_matrices(res1,res2,midle,needed);
                 midle->num_inserted=2;
                 midle->inserted[0]=ht1;
                 midle->inserted[1]=ht2;

@@ -296,7 +296,7 @@ Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed 
     for(i=0;i<rows;i++){
         retur->location[i] = 1; //initialise possition matrix
         for(j=0;j<colums;j++)
-        retur->TableA[i][j]=idlist[i][j];
+        retur->TableA[i][j]=idlist[j][i];
        retur->TableA[i][colums]=col[i];
    //     printf(" id %"PRIu64 ",%"PRIu64 "\n",retur->TableA[i][j-1],retur->TableA[i][colums]);
 
@@ -480,7 +480,7 @@ void free_table(Table_Info *table) {            // self explanatory
     printf("rows %d\n",table->rows);
     for (i = 0; i < table->rows; i++) {   // <-- THAT WORKS .FIX YOUR PC!!! and get some bloody linux
         free(table->TableA[i]);
-        free(table->TableB[i]);
+      // free(table->TableB[i]);
 
     }
 
@@ -508,7 +508,7 @@ void free_table(Table_Info *table) {            // self explanatory
 }
 
 //=================================================================================================================
-int** join_matrices(results* A, results* B,int needed,int middle_matrix_size ) {  //join_matrices
+int** join_matrices(results* A, results* B,int needed,int middle_matrix_size ,int* size) {  //join_matrices
 
     info_node* list;
     node_type* cur_node = NULL;
@@ -540,20 +540,21 @@ int added=0;
                         midle->table[k][added]=(int)A->matrix[i][k];
                     for(k=A->columns;k<(A->columns+B->columns);k++)
                         midle->table[k][added]=(int)B->matrix[j][k];
+
                 }else{
                                             ///realloc if no space////////
-                for(k=0;k<(A->columns+B->columns);k++){
-                    midle->table[k]=realloc(midle->table[k],2*middle_matrix_size);
-                   // if(test==NULL){
-                   //     printf("MIDLE MATRIX REALLOC=NULL \n");
-                  //      exit(1);
-                   // }
-                   // midle->table[k]=test;
-                }
+                     for(k=0;k<(A->columns+B->columns);k++){
+                    test=(int*)realloc(midle->table[k],2*middle_matrix_size);
+                    if(test==0){
+                        printf("MIDLE MATRIX REALLOC=NULL \n");
+                        exit(1);
+                    }
+                    midle->table[k]=test;
+                     }
                     middle_matrix_size=2*middle_matrix_size;
 
                     for(k=0;k<A->columns;k++){}
-                      //  midle->table[k][added]=(int)A->matrix[i][k];     // add all the columns
+                     //   midle->table[k][added]=(int)A->matrix[i][k];     // add all the columns
                     for(k=A->columns;k<(A->columns+B->columns);k++){}
                        // midle->table[k][added]=(int)B->matrix[j][k];
 
@@ -584,7 +585,7 @@ int added=0;
     printf("\n  added: %d\n", added);
 
     midle->columns=A->columns+B->columns;
-    midle->size=added;
+    *size=added;
     return midle->table;
 }
 

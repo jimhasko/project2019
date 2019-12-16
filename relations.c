@@ -642,7 +642,6 @@ short_priority(transfer->priority1,priority_number);
         idcounter=0;
 
 
-
     table1=transfer->priority1[i].master_table1;
     column1=transfer->priority1[i].col1;
     ht1=transfer->priority1[i].here_table1;
@@ -749,7 +748,7 @@ short_priority(transfer->priority1,priority_number);
                 res1=big_short(col1,list1,1,transfer->tables_ids[ht1].size,needed);
                 res2=big_short(col2,list2,1,transfer->tables_ids[ht2].size,needed);
 
-                 midle->table =join_matrices(res1,res2,needed,middle__size);        ////////< join
+                 midle->table =join_matrices(res1,res2,needed,middle__size,(&midle->size));        ////////< join
                 midle->num_inserted=2;
                 midle->inserted[0]=ht1;
                 midle->inserted[1]=ht2;
@@ -776,7 +775,7 @@ short_priority(transfer->priority1,priority_number);
                     break;
 
                  } else {
-                     midle->num_inserted++;
+
                      if (isin1 == 1) {
                          list1= get_id_list(&transfer->tables_ids[ht2]);
                          res1=big_short(col1,midle->table,midle->num_inserted,midle->size,needed);
@@ -791,8 +790,8 @@ short_priority(transfer->priority1,priority_number);
                          free_list(list1,transfer->tables_ids[ht1].size);
                      }
                         free_midle_table(midle);
-                     midle->table =join_matrices(res1,res2,needed,middle__size);            ////////< join
-
+                     midle->table =join_matrices(res1,res2,needed,middle__size,(&midle->size));            ////////< join
+                     midle->num_inserted++;
 
                  }
 
@@ -806,11 +805,15 @@ short_priority(transfer->priority1,priority_number);
         transfer->priority1[i].size=idcounter;
         free(transfer->tables_ids[ht1].id_list);
         transfer->tables_ids[ht1].id_list=new;
+        midle->size=idcounter;
         //new=NULL;
         }
 
 
-
+        if(midle->size==0){
+            printf("0 common values \n");
+            //   break;
+        }
 
 
 
@@ -820,10 +823,11 @@ short_priority(transfer->priority1,priority_number);
 }
 void free_list(int** list,int size){
     int i;
-    for(i=1;i<size;i++)
+   /* for(i=1;i<size;i++)
     {
         free(list[i]);
-    }
+    }*/
+   free(list[0]);
 
 }
 
@@ -840,17 +844,22 @@ void free_midle_table(middle* midle){
 int** get_id_list(tableid * idlist){
    int j,size2=idlist->size;
     int ** list2;
-     list2=(int**)malloc(sizeof(int*)*size2);
-
-    for(j=0;j<idlist->size;j++){
-        list2[j]=malloc(sizeof(int));
+     list2=(int**)malloc(sizeof(int*)*1);
+        if(list2==NULL)
+            perror(list2);
+    for(j=0;j<1;j++) {
+        list2[j] = malloc(sizeof(int)*size2);
     }
 
     for(j=0;j<idlist->size;j++){
-        list2[j][0]=idlist->id_list[j];
+        list2[0][j]=idlist->id_list[j];
     }
-
-    return list2;
+    if(list2!=NULL){
+    return list2;}
+    else {
+        printf("  god why ? \n");
+        exit(1);
+    }
 }
 
 void midle_scan(middle* midle,priority* prior,int size,List_of_Tables* master_table){

@@ -7,7 +7,7 @@
 //#include "relations.h"
 #define  quick_short 100
 #define  SizeofDataFileName 100
-#define  middle__size 1000
+#define  middle__size 500
 //=================================================================================================================
 typedef struct Listnode {
 
@@ -105,7 +105,7 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed );
 
 void free_table(Table_Info *table);
 
-int** join_matrices(results* A, results* B,int needed,int middle_matrix_size);
+int** join_matrices(results* A, results* B,int needed,int middle_matrix_size,int * size);
 //results *  simple_mesure(results* A,uint64_t num,char operator);
 void free_results(results * A);
 //=================================================================================================================

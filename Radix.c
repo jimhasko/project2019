@@ -522,7 +522,7 @@ int** join_matrices(results* A, results* B,int needed,int middle_matrix_size ) {
     for(i=0;i<(A->columns+B->columns);i++)
         midle->table[i]=(int*)malloc(sizeof(int)*middle_matrix_size);//middle [columns][rows]
 
-    list = midle->start;
+
     current_looked = 0;
 int added=0;
    for (i = 0; i < A->rows; i++) {
@@ -543,19 +543,19 @@ int added=0;
                 }else{
                                             ///realloc if no space////////
                 for(k=0;k<(A->columns+B->columns);k++){
-                    test=realloc(midle->table[k],2*middle_matrix_size);
-                    if(test==NULL){
-                        printf("MIDLE MATRIX REALLOC=NULL \n");
-                        exit(1);
-                    }
-                    midle->table[k]=test;
+                    midle->table[k]=realloc(midle->table[k],2*middle_matrix_size);
+                   // if(test==NULL){
+                   //     printf("MIDLE MATRIX REALLOC=NULL \n");
+                  //      exit(1);
+                   // }
+                   // midle->table[k]=test;
                 }
                     middle_matrix_size=2*middle_matrix_size;
 
-                    for(k=0;k<A->columns;k++)
-                        midle->table[k][added]=(int)A->matrix[i][k];     // add all the columns
-                    for(k=A->columns;k<(A->columns+B->columns);k++)
-                        midle->table[k][added]=(int)B->matrix[j][k];
+                    for(k=0;k<A->columns;k++){}
+                      //  midle->table[k][added]=(int)A->matrix[i][k];     // add all the columns
+                    for(k=A->columns;k<(A->columns+B->columns);k++){}
+                       // midle->table[k][added]=(int)B->matrix[j][k];
 
 
                 }

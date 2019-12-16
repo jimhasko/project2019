@@ -655,8 +655,9 @@ short_priority(transfer->priority1,priority_number);
         col2=master_table->tables[table2].Full_Table[column2].Column;
     }
 
-printf("made A  new %d",transfer->tables_ids[ht1].size);
+
     if(transfer->priority1[i].type!=5){
+        printf("made A  new %d",transfer->tables_ids[ht1].size);
     new=malloc(sizeof(int)*transfer->tables_ids[ht1].size);
         if(new == NULL) {
             perror("malloc");
@@ -748,7 +749,7 @@ printf("made A  new %d",transfer->tables_ids[ht1].size);
                 res1=big_short(col1,list1,1,transfer->tables_ids[ht1].size,needed);
                 res2=big_short(col2,list2,1,transfer->tables_ids[ht2].size,needed);
 
-                 midle->table =join_matrices(res1,res2,needed,middle__size);
+                 midle->table =join_matrices(res1,res2,needed,middle__size);        ////////< join
                 midle->num_inserted=2;
                 midle->inserted[0]=ht1;
                 midle->inserted[1]=ht2;
@@ -790,7 +791,7 @@ printf("made A  new %d",transfer->tables_ids[ht1].size);
                          free_list(list1,transfer->tables_ids[ht1].size);
                      }
                         free_midle_table(midle);
-                     midle->table =join_matrices(res1,res2,needed,middle__size);
+                     midle->table =join_matrices(res1,res2,needed,middle__size);            ////////< join
 
 
                  }
@@ -827,17 +828,15 @@ void free_list(int** list,int size){
 }
 
 void free_midle_table(middle* midle){
-    int i,col,size;
+    int i,col;
     col=midle->columns;
-    size=midle->size;
+
     for(i=0;i<col;i++){
         free(midle->table[i]);
     }
     free(midle->table);
-
-
-
 }
+
 int** get_id_list(tableid * idlist){
    int j,size2=idlist->size;
     int ** list2;

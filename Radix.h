@@ -7,7 +7,7 @@
 //#include "relations.h"
 #define  quick_short 100
 #define  SizeofDataFileName 100
-#define  middle__size 500
+#define  middle__size 1000
 //=================================================================================================================
 typedef struct Listnode {
 

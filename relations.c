@@ -619,8 +619,6 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
     int size,table1,table2,column1,column2,ht1,ht2,priority_number;
 
 
-    middle* middle_matrix;
-    int* replacer_matrix;
 
 
     priority_number=transfer->priority_number;
@@ -634,6 +632,8 @@ short_priority(transfer->priority1,priority_number);
     midle->inserted=malloc(sizeof(int)*master_table->num_of_tables);
     midle->num_inserted=0;
     midle->start=NULL;
+    midle->columns=0;
+    midle->size=0;
  //   middle.start  //kane initialize ti lista
     for (i = 0; i < priority_number; i++) {         //gia ola ta queries
                 counter=0;
@@ -655,8 +655,13 @@ short_priority(transfer->priority1,priority_number);
         col2=master_table->tables[table2].Full_Table[column2].Column;
     }
 
-
-        new=malloc(sizeof(int)*transfer->tables_ids[ht1].size);
+printf("made A  new %d",transfer->tables_ids[ht1].size);
+    if(transfer->priority1[i].type!=5){
+    new=malloc(sizeof(int)*transfer->tables_ids[ht1].size);
+        if(new == NULL) {
+            perror("malloc");
+        exit(1);
+        }}
 
         if (transfer->priority1[i].type == 1) {             //self join 111111111111111111111111111111111111111111111111111111111111111
 
@@ -721,50 +726,74 @@ short_priority(transfer->priority1,priority_number);
 
             }
 
-        }else{                                                           //tablejoin!!!!!!!!!!!!!!5555555555555555555
-            if(midle->start==NULL) {
-                int k;
-                int ** list1;
-                int ** list2;
-                int needed=1; //<---i kolona pou 8a perni apo to middle
-                priority_tree(transfer->priority1, transfer->priority_number,transfer);
-                for (k = 0; k < priority_number; k++)          //gia ola ta queries
-                    printf(" priority %d : %s \n",k, transfer->priority1[k].command);
+        }else{                                              //tablejoin!!!!!!!!!!!!!!5555555555555555555///////////////
 
-                list1=(int**)malloc(sizeof(int*)*transfer->tables_ids[ht1].size);
-                list2=(int**)malloc(sizeof(int*)*transfer->tables_ids[ht2].size);
-                for(j=0;j<transfer->tables_ids[ht1].size;j++){
-                    list1[j]=malloc(sizeof(int));
-                }
-                for(j=0;j<transfer->tables_ids[ht2].size;j++){
-                    list2[j]=malloc(sizeof(int));
-                }
-                for(j=0;j<transfer->tables_ids[ht1].size;j++){
-                    list1[j][0]=transfer->tables_ids[ht1].id_list[j];
-                }
-                for(j=0;j<transfer->tables_ids[ht2].size;j++){
-                    list2[j][0]=transfer->tables_ids[ht2].id_list[j];
-                }
-                midle->start=list_creation();
-                results * res1;
-                results * res2;
+            int ** list1;
+            results * res1;
+            results * res2;
+            int isin1,isin2,mid_size,needed1,needed=1;
+            if(midle->num_inserted==0) {
+
+                   priority_tree(transfer->priority1, transfer->priority_number, transfer);
+                int ** list2;
+                    list1=get_id_list(&transfer->tables_ids[ht1]);
+                    list2=get_id_list(&transfer->tables_ids[ht2]);
+
+
+
+
+
+
+
                 res1=big_short(col1,list1,1,transfer->tables_ids[ht1].size,needed);
                 res2=big_short(col2,list2,1,transfer->tables_ids[ht2].size,needed);
 
-                join_matrices(res1,res2,midle,needed);
+                 midle->table =join_matrices(res1,res2,needed,middle__size);
                 midle->num_inserted=2;
                 midle->inserted[0]=ht1;
                 midle->inserted[1]=ht2;
-            }else{
-            for(j=0;j<midle->num_inserted;j++){
-                if(ht1==midle->inserted[i]){
-
-                }
+                free_list(list1,transfer->tables_ids[ht1].size);
+                free_list(list2,transfer->tables_ids[ht2].size);
 
 
             }
+            else{       //////secomnd run//////////////////
 
 
+                isin1=0;
+                isin2=0;
+                for(j=0;j<midle->num_inserted;j++){
+                  if(ht1==midle->inserted[i])
+                    isin1=1;
+                    needed=i;
+                     //  needed1=i;
+                     if(ht2==midle->inserted[i])
+                    isin2=1;
+                     needed=i;}
+                 if(isin1+isin2==2){
+                    midle_scan(midle,(&transfer->priority1[i]),midle->size,master_table);
+                    break;
+
+                 } else {
+                     midle->num_inserted++;
+                     if (isin1 == 1) {
+                         list1= get_id_list(&transfer->tables_ids[ht2]);
+                         res1=big_short(col1,midle->table,midle->num_inserted,midle->size,needed);
+                         res2=big_short(col2,list1,1,transfer->tables_ids[ht2].size,1);
+                         midle->inserted[midle->num_inserted]=ht2;
+                         free_list(list1,transfer->tables_ids[ht2].size);
+                     } else {
+                        list1= get_id_list(&transfer->tables_ids[ht1]);
+                         res1=big_short(col2,midle->table,midle->num_inserted,midle->size,needed);
+                         res2=big_short(col1,list1,1,transfer->tables_ids[ht1].size,1);
+                         midle->inserted[midle->num_inserted]=ht1;
+                         free_list(list1,transfer->tables_ids[ht1].size);
+                     }
+                        free_midle_table(midle);
+                     midle->table =join_matrices(res1,res2,needed,middle__size);
+
+
+                 }
 
 
 
@@ -775,290 +804,110 @@ short_priority(transfer->priority1,priority_number);
         transfer->tables_ids[ht1].size=idcounter;
         transfer->priority1[i].size=idcounter;
         free(transfer->tables_ids[ht1].id_list);
-        transfer->tables_ids[ht1].id_list=new;}
-
-
-
-
-
-
-    }
-
-
-}
-
-
-
-
-
-////////////////////////
-
-/*
-List_of_Tables run_joins(List_of_Tables* temp_table,middle* mid_table,int priority_number,int max_priority,priority* priority_series){
-    uint64_t i,j,k,master_table1,n,column1,master_table2,column2,temp1,temp2;
-
-    tableid*test_matrix;
-    test_matrix=(tableid*)malloc(parag(temp_table->num_of_tables)*sizeof(tableid));
-    statistics* stats_table;
-    int max_columns=0;
-    int * arr;
-    arr=malloc(temp_table->num_of_tables*sizeof(int));
-    for(j=0;j<temp_table->num_of_tables;j++)
-        arr[i]=i;
-
-
-
-
-
-
-
-
-
-
-    for(j=0;j<temp_table->num_of_tables;j++) {
-
-
-        test_matrix[j].f_size=0;
-//        test_matrix[j].is_it_on=calloc(temp_table->num_of_tables,sizeof(int));
-        test_matrix[j].piority_list=calloc(temp_table->num_of_tables,sizeof(int));
-
-    }
-
-
-
-
-
-
-for(j=0;j<max_priority-priority_number;j++){
-
-    master_table1= priority_series[j+priority_number].command[0]-48;
-    column1= priority_series[j+priority_number].command[2]-48;
-    master_table2= priority_series[j+priority_number].command[4]-48;
-    column2= priority_series[j+priority_number].command[6]-48;
-
-    for(i=0;i<max_priority-priority_number;i++){
-
-        
-
-
-
-    }
-
-
-
-
-}
-
-
-
-
-
-
-}
-*/
-
-
-
-
-
-
-
-
-int parag(int input){
-    int i,res=1;
-    for(i=1;i<=input;i++)
-        res=res*i;
-    return res;
-}
-
-void permute(int *array,int i,int length,int** test) {
-    int temp,k,l;
-    k=0;
-    if (length == i){
-        while(k<parag(length)) {
-            if(test[k][0]!=-1){
-                k++;
-            }else{
-                for (l = 0; l < length; l++){
-                    //  printf("%d ", array[l]);
-                    test[k][l]=array[l];}
-                // printf("\n");
-                k=24;
-            }}
-        return ;
-    }
-    int j = i;
-    for (j = i; j < length; j++) {
-
-        temp=array[i];
-        array[i]=array[j];
-        array[j]=temp;
-        permute(array,i+1,length,test);
-
-        temp=array[i];
-        array[i]=array[j];
-        array[j]=temp;
-    }
-
-}
-
-
-List_of_Tables* cost(int table1,int table2,int column1,int column2 ,List_of_Tables* temp_table){
-    uint64_t temp1,temp2,n,i;
-    if(temp_table->tables[table1].stats[column1].lower<temp_table->tables[table2].stats[column2].lower){
-        temp_table->tables[table1].stats[column1].lower=temp_table->tables[table2].stats[column2].lower;
-
-    }else{
-
-        temp_table->tables[table2].stats[column2].lower=temp_table->tables[table1].stats[column1].lower;
-    }
-
-    if(temp_table->tables[table1].stats[column1].upper<temp_table->tables[table2].stats[column2].upper){
-        temp_table->tables[table1].stats[column1].upper=temp_table->tables[table2].stats[column2].upper;
-
-    }else{
-
-        temp_table->tables[table2].stats[column2].upper=temp_table->tables[table1].stats[column1].upper;
-    }
-
-    if((n=temp_table->tables[table2].stats[column2].upper-temp_table->tables[table1].stats[column1].lower+1)>bool_num){
-        n=bool_num;
-    }
-
-    temp_table->tables[table1].stats[column1].full=temp_table->tables[table1].stats[column1].full*temp_table->tables[table2].stats[column2].full/n;
-    temp_table->tables[table2].stats[column2].full= temp_table->tables[table1].stats[column1].full;
-
-    temp1= temp_table->tables[table1].stats[column1].distinct;
-    temp2= temp_table->tables[table2].stats[column2].distinct;
-    temp_table->tables[table1].stats[column1].distinct=temp_table->tables[table1].stats[column1].distinct*temp_table->tables[table2].stats[column2].distinct/n;
-    temp_table->tables[table2].stats[column2].distinct= temp_table->tables[table1].stats[column1].distinct;
-    temp1= temp_table->tables[table1].stats[column1].distinct/temp1;
-    temp2= temp_table->tables[table1].stats[column1].distinct/temp2;
-    for(i=0;i<temp_table->tables[table1].column_num;i++){                                   //other columns//////////////////////////////////////////////
-        if(i!=column1) {
-            temp_table->tables[table1].stats[i].full=temp_table->tables[table1].stats[column1].full;
-            temp_table->tables[table1].stats[i].distinct=(1-power(1-temp1,temp_table->tables[table1].stats[i].full/temp_table->tables[table1].stats[i].distinct));
-        }
-
-    }
-
-
-
-    for(i=0;i<temp_table->tables[table2].column_num;i++){                                   //other columns//////////////////////////////////////////////
-        if(i!=column2) {
-            temp_table->tables[table2].stats[i].full=temp_table->tables[table2].stats[column2].full;
-            temp_table->tables[table2].stats[i].distinct=(1-power(1-temp2,temp_table->tables[table2].stats[i].full/temp_table->tables[table2].stats[i].distinct));
-        }
-
-    }
-
-
-
-return temp_table;
-
-
-
-}
-
-
-
-
-
-void short_jois(priority* priority_series,int max_priority,int priority_number,int** prem,List_of_Tables * temp_table){
-    int max_columns=0;
-    uint64_t i,j,table1,table2,column1,column2,k,temp_minimum;
-    int minimum=-1;
-    int*priority_line;
-    int* priotity_line_temp;
-    priotity_line_temp=(int*)malloc(temp_table->num_of_tables*sizeof(int));
-    priority_line=(int*)malloc(temp_table->num_of_tables*sizeof(int));
-    neibour_node** neibour;
-
-neibour=(neibour_node**)malloc(sizeof(neibour_node*)*temp_table->num_of_tables);
-   for(j=0;j<temp_table->num_of_tables;j++)
-    neibour[j]=calloc(temp_table->num_of_tables,sizeof(neibour_node));
-
-
-
-
-
-
-
-
-    for(j=priority_number;j<max_priority;j++){       //pinakas geitniasis
-        table1= priority_series[j].command[0]-48;
-        column1= priority_series[j].command[2]-48;
-        table2= priority_series[j].command[4]-48;
-        column2= priority_series[j].command[6]-48;
-
-        neibour[table1][table2].bol=1;
-        neibour[table2][table1].bol=1;
-        neibour[table1][table2].priority_line=j;     //pinakas geitniasis
-        neibour[table2][table1].priority_line=j;
-    }
-
-
-
-
-    for(j=0;j<temp_table->num_of_tables;j++)
-        if(max_columns<temp_table->tables[j].column_num)
-            max_columns=temp_table->tables[j].column_num;
-
-    statistics ** stats_table;
-    stats_table=(statistics**)malloc(temp_table->num_of_tables*sizeof(statistics*));
-
-    for(j=0;j<temp_table->num_of_tables;j++)
-        stats_table[j]=(statistics*)malloc(sizeof(statistics)*max_columns);
-
-   // stats_table=(statistics*)malloc(max_columns*temp_table->num_of_tables*sizeof(statistics));      //kratai ta arxika statistika///
-    for(j=0;j<temp_table->num_of_tables;j++) {
-        for (i = 0; i < temp_table->tables[j].column_num; i++) {
-            stats_table[j][i] = temp_table->tables[j].stats[i];
-        }
-    }
-    for(k=0;k<parag(temp_table->num_of_tables);k++){
-temp_minimum=0;
-        for(i=0;i<temp_table->num_of_tables-1;i++){
-
-            if(neibour[prem[k][i]][prem[k][i+1]].bol==0)
-                break;
-
-            table1 = priority_series[neibour[prem[k][i]][prem[k][i+1]].priority_line].command[0] - 48;
-            column1 = priority_series[neibour[prem[k][i]][prem[k][i+1]].priority_line].command[2] - 48;
-            table2 = priority_series[neibour[prem[k][i]][prem[k][i+1]].priority_line].command[4] - 48;
-            column2 = priority_series[neibour[prem[k][i]][prem[k][i+1]].priority_line].command[6] - 48;
-
-            temp_table=cost(table1,table2,column1,column2,temp_table);
-            temp_minimum=temp_minimum+temp_table->tables[table1].stats[column1].full;
-            priotity_line_temp[i]=neibour[prem[k][i]][prem[k][i+1]].priority_line;
+        transfer->tables_ids[ht1].id_list=new;
+        //new=NULL;
         }
 
 
-        if(minimum==-1){
-            minimum=temp_minimum;
-            for(i=0;i<temp_table->num_of_tables;i++)
-            priority_line[i]=priotity_line_temp[i];
-        }else{
-            if(minimum>temp_minimum){
-                minimum=temp_minimum;
-                for(i=0;i<temp_table->num_of_tables;i++)
-                    priority_line[i]=priotity_line_temp[i];
+
+
+
+
+    }
+
+
+}
+void free_list(int** list,int size){
+    int i;
+    for(i=1;i<size;i++)
+    {
+        free(list[i]);
+    }
+
+}
+
+void free_midle_table(middle* midle){
+    int i,col,size;
+    col=midle->columns;
+    size=midle->size;
+    for(i=0;i<col;i++){
+        free(midle->table[i]);
+    }
+    free(midle->table);
+
+
+
+}
+int** get_id_list(tableid * idlist){
+   int j,size2=idlist->size;
+    int ** list2;
+     list2=(int**)malloc(sizeof(int*)*size2);
+
+    for(j=0;j<idlist->size;j++){
+        list2[j]=malloc(sizeof(int));
+    }
+
+    for(j=0;j<idlist->size;j++){
+        list2[j][0]=idlist->id_list[j];
+    }
+
+    return list2;
+}
+
+void midle_scan(middle* midle,priority* prior,int size,List_of_Tables* master_table){
+    int i,j,k,col1,col2;
+    int* test;
+uint64_t * column1=master_table->tables[prior->master_table1].Full_Table[prior->col1].Column;
+uint64_t * column2=master_table->tables[prior->master_table2].Full_Table[prior->col2].Column;
+  int  ht1=prior->here_table1;
+  int  ht2=prior->here_table2;
+  col1=prior->col1;
+  col2=prior->col2;
+  int added=0;
+    int** temp=(int**)malloc(sizeof(int*)*(midle->num_inserted));
+    for(i=0;i<(midle->num_inserted);i++)
+       temp[i]=malloc(sizeof(int)*size);
+
+    for(j=0;j<size;j++){
+        if(column1[j]==column2[j]){
+            for(i=0;i<midle->num_inserted;i++)
+               temp[i][added]= midle->table[i][j];
+            added++;
+            if(added==size){
+
+                for(k=0;k<(midle->num_inserted);k++){
+                    test=realloc(midle->table[k],2*size);
+                    if(test==NULL){
+                        printf("MIDLE MATRIX REALLOC=NULL on selfjoin \n");
+                        exit(1);
+                    }
+                    temp[k]=test;
+                }
+
+
+
+
             }
 
         }
 
-        for(i=0;i<temp_table->num_of_tables;i++){
 
 
-
-
-
-
-        }
-
-
-        }
     }
+
+free(midle->table);
+    midle->table=temp;
+
+
+}
+
+
+
+
+
+
+
+
 
 
 

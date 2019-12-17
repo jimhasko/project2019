@@ -526,6 +526,7 @@ int** join_matrices(results* A, results* B,int needed,int middle_matrix_size ,in
     midle=(middle*)malloc(sizeof(middle));
     midle->table=NULL;
     int columns=A->columns+B->columns;
+    
     midle->table=(int**)malloc(sizeof(int*)*columns);
 
     for(i=0;i<(A->columns+B->columns);i++)

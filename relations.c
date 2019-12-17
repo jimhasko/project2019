@@ -764,6 +764,7 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
                 midle->num_inserted=2;
                 midle->inserted[0]=ht1;
                 midle->inserted[1]=ht2;
+                midle->columns=2;
                 free_list(list1,transfer->tables_ids[ht1].size);
                 free_list(list2,transfer->tables_ids[ht2].size);
 
@@ -976,7 +977,7 @@ void free_midle_table(middle* midle){
 void free_midle(middle* midle){
     int i,j;
     free_midle_table(midle);
-  //  free(midle->inserted);
+    free(midle->inserted);
     free(midle);
 
 
@@ -1008,7 +1009,7 @@ void free_big(List_of_Tables* master){
         }
 
 
-free(master->tables->Full_Table);
+free(master->tables);
 
     }
 

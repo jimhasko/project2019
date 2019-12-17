@@ -47,7 +47,51 @@ void short_priority(priority* prior,int prior_num){
 }
 
 
+List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* argv[]) {
 
+    if (argc != 3 ) {
+        printf("Error with arguments! input-> Init_file Work_file!");
+    }
+    else {
+
+        FILE * fptri = NULL;
+        int lines = 0;
+        char * line =  (char*) malloc( sizeof(char) * max_line_length);
+
+        fptri = fopen(argv[1], "r");
+        if(fptri == NULL) {
+            printf("No such init_file in the working directory!");
+        }
+
+        while(!feof(fptri)) {
+            if(fgetc(fptri) == '\n') {
+                lines++;
+            }
+        }
+
+        fseek(fptri, 0, SEEK_SET);
+
+        if (lines <= 0 ) {
+
+            printf("Init_file was empty, check file again!");
+        }
+
+        // master_table = (List_of_Tables*) malloc (sizeof(List_of_Tables));
+        master_table.num_of_tables = lines;
+        lines = 0;
+        master_table.tables=(Single_Table*)malloc(sizeof(Single_Table)*master_table.num_of_tables);
+        while (EOF != fscanf(fptri, "%[^\n]\n", line)) {
+
+            master_table.tables[lines]=fill(line, lines);
+            //printf("%s %d\n",line, lines);
+            lines++;
+        }
+        free(line);
+    }
+
+
+    return master_table;
+}
 
 int min_priority(priority* prior,int priority_number){
     int i,min;
@@ -472,7 +516,8 @@ int len,counter_guard=10;
             if(len==5||ptr[5]!='.'){
                 priority_series[counter].type=2;  //=number
                 last = strrchr(ptr, '=');
-                priority_series[counter].number=Sto64(last);
+                priority_series[counter].number=Sto64(last+1);
+
 
             }else   if(((here_table1)==(here_table2)&&(master_table->tables[table1].table_name==master_table->tables[table2].table_name))){// self join
 
@@ -766,25 +811,11 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
 
 
                 res1=big_short(col1,list1,1,transfer->tables_ids[ht1].size,needed);
-               if( res1->matrix[100][1]!=col1[res1->matrix[100][0]])
-               {
-                   printf("FUCKKK!");
-                   exit(1);
 
-               }
                 res2=big_short(col2,list2,1,transfer->tables_ids[ht2].size,needed);
-                if( res2->matrix[100][1]!=col2[res2->matrix[100][0]])
-                {
-                    printf("FUCKKK1.5!");
-                    exit(1);
 
-                }
                  midle->table =join_matrices(res1,res2,0,middle__size,(&midle->size));        ////////< join
-                if(col1[midle->table[0][200]]!=col2[midle->table[1][200]]){
-                    printf("FUCKKK2!");
-                    exit(1);
 
-                }
                 midle->num_inserted=2;
                 midle->inserted[0]=ht1;
                 midle->inserted[1]=ht2;
@@ -948,7 +979,7 @@ printf("ADDING!!\n");
             for (j = 0; j < midle->num_inserted; j++) {
                 if (HT == midle->inserted[j]){
                     ins_id = j;
-                    printf("j: %d : ",j);
+
                     break;}
             }
 
@@ -964,17 +995,21 @@ printf("ADDING!!\n");
 
             }
 
-            printf(" SUM%d ::%"PRIu64 "\n", i, sums[i]);
+            printf(" %"PRIu64 " ",  sums[i]);
 
 
         }
-
+        free(sums);
+    }else{
+        for(j=0;j<transfer->suma_size;j++)
+            printf("NULL  ");
     }
-    free(sums);
+    printf("\n \n");
+
 
     free_midle(midle);
     //free_transfer(transfer);
-    free_big(master_table);
+    //free_big(master_table);
 
 
 
@@ -1021,7 +1056,8 @@ void free_midle_table(middle* midle){
     for(i=0;i<col;i++){
         free(midle->table[i]);
     }
-    free(midle->table);
+    if(midle->num_inserted>0)
+        free(midle->table);
 }
 
 void free_midle(middle* midle){

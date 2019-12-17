@@ -29,7 +29,8 @@ typedef struct statistics{
 
 
 typedef struct Single_Table{
-    uint64_t column_num,tube_num;
+    uint64_t column_num;
+    uint64_t tube_num;
     Row_table* Full_Table;
     int* id_table;
     int table_name;

@@ -620,7 +620,8 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
     int size,table1,table2,column1,column2,ht1,ht2,priority_number;
 
-
+    ht1 = 0;
+    ht2 = 0;
 
 
     priority_number=transfer->priority_number;

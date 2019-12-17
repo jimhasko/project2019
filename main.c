@@ -33,11 +33,11 @@ int main(int argc, char** argv) {
     master_table.tables[3]=fill(name4,3);
     master_table.tables[4]=fill(name5,4);
 just_transfer * test;
-middle* fuck;
+middle* bad_word;
    test= analise(str,&master_table);
 
-   fuck=run_filters(&master_table,test);
-athrisma(fuck,test,&master_table);
+   bad_word=run_filters(&master_table,test);
+    athrisma(bad_word,test,&master_table);
     clock_t stop = clock(); //End timer
     double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
 

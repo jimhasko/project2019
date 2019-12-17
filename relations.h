@@ -43,6 +43,7 @@ typedef struct neibour_node{
     int priority_line;
 
 
+
 }neibour_node;
 
 

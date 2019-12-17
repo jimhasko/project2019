@@ -60,13 +60,18 @@ typedef struct priority {
 }priority;
 
 
+typedef struct summa {
+
+
+    int col,master_table,here_table;
+}summa;
 
 
 typedef struct just_transfer{
     priority* priority1;
     int priority_number;
-
-    int num_of_tables;//posa ine ta from tables
+    summa * suma;
+    int num_of_tables,suma_size;//posa ine ta from tables
     int* tables;// pia einai ta from tables
     tableid* tables_ids;
 }just_transfer;
@@ -94,3 +99,7 @@ int** get_id_list(tableid * idlist);
 void midle_scan(middle* midle,priority* prior,int size,List_of_Tables* master_table);
 void free_list(int** list,int size);
 void free_midle_table(middle* midle);
+void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table);
+void free_midle(middle* midle);
+void free_big(List_of_Tables* master);
+void free_transfer(just_transfer* transfer);

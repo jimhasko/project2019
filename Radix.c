@@ -63,7 +63,7 @@ int bithash2(uint64_t hash_value, int time) { //time starts at 0 and ads by one
 }
 
 //=================================================================================================================
-void print(Table_Info *table, int from, int to) {
+void print(Table_Info *table, int from, int to,int columns) {
     printf("PRINTING!! from %d, to %d \n\n",from,to);
     int i;
 
@@ -71,16 +71,16 @@ void print(Table_Info *table, int from, int to) {
     for (i = from; i < to; i++) {
 
         for (i = from; i < to; i++) {
-            printf("[%"PRIu64" %"PRIu64"] %d ::%d \n", table->TableA[i][0], table->TableA[i][1], i,
-                   bithash2(table->TableA[i][1], table->time));
+            printf("[%"PRIu64" %"PRIu64"|| %"PRIu64"] %d ::%d location::%d \n", table->TableA[i][0], table->TableA[i][1],table->TableA[i][columns], i,
+                   bithash2(table->TableA[i][1], table->time),table->location[i]);
         }
     }
 
     printf("\n");
     printf("TABLE B\n \n");
     for (i = from; i < to; i++) {
-        printf("[%"PRIu64" %"PRIu64"] %d ::%d \n", table->TableB[i][0], table->TableB[i][1], i,
-               bithash2(table->TableB[i][1], table->time));
+        printf("[%"PRIu64" %"PRIu64"|| %"PRIu64"] %d ::%d location::%d\n", table->TableB[i][0], table->TableB[i][1],table->TableB[i][columns], i,
+               bithash2(table->TableB[i][1], table->time),table->location[i]);
     }
 
     printf("DONE PRINTING!! \n\n\n\n");
@@ -276,13 +276,13 @@ Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed 
     columls = colums+1;
 
     Table_Info *retur = malloc(sizeof(Table_Info));
-    retur->TableA = malloc(sizeof(uint64_t *) * rows);
-    retur->TableB = malloc(sizeof(uint64_t *) * rows);
+    retur->TableA = (uint64_t **)malloc(sizeof(uint64_t *) * rows);
+    retur->TableB = (uint64_t **)malloc(sizeof(uint64_t *) * rows);
     retur->location = malloc(sizeof(int *) * rows);
 
     for (i = 0; i < rows; i++) {
-        retur->TableA[i] = malloc(sizeof(int) * columls);
-        retur->TableB[i] = malloc(sizeof(int) * columls);
+        retur->TableA[i] = malloc(sizeof(uint64_t) * columls);
+        retur->TableB[i] = malloc( sizeof(uint64_t) * columls);
     }
 
     retur->rows = rows;
@@ -294,11 +294,16 @@ Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed 
         retur->Bucket_list[i] = init_radix_List();
     }
     for(i=0;i<rows;i++){
+        if(i==37){
+          int a=0;}
+
         retur->location[i] = 1; //initialise possition matrix
-        for(j=0;j<colums;j++)
-        retur->TableA[i][j]=idlist[j][i];
+        for(j=0;j<colums;j++) {
+            retur->TableA[i][j] = idlist[j][i];
+            //printf(" id %"PRIu64 ,retur->TableA[i][j]);
+        }
        retur->TableA[i][colums]=col[i];
-   //     printf(" id %"PRIu64 ",%"PRIu64 "\n",retur->TableA[i][j-1],retur->TableA[i][colums]);
+      //  printf(",%"PRIu64 "\n",retur->TableA[i][colums]);
 
 
     }
@@ -375,7 +380,7 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
         while (kl != NULL) {                 //for all the radix shorts to be done in that table state & bits
 
             sumlist = radix_Sort(table, table->time, kl->from, kl->to);
-
+         //   print(table,10,70,colums);
             for (i = kl->from; i < kl->to; i++) {
                 table->location[i] = 1 - table->location[i];            //save data matrix location
             }
@@ -401,8 +406,8 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
 
                         quicksort(table->TableB, from, to - 1,colums);     //if not quickshort it
 
-                       // printf("quickshorted hash: %d \n",sumlist[i][0]);
-                       //  print(table,from,to);
+                        //printf("quickshorted hash: %d \n",sumlist[i][0]);
+                         //print(table,from,to,colums);
                     }
                 }
             }
@@ -450,6 +455,7 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
 
     int zeros = 0;
     int ones = 0;
+
     for (i = 0; i < table->rows; i++) {
 
         if (i < table->rows - 1) {
@@ -480,7 +486,7 @@ void free_table(Table_Info *table) {            // self explanatory
     printf("rows %d\n",table->rows);
     for (i = 0; i < table->rows; i++) {   // <-- THAT WORKS .FIX YOUR PC!!! and get some bloody linux
         free(table->TableA[i]);
-      // free(table->TableB[i]);
+       free(table->TableB[i]);
 
     }
 
@@ -543,20 +549,21 @@ int added=0;
 
                 }else{
                                             ///realloc if no space////////
+                    middle_matrix_size=2*middle_matrix_size;
                      for(k=0;k<(A->columns+B->columns);k++){
-                    test=(int*)realloc(midle->table[k],2*middle_matrix_size);
+                    test=(int*)realloc(midle->table[k],(size_t)middle_matrix_size);
                     if(test==0){
                         printf("MIDLE MATRIX REALLOC=NULL \n");
                         exit(1);
                     }
                     midle->table[k]=test;
                      }
-                    middle_matrix_size=2*middle_matrix_size;
+
 
                     for(k=0;k<A->columns;k++){}
-                     //   midle->table[k][added]=(int)A->matrix[i][k];     // add all the columns
+                        midle->table[k][added]=(int)A->matrix[i][k];     // add all the columns
                     for(k=A->columns;k<(A->columns+B->columns);k++){}
-                       // midle->table[k][added]=(int)B->matrix[j][k];
+                        midle->table[k][added]=(int)B->matrix[j][k];
 
 
                 }

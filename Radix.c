@@ -507,7 +507,7 @@ void free_table(Table_Info *table) {            // self explanatory
         }
         free(table->Bucket_list[i]);
     }
-    //free(table->Bucket_list); ///<<--- this thing
+    free(table->Bucket_list); ///<<--- this thing
 
     free(table);
 
@@ -590,9 +590,10 @@ int added=0;
  free_results(A);
    free_results(B);
     printf("\n  added: %d\n", added);
-
-    midle->columns=A->columns+B->columns;
+int columns=A->columns+B->columns;
+    midle->columns=columns;
     *size=added;
+
     return midle->table;
 }
 
@@ -603,7 +604,7 @@ void free_results(results * A){
     for(i=0;i<A->rows;i++){
         free(A->matrix[i]);
     }
-   // free(A->matrix);
+    free(A->matrix);
     free(A);
 
 }

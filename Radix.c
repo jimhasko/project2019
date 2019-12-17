@@ -560,6 +560,7 @@ int added=0;
                      }
 
 
+
                     for(k=0;k<A->columns;k++){}
                         midle->table[k][added]=(int)A->matrix[i][k];     // add all the columns
                     for(k=A->columns;k<(A->columns+B->columns);k++){}

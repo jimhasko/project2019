@@ -33,7 +33,7 @@ int j;
 
 
     master_table = get_data_from_file( master_table, argc, argv);
-    char*str="3 1|0.1=1.0&0.2<3071|0.2 0.2";
+    char*str="9 1 12|0.2=1.0&1.0=2.1&2.2=1.0&0.2<2685|2.0";
     just_transfer * test;
     middle* bad_word;
     test = analise(str,&master_table);

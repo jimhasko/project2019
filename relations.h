@@ -95,7 +95,7 @@ int max(int* from,int from_num,List_of_Tables* master_table);
 void permute(int *array,int i,int length,int** test);
 void get_size(priority* prior,int priority_number,just_transfer* just, int now);
 int** get_id_list(tableid * idlist);
-void midle_scan(middle* midle,priority* prior,int size,List_of_Tables* master_table);
+void midle_scan(middle* midle,priority* prior,List_of_Tables* master_table);
 List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* argv[]);
 
 

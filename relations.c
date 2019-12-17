@@ -541,6 +541,9 @@ int len,counter_guard=10;
                   swap=column2;
                   column2=column1;
                   column1=swap;
+                  swap=table2;
+                  table2=table1;
+                  table1=swap;
               }
 
                 priority_series[counter].type = 5;
@@ -637,9 +640,9 @@ int size=0;
     transfer->suma_size=size;
     transfer->suma=suma;
     free(temp);
-    free(proboli);
-    free(katigorima);
-    free(sxesi);
+    //free(proboli);
+    //free(katigorima);
+    //free(sxesi);
     return transfer;
 
 
@@ -842,7 +845,7 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
                     isin2=1;
                      needed=j;}}
                  if(isin1+isin2==2){
-                    midle_scan(midle,(&transfer->priority1[i]),midle->size,master_table);
+                    midle_scan(midle,(&transfer->priority1[i]),master_table);
 
 
                  } else {
@@ -900,9 +903,10 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
 
 
 
-void midle_scan(middle* midle,priority* prior,int size,List_of_Tables* master_table){
-    int i,j,k;
+void midle_scan(middle* midle,priority* prior,List_of_Tables* master_table){
+    int i,j,k,size;
     int* test;
+    size=midle->size;
 uint64_t * column1=master_table->tables[prior->master_table1].Full_Table[prior->col1].Column;
 uint64_t * column2=master_table->tables[prior->master_table2].Full_Table[prior->col2].Column;
   int  ht1=prior->here_table1;

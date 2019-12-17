@@ -7,7 +7,7 @@
 //#include "relations.h"
 #define  quick_short 100
 #define  SizeofDataFileName 100
-#define  middle__size 500
+#define  middle__size 1000
 //=================================================================================================================
 typedef struct Listnode {
 
@@ -92,7 +92,7 @@ Head *init_List();
 
 int bithash2(uint64_t hash_value, int time);
 
-void print(Table_Info *table, int from, int to);
+void print(Table_Info *table, int from, int to,int columns);
 
 int **radix_Sort(Table_Info *table, int time, int from, int to);
 

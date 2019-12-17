@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     char* name3="/home/dimitris/CLionProjects/jj2019/workloads/small/r2";
     char* name4="/home/dimitris/CLionProjects/jj2019/workloads/small/r3";
     char* name5="/home/dimitris/CLionProjects/jj2019/workloads/small/r4";
-    char*str="0 2 4 3|0.1=1.2&1.1=3.2&2.1=0.2|0.0 1.1";
+    char*str="0 2 4|0.1=1.2&1.0=2.1&0.1>3000|0.0 1.1";
     List_of_Tables master_table;
     master_table.num_of_tables=5;
     master_table.tables=(Single_Table*)malloc(sizeof(Single_Table)*master_table.num_of_tables);
@@ -33,10 +33,11 @@ int main(int argc, char** argv) {
     master_table.tables[3]=fill(name4,3);
     master_table.tables[4]=fill(name5,4);
 just_transfer * test;
+middle* fuck;
    test= analise(str,&master_table);
 
-   run_filters(&master_table,test);
-
+   fuck=run_filters(&master_table,test);
+athrisma(fuck,test,&master_table);
     clock_t stop = clock(); //End timer
     double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
 

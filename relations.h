@@ -1,12 +1,6 @@
-//
-// Created by dimitris on 06/01/2019.
-//
 
-#ifndef PROJECT2018_RELATIONS_H
-#define PROJECT2018_RELATIONS_H
-
-#endif //PROJECT2018_RELATIONS_H
-
+#ifndef RELATIONS_H
+#define RELATIONS_H
 
 #include <inttypes.h>
 #include <stdio.h>
@@ -14,6 +8,9 @@
 #include<string.h>
 #include<stdint.h>
 #include "Radix.h"
+
+#define max_line_length 500
+#define init_filename_length 5
 
 typedef struct Row_Table{
 
@@ -108,3 +105,5 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
 void free_midle(middle* midle);
 void free_big(List_of_Tables* master);
 void free_transfer(just_transfer* transfer);
+
+#endif //RELATIONS_H

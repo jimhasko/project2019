@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I -Wall -O2 -g
+CFLAGS=-I -Wall -O2
 
 all:  Relations Radix Quicksort Result_List main
 

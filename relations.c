@@ -197,15 +197,17 @@ int power(int basi,int pano){
 Single_Table fill(char* filename,int name){     //diabazi binary k gemizi ti mnimi
     Single_Table Table_Node;
     FILE *fp = fopen(filename,"r");
-if(!fp){
-    printf("wrong imput fille %s \n",filename);
 
-}
+    if(!fp){
+
+        printf("wrong input file %s \n",filename);
+    }
+
     int* distinct;
+    int result;
 
-    //int y;
-    fread(&Table_Node.tube_num,sizeof(uint64_t),1,fp);
-    fread(&Table_Node.column_num,sizeof(uint64_t),1,fp);
+    result = fread(&Table_Node.tube_num,sizeof(uint64_t),1,fp);
+    result = fread(&Table_Node.column_num,sizeof(uint64_t),1,fp);
 
     Table_Node.Full_Table=(Row_table*)malloc(sizeof(Row_table)*Table_Node.column_num);
     Table_Node.stats=(statistics*)malloc(sizeof(statistics)*Table_Node.column_num);
@@ -270,8 +272,9 @@ if(!fp){
         Table_Node.id_table[i]=i;
     }
          //   printf("\n %ld  <",i);
+         int result;
 
-        fread(& Table_Node.Full_Table[j].Column[k],sizeof(uint64_t),1,fp);
+        result = fread(& Table_Node.Full_Table[j].Column[k],sizeof(uint64_t),1,fp);
         // fread(&temp[k],sizeof(uint64_t),1,fp);
 
         //  printf("x  %ld  x\n",temp[k]);
@@ -415,6 +418,7 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
     i=0;
     int j,ht1,ht2;
     char *ptr = strtok(sxesi, delim);
+    printf("%d\n",master_table->num_of_tables);
     from=malloc(sizeof(int)*master_table->num_of_tables);
     while(ptr != NULL)
     {
@@ -588,9 +592,9 @@ int size=0;
     transfer->suma_size=size;
     transfer->suma=suma;
     free(temp);
-  //  free(proboli);
-    //free(katigorima);
-    //free(sxesi);
+    free(proboli);
+    free(katigorima);
+    free(sxesi);
     return transfer;
 
 
@@ -969,7 +973,7 @@ printf("ADDING!!\n");
     free(sums);
 
     free_midle(midle);
-    free_transfer(transfer);
+    //free_transfer(transfer);
     free_big(master_table);
 
 

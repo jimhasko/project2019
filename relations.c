@@ -28,12 +28,12 @@ uint64_t Sto64(const char *s) { // string to number
 
 void short_priority(priority* prior,int prior_num){
     int i,j;
-    //int test1,test2;
+    int test1,test2;
     priority temp;
     for(j=0;j<prior_num;j++){
         for(i=0;i<prior_num-1;i++){
-          //  test1=prior[i].type;
-            //test2=prior[i+1].type;
+            test1=prior[i].type;
+            test2=prior[i+1].type;
             if(prior[i].type>prior[i+1].type){
                 temp=prior[i];
                 prior[i]=prior[i+1];
@@ -77,7 +77,7 @@ void swap_priority(priority* prior,int from,int to){
 
 }
 void get_size(priority* prior,int priority_number,just_transfer* just, int now){
-    int i,hr1,hr2;
+    int i,j,hr1,hr2;
     for(i=now;i<priority_number;i++){
         hr1=prior[i].here_table1;
         hr2=prior[i].here_table2;
@@ -201,7 +201,7 @@ if(!fp){
     printf("wrong imput fille %s \n",filename);
 
 }
-
+    int* distinct;
 
     //int y;
     fread(&Table_Node.tube_num,sizeof(uint64_t),1,fp);
@@ -211,7 +211,7 @@ if(!fp){
     Table_Node.stats=(statistics*)malloc(sizeof(statistics)*Table_Node.column_num);
     Table_Node.id_table=malloc(sizeof(int)*Table_Node.tube_num);
     Table_Node.table_name=name;
-    int j,i,k=0;
+    int j,bool_test,i,k=0;
     j=0;
     //uint64_t i,max;
     //int kl=0;
@@ -413,7 +413,7 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
     int from_number;
     char delim[] = " ";
     i=0;
-    int j;
+    int j,ht1,ht2;
     char *ptr = strtok(sxesi, delim);
     from=malloc(sizeof(int)*master_table->num_of_tables);
     while(ptr != NULL)
@@ -452,7 +452,6 @@ int len,counter_guard=10;
     here_table1=ptr[0]-48;
     table1=from[here_table1];
     column1=ptr[2]-48;
-    here_table2=0;
     if(len>6){
         here_table2=ptr[4]-48;
         table2=from[here_table2];
@@ -614,13 +613,13 @@ int max(int* from,int from_num,List_of_Tables* master_table){
 middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
 
-    int  i, j;
+    int comparison, i, j,temp;
+
+    int counter = 0;
 
 
 
-
-
-    int table1,table2,column1,column2,ht1,ht2,priority_number;
+    int size,table1,table2,column1,column2,ht1,ht2,priority_number;
 
     ht1 = 0;
     ht2 = 0;
@@ -631,18 +630,20 @@ short_priority(transfer->priority1,priority_number);
     uint64_t * col1;
     uint64_t *  col2;
     int * new;
+
     int id,idcounter;
     middle* midle;
     midle=(middle*)malloc(sizeof(middle));
     midle->inserted=NULL;
-    midle->inserted=(int*)malloc(sizeof(int)*(master_table->num_of_tables));
+    midle->inserted=malloc(sizeof(int)*master_table->num_of_tables);
+   // midle->inserted=pass;
     midle->num_inserted=0;
     midle->start=NULL;
     midle->columns=0;
     midle->size=0;
- //int counter;
+ //   middle.start  //kane initialize ti lista
     for (i = 0; i < priority_number; i++) {         //gia ola ta queries
-               // counter=0;
+                counter=0;
 if(transfer->priority1[i].type == 5 && midle->num_inserted==0)
     priority_tree(transfer->priority1, transfer->priority_number, transfer);
 printf(" priority %d : %s \n",i, transfer->priority1[i].command);
@@ -742,7 +743,7 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
             int ** list1;
             results * res1;
             results * res2;
-            int isin1,isin2,needed=1;
+            int isin1,isin2,mid_size,needed1,needed=1;
             if(midle->num_inserted==0) {
 
                //    priority_tree(transfer->priority1, transfer->priority_number, transfer);
@@ -763,8 +764,8 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
                 midle->num_inserted=2;
                 midle->inserted[0]=ht1;
                 midle->inserted[1]=ht2;
-                free_list(list1);
-                free_list(list2);
+                free_list(list1,transfer->tables_ids[ht1].size);
+                free_list(list2,transfer->tables_ids[ht2].size);
 
 
             }
@@ -780,14 +781,15 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
 
                 isin1=0;
                 isin2=0;
+
                 for(j=0;j<midle->num_inserted;j++){
-                  if(ht1==midle->inserted[i]){
+                  if(ht1==midle->inserted[j])
                     isin1=1;
-                    needed=i;}
+                    needed=j;
                      //  needed1=i;
-                     if(ht2==midle->inserted[i]){
+                     if(ht2==midle->inserted[j])
                     isin2=1;
-                     needed=i;}}
+                     needed=j;}
                  if(isin1+isin2==2){
                     midle_scan(midle,(&transfer->priority1[i]),midle->size,master_table);
                     break;
@@ -799,13 +801,13 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
                          res1=big_short(col1,midle->table,midle->num_inserted,midle->size,needed);
                          res2=big_short(col2,list1,1,transfer->tables_ids[ht2].size,1);
                          midle->inserted[midle->num_inserted]=ht2;
-                         free_list(list1);
+                         free_list(list1,transfer->tables_ids[ht2].size);
                      } else {
                         list1= get_id_list(&transfer->tables_ids[ht1]);
                          res1=big_short(col2,midle->table,midle->num_inserted,midle->size,needed);
                          res2=big_short(col1,list1,1,transfer->tables_ids[ht1].size,1);
                          midle->inserted[midle->num_inserted]=ht1;
-                         free_list(list1);
+                         free_list(list1,transfer->tables_ids[ht1].size);
 
                      }
                         free_midle_table(midle);
@@ -863,14 +865,14 @@ int** get_id_list(tableid * idlist){
 }
 
 void midle_scan(middle* midle,priority* prior,int size,List_of_Tables* master_table){
-    int i,j,k;
+    int i,j,k,col1,col2;
     int* test;
 uint64_t * column1=master_table->tables[prior->master_table1].Full_Table[prior->col1].Column;
 uint64_t * column2=master_table->tables[prior->master_table2].Full_Table[prior->col2].Column;
- // int  ht1=prior->here_table1;
- // int  ht2=prior->here_table2;
- // col1=prior->col1;
- // col2=prior->col2;
+  int  ht1=prior->here_table1;
+  int  ht2=prior->here_table2;
+  col1=prior->col1;
+  col2=prior->col2;
   int added=0;
     int** temp=(int**)malloc(sizeof(int*)*(midle->num_inserted));
     for(i=0;i<(midle->num_inserted);i++)
@@ -903,14 +905,14 @@ uint64_t * column2=master_table->tables[prior->master_table2].Full_Table[prior->
 
     }
 
-free(midle->table);
+free_midle_table(midle);
     midle->table=temp;
 
 
 }
 
 void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table){
-    int i,j,MT,CL,HT,ins_id,table_id;
+    int i,j,k,MT,CL,HT,ins_id,table_id;
     uint64_t * column;
     uint64_t * sums;
     sums=(uint64_t*)calloc(transfer->suma_size,sizeof(uint64_t));
@@ -919,7 +921,7 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
         HT=transfer->suma[i].here_table;
         CL=transfer->suma[i].col;
         column=master_table->tables[MT].Full_Table[CL].Column;
-        ins_id=0;
+
         for(j=0;j<midle->num_inserted;j++){
             if(CL==midle->inserted[j])
                 ins_id=j;
@@ -950,8 +952,12 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
 
 
 
-void free_list(int** list){
-
+void free_list(int** list,int size){
+    int i;
+    /* for(i=1;i<size;i++)
+     {
+         free(list[i]);
+     }*/
     free(list[0]);
     free(list);
 
@@ -968,9 +974,9 @@ void free_midle_table(middle* midle){
 }
 
 void free_midle(middle* midle){
-
+    int i,j;
     free_midle_table(midle);
-    free(midle->inserted);
+  //  free(midle->inserted);
     free(midle);
 
 
@@ -979,14 +985,15 @@ void free_midle(middle* midle){
 
 
 void free_transfer(just_transfer* transfer){
-    int i;
+    int i,j;
    free( transfer->tables);
     free(transfer->priority1);
     free(transfer->suma);
-    free(transfer);
+
     for(i=0;i<transfer->num_of_tables;i++)
         free(transfer->tables_ids[i].id_list);
     free(transfer->tables_ids);
+    free(transfer);
 
 }
 void free_big(List_of_Tables* master){
@@ -1000,12 +1007,12 @@ void free_big(List_of_Tables* master){
 
         }
 
-    free(master->tables[i].Full_Table);
 
+free(master->tables->Full_Table);
 
     }
 
-free(master->tables);
+
 
 }
 

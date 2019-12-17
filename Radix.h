@@ -7,7 +7,7 @@
 //#include "relations.h"
 #define  quick_short 100
 #define  SizeofDataFileName 100
-#define  middle__size 1000
+#define  middle__size 500
 //=================================================================================================================
 typedef struct Listnode {
 
@@ -78,7 +78,6 @@ typedef struct middle_struct{
     int columns,size,matrix_size;
 
 }middle;
-
 
 
 Radix_Head *init_radix_List();

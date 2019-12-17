@@ -524,7 +524,10 @@ int** join_matrices(results* A, results* B,int needed,int middle_matrix_size ,in
     int  current_looked;
     middle* midle;
     midle=(middle*)malloc(sizeof(middle));
-    midle->table=(int**)malloc(sizeof(int*)*(A->columns+B->columns));
+    midle->table=NULL;
+    int columns=A->columns+B->columns;
+    midle->table=(int**)malloc(sizeof(int*)*columns);
+
     for(i=0;i<(A->columns+B->columns);i++)
         midle->table[i]=(int*)malloc(sizeof(int)*middle_matrix_size);//middle [columns][rows]
 
@@ -561,9 +564,9 @@ int added=0;
 
 
 
-                    for(k=0;k<A->columns;k++){}
+                    for(k=0;k<A->columns;k++)
                         midle->table[k][added]=(int)A->matrix[i][k];     // add all the columns
-                    for(k=A->columns;k<(A->columns+B->columns);k++){}
+                    for(k=A->columns;k<(A->columns+B->columns);k++)
                         midle->table[k][added]=(int)B->matrix[j][k];
 
 
@@ -591,7 +594,7 @@ int added=0;
  free_results(A);
    free_results(B);
     printf("\n  added: %d\n", added);
-int columns=A->columns+B->columns;
+
     midle->columns=columns;
     *size=added;
 

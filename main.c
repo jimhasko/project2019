@@ -8,21 +8,20 @@
 int main(int argc, char** argv) {
 
     clock_t start = clock(); //Start timer
-    char *filename1 = malloc(SizeofDataFileName * sizeof(char));
+    /*char *filename1 = malloc(SizeofDataFileName * sizeof(char));
     strcpy(filename1, argv[1]);
     char *filename2 = malloc(SizeofDataFileName * sizeof(char));
     strcpy(filename2, argv[2]);
     int needed_columnA, needed_columnB;
 
     needed_columnA = 1;
-    needed_columnB = 1;
+    needed_columnB = 1;*/
 
-
-    char* name="/home/dimitris/CLionProjects/jj2019/workloads/small/r0";
-    char* name2="/home/dimitris/CLionProjects/jj2019/workloads/small/r1";
-    char* name3="/home/dimitris/CLionProjects/jj2019/workloads/small/r2";
-    char* name4="/home/dimitris/CLionProjects/jj2019/workloads/small/r3";
-    char* name5="/home/dimitris/CLionProjects/jj2019/workloads/small/r4";
+    char* name="/home/elias/workloads/small/r0";
+    char* name2="/home/elias/workloads/small/r1";
+    char* name3="/home/elias/workloads/small/r2";
+    char* name4="/home/elias/workloads/small/r3";
+    char* name5="/home/elias/workloads/small/r4";
     char*str="0 2 4 3|0.1=1.2&1.1=3.2&2.1=0.2|0.0 1.1";
     List_of_Tables master_table;
     master_table.num_of_tables=5;

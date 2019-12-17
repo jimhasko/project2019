@@ -8,14 +8,14 @@
 int main(int argc, char** argv) {
 
     clock_t start = clock(); //Start timer
-    char *filename1 = malloc(SizeofDataFileName * sizeof(char));
-    strcpy(filename1, argv[1]);
-    char *filename2 = malloc(SizeofDataFileName * sizeof(char));
-    strcpy(filename2, argv[2]);
-    int needed_columnA, needed_columnB;
+  //  char *filename1 = malloc(SizeofDataFileName * sizeof(char));
+    //strcpy(filename1, argv[1]);
+    //char *filename2 = malloc(SizeofDataFileName * sizeof(char));
+    //strcpy(filename2, argv[2]);
+    //int needed_columnA, needed_columnB;
 
-    needed_columnA = 1;
-    needed_columnB = 1;
+   // needed_columnA = 1;
+    //needed_columnB = 1;
 
 
     char* name="/home/dimitris/CLionProjects/jj2019/workloads/small/r0";

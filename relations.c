@@ -556,6 +556,7 @@ just_transfer* transfer;
     }
 /////////////////
     char* temp;
+    temp=malloc(sizeof(char)*strlen(proboli));
     strcpy(temp,proboli);
     char delimprov[] = " ";
     ptr = strtok(temp, delimprov);
@@ -586,6 +587,10 @@ int size=0;
     }
     transfer->suma_size=size;
     transfer->suma=suma;
+    free(temp);
+    free(proboli);
+    free(katigorima);
+    free(sxesi);
     return transfer;
 
 }
@@ -626,7 +631,8 @@ short_priority(transfer->priority1,priority_number);
     int id,idcounter;
     middle* midle;
     midle=(middle*)malloc(sizeof(middle));
-    midle->inserted=malloc(sizeof(int)*master_table->num_of_tables);
+    midle->inserted=NULL;
+    midle->inserted=(int*)malloc(sizeof(int)*(master_table->num_of_tables));
     midle->num_inserted=0;
     midle->start=NULL;
     midle->columns=0;
@@ -644,6 +650,10 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
     column1=transfer->priority1[i].col1;
     ht1=transfer->priority1[i].here_table1;
         col1=master_table->tables[table1].Full_Table[column1].Column;
+        ht2=ht1;
+        col2=col1;
+        table2=table1;
+        column2=column1;
     if(transfer->priority1[i].type==5||transfer->priority1[i].type==1){// if it needs 2 matrixes
 
         table2=transfer->priority1[i].master_table2;
@@ -827,25 +837,6 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
     return midle;
 
 }
-void free_list(int** list,int size){
-    int i;
-   /* for(i=1;i<size;i++)
-    {
-        free(list[i]);
-    }*/
-   //free(list[0]);
-
-}
-
-void free_midle_table(middle* midle){
-    int i,col;
-    col=midle->columns;
-
-    for(i=0;i<col;i++){
-        free(midle->table[i]);
-    }
-    free(midle->table);
-}
 
 int** get_id_list(tableid * idlist){
    int j,size2=idlist->size;
@@ -951,6 +942,31 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
 
 }
 
+
+
+
+
+void free_list(int** list,int size){
+    int i;
+    /* for(i=1;i<size;i++)
+     {
+         free(list[i]);
+     }*/
+    free(list[0]);
+    free(list);
+
+}
+
+void free_midle_table(middle* midle){
+    int i,col;
+    col=midle->columns;
+
+    for(i=0;i<col;i++){
+        free(midle->table[i]);
+    }
+    free(midle->table);
+}
+
 void free_midle(middle* midle){
     int i,j;
     free_midle_table(midle);
@@ -968,6 +984,9 @@ void free_transfer(just_transfer* transfer){
     free(transfer->priority1);
     free(transfer->suma);
     free(transfer);
+    for(i=0;i<transfer->num_of_tables;i++)
+        free(transfer->tables_ids[i].id_list);
+    free(transfer->tables_ids);
 
 }
 void free_big(List_of_Tables* master){

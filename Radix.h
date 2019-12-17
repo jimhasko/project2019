@@ -75,7 +75,7 @@ typedef struct middle_struct{
     info_node* start;
     int* inserted;
     int num_inserted;
-    int columns,size;
+    int columns,size,matrix_size;
 
 }middle;
 

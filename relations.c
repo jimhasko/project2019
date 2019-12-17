@@ -593,6 +593,7 @@ int size=0;
     free(sxesi);
     return transfer;
 
+
 }
 
 int max(int* from,int from_num,List_of_Tables* master_table){

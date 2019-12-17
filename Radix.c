@@ -551,7 +551,7 @@ int added=0;
                                             ///realloc if no space////////
                     middle_matrix_size=2*middle_matrix_size;
                      for(k=0;k<(A->columns+B->columns);k++){
-                    test=(int*)realloc(midle->table[k],(size_t)middle_matrix_size);
+                    test=(int*)realloc(midle->table[k],(size_t)middle_matrix_size*sizeof(int));
                     if(test==0){
                         printf("MIDLE MATRIX REALLOC=NULL \n");
                         exit(1);

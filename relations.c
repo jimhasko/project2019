@@ -809,6 +809,7 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
                         free_midle_table(midle);
                      midle->table =join_matrices(res1,res2,needed,middle__size,(&midle->size));            ////////< join
                      midle->num_inserted++;
+                     midle->columns++;
 
                  }
 

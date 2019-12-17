@@ -276,13 +276,13 @@ Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed 
     columls = colums+1;
 
     Table_Info *retur = malloc(sizeof(Table_Info));
-    retur->TableA = malloc(sizeof(uint64_t *) * rows);
-    retur->TableB = malloc(sizeof(uint64_t *) * rows);
+    retur->TableA = (uint64_t **)malloc(sizeof(uint64_t *) * rows);
+    retur->TableB = (uint64_t **)malloc(sizeof(uint64_t *) * rows);
     retur->location = malloc(sizeof(int *) * rows);
 
     for (i = 0; i < rows; i++) {
-        retur->TableA[i] = malloc(sizeof(int) * columls);
-        retur->TableB[i] = malloc( sizeof(int) * columls);
+        retur->TableA[i] = malloc(sizeof(uint64_t) * columls);
+        retur->TableB[i] = malloc( sizeof(uint64_t) * columls);
     }
 
     retur->rows = rows;

@@ -571,12 +571,12 @@ int size=0;
 
     }
     ptr = strtok(proboli, delimprov);
-    summa * suma=(summa*)malloc(sizeof(suma)*size);
+    summa * suma=(summa*)malloc(sizeof(summa)*size);
     while(ptr != NULL)
     {
 
         suma[i].here_table=ptr[0]-48;
-        suma[i].master_table=from[ptr[0]-48];
+        suma[i].master_table=(int)from[ptr[0]-48];
         suma[i].col=ptr[2]-48;
 
 

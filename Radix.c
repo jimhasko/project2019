@@ -117,7 +117,7 @@ int **radix_Sort(Table_Info *table, int time, int from, int to) { // table kai p
     int location = 0;
     for (i = from; i < to; i++) {
 
-        location = bithash2(table->TableA[i][needed], time);
+        location = bithash2(table->TableA[i][columns], time);//itan needed anti columns
         list_Add_Id(&refarray[location], i);
         hist[location][1]++;
     }
@@ -294,15 +294,15 @@ Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed 
         retur->Bucket_list[i] = init_radix_List();
     }
     for(i=0;i<rows;i++){
-        if(i==37){
-          int a=0;}
+
 
         retur->location[i] = 1; //initialise possition matrix
         for(j=0;j<colums;j++) {
+
             retur->TableA[i][j] = idlist[j][i];
-            //printf(" id %"PRIu64 ,retur->TableA[i][j]);
+
         }
-       retur->TableA[i][colums]=col[i];
+       retur->TableA[i][colums]=col[idlist[needed][i]];//retur->TableA[i][colums]=col[i];
       //  printf(",%"PRIu64 "\n",retur->TableA[i][colums]);
 
 
@@ -518,19 +518,19 @@ int** join_matrices(results* A, results* B,int needed,int middle_matrix_size ,in
 
     info_node* list;
     node_type* cur_node = NULL;
-    int i,j,k;
+    int i,j,k,wtf;
     int* test;
     uint64_t targetIDA, targetIDB,targetA, targetB;
     int  current_looked;
     middle* midle;
-    midle=(middle*)malloc(sizeof(middle));
-    midle->table=NULL;
+   // midle=(middle*)malloc(sizeof(middle));
+   // midle->table=NULL;
     int columns=A->columns+B->columns;
-    
-    midle->table=(int**)malloc(sizeof(int*)*columns);
+    int** table;
+    table=(int**)malloc(sizeof(int*)*columns);
 
     for(i=0;i<(A->columns+B->columns);i++)
-        midle->table[i]=(int*)malloc(sizeof(int)*middle_matrix_size);//middle [columns][rows]
+        table[i]=(int*)malloc(sizeof(int)*middle_matrix_size);//middle [columns][rows]
 
 
     current_looked = 0;
@@ -546,29 +546,33 @@ int added=0;
             if (targetA == targetB) {
 
                 if(added<middle_matrix_size){   ///add all the columns
-                    for(k=0;k<A->columns;k++)
-                        midle->table[k][added]=(int)A->matrix[i][k];
-                    for(k=A->columns;k<(A->columns+B->columns);k++)
-                        midle->table[k][added]=(int)B->matrix[j][k];
+                    for(k=0;k<A->columns;k++){
+
+                        table[k][added]=(int)A->matrix[i][k];
+                    wtf=table[k][added];}
+                   // for(k=A->columns;k<(A->columns+B->columns);k++)
+                    //    table[k][added]=(int)B->matrix[j][k];
+                   // for(k=A->columns;k<(A->columns+1);k++)
+                        table[A->columns][added]=(int)B->matrix[j][0];
 
                 }else{
                                             ///realloc if no space////////
                     middle_matrix_size=2*middle_matrix_size;
                      for(k=0;k<(A->columns+B->columns);k++){
-                    test=(int*)realloc(midle->table[k],(size_t)middle_matrix_size*sizeof(int));
+                    test=(int*)realloc(table[k],(size_t)middle_matrix_size*sizeof(int));
                     if(test==0){
                         printf("MIDLE MATRIX REALLOC=NULL \n");
                         exit(1);
                     }
-                    midle->table[k]=test;
+                    table[k]=test;
                      }
 
 
 
                     for(k=0;k<A->columns;k++)
-                        midle->table[k][added]=(int)A->matrix[i][k];     // add all the columns
-                    for(k=A->columns;k<(A->columns+B->columns);k++)
-                        midle->table[k][added]=(int)B->matrix[j][k];
+                        table[k][added]=(int)A->matrix[i][k];     // add all the columns
+                    for(k=A->columns;k<(A->columns+1);k++)
+                        table[A->columns][added]=(int)B->matrix[j][0];
 
 
                 }
@@ -596,10 +600,10 @@ int added=0;
    free_results(B);
     printf("\n  added: %d\n", added);
 
-    midle->columns=columns;
+    //midle->columns=columns;
     *size=added;
 
-    return midle->table;
+    return table;
 }
 
 //=================================================================================================================

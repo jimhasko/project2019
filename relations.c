@@ -588,9 +588,9 @@ int size=0;
     transfer->suma_size=size;
     transfer->suma=suma;
     free(temp);
-    free(proboli);
-    free(katigorima);
-    free(sxesi);
+  //  free(proboli);
+    //free(katigorima);
+    //free(sxesi);
     return transfer;
 
 
@@ -743,8 +743,12 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
             int ** list1;
             results * res1;
             results * res2;
-            int isin1,isin2,mid_size,needed1,needed=1;
-            if(midle->num_inserted==0) {
+            int isin1,isin2,mid_size,needed1,needed=0;
+
+            if(midle->num_inserted==0) {  //////first runnnnn
+
+
+
 
                //    priority_tree(transfer->priority1, transfer->priority_number, transfer);
                 int ** list2;
@@ -758,9 +762,25 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
 
 
                 res1=big_short(col1,list1,1,transfer->tables_ids[ht1].size,needed);
-                res2=big_short(col2,list2,1,transfer->tables_ids[ht2].size,needed);
+               if( res1->matrix[100][1]!=col1[res1->matrix[100][0]])
+               {
+                   printf("FUCKKK!");
+                   exit(1);
 
-                 midle->table =join_matrices(res1,res2,needed,middle__size,(&midle->size));        ////////< join
+               }
+                res2=big_short(col2,list2,1,transfer->tables_ids[ht2].size,needed);
+                if( res2->matrix[100][1]!=col2[res2->matrix[100][0]])
+                {
+                    printf("FUCKKK1.5!");
+                    exit(1);
+
+                }
+                 midle->table =join_matrices(res1,res2,0,middle__size,(&midle->size));        ////////< join
+                if(col1[midle->table[0][200]]!=col2[midle->table[1][200]]){
+                    printf("FUCKKK2!");
+                    exit(1);
+
+                }
                 midle->num_inserted=2;
                 midle->inserted[0]=ht1;
                 midle->inserted[1]=ht2;
@@ -773,46 +793,44 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
             else{       //////secomnd run//////////////////
 
 
-              //  Table_Info *table;
-                //table = get_table(col1,midle->table,midle->num_inserted,midle->size,needed);
-                //quicksort(table->TableA,0,midle->size,midle->num_inserted);
-                //print(table,0,50,midle->num_inserted);
-
 
 
                 isin1=0;
                 isin2=0;
 
                 for(j=0;j<midle->num_inserted;j++){
-                  if(ht1==midle->inserted[j])
+                  if(ht1==midle->inserted[j]){
                     isin1=1;
-                    needed=j;
+                    needed=j;}
                      //  needed1=i;
-                     if(ht2==midle->inserted[j])
+                     if(ht2==midle->inserted[j]){
                     isin2=1;
-                     needed=j;}
+                     needed=j;}}
                  if(isin1+isin2==2){
                     midle_scan(midle,(&transfer->priority1[i]),midle->size,master_table);
-                    break;
+
 
                  } else {
 
                      if (isin1 == 1) {
+
                          list1= get_id_list(&transfer->tables_ids[ht2]);
                          res1=big_short(col1,midle->table,midle->num_inserted,midle->size,needed);
-                         res2=big_short(col2,list1,1,transfer->tables_ids[ht2].size,1);
+                         res2=big_short(col2,list1,1,transfer->tables_ids[ht2].size,0);
                          midle->inserted[midle->num_inserted]=ht2;
                          free_list(list1,transfer->tables_ids[ht2].size);
                      } else {
                         list1= get_id_list(&transfer->tables_ids[ht1]);
                          res1=big_short(col2,midle->table,midle->num_inserted,midle->size,needed);
-                         res2=big_short(col1,list1,1,transfer->tables_ids[ht1].size,1);
+                         res2=big_short(col1,list1,1,transfer->tables_ids[ht1].size,0);
                          midle->inserted[midle->num_inserted]=ht1;
                          free_list(list1,transfer->tables_ids[ht1].size);
 
                      }
                         free_midle_table(midle);
                      midle->table =join_matrices(res1,res2,needed,middle__size,(&midle->size));            ////////< join
+
+
                      midle->num_inserted++;
                      midle->columns++;
 
@@ -835,7 +853,7 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
 
         if(midle->size==0){
             printf("0 common values \n");
-            //   break;
+               break;
         }
 
 
@@ -845,49 +863,45 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
 
 }
 
-int** get_id_list(tableid * idlist){
-   int j,size2=idlist->size;
-    int ** list2;
-     list2=(int**)malloc(sizeof(int*));
 
-   // for(j=0;j<1;j++) {
-        list2[0] = malloc(sizeof(int)*size2);
-  //  }
-
-    for(j=0;j<idlist->size;j++){
-        list2[0][j]=idlist->id_list[j];
-    }
-    if(list2!=NULL){
-    return list2;}
-    else {
-        printf("  god why ? \n");
-        exit(1);
-    }
-}
 
 void midle_scan(middle* midle,priority* prior,int size,List_of_Tables* master_table){
-    int i,j,k,col1,col2;
+    int i,j,k;
     int* test;
 uint64_t * column1=master_table->tables[prior->master_table1].Full_Table[prior->col1].Column;
 uint64_t * column2=master_table->tables[prior->master_table2].Full_Table[prior->col2].Column;
   int  ht1=prior->here_table1;
   int  ht2=prior->here_table2;
-  col1=prior->col1;
-  col2=prior->col2;
-  int added=0;
-    int** temp=(int**)malloc(sizeof(int*)*(midle->num_inserted));
-    for(i=0;i<(midle->num_inserted);i++)
-       temp[i]=malloc(sizeof(int)*size);
+  int col1=prior->col1;
+  int col2=prior->col2;
+  int id1;
+  int id2;
 
+    int** temp=(int**)malloc(sizeof(int*)*(midle->num_inserted));
+    if(temp==NULL){
+        printf(" out of memory ");
+        exit(1);
+    }
+    for(i=0;i<(midle->num_inserted);i++) {               ///table[rows][columns]
+        temp[i] = malloc(sizeof(int) * size);
+        if(midle->inserted[i]==ht1)
+            ht1=i;
+        if(midle->inserted[i]==ht2)
+            ht2=i;
+    }
+    int added=0;
+///////////
     for(j=0;j<size;j++){
-        if(column1[j]==column2[j]){
+        id1=midle->table[ht1][j];
+        id2=midle->table[ht2][j];
+        if(column1[id1]==column2[id2]){
             for(i=0;i<midle->num_inserted;i++)
                temp[i][added]= midle->table[i][j];
             added++;
             if(added==size){
 
                 for(k=0;k<(midle->num_inserted);k++){
-                    test=realloc(midle->table[k],2*size);
+                    test=(int*)realloc(midle->table[k],2*size*sizeof(int));
                     if(test==NULL){
                         printf("MIDLE MATRIX REALLOC=NULL on selfjoin \n");
                         exit(1);
@@ -896,19 +910,17 @@ uint64_t * column2=master_table->tables[prior->master_table2].Full_Table[prior->
                 }
 
 
-
-
             }
 
         }
-
 
 
     }
 
 free_midle_table(midle);
     midle->table=temp;
-
+    midle->size=added;
+    printf("added: %d\n",added);
 
 }
 
@@ -916,26 +928,42 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
     int i,j,k,MT,CL,HT,ins_id,table_id;
     uint64_t * column;
     uint64_t * sums;
-    sums=(uint64_t*)calloc(transfer->suma_size,sizeof(uint64_t));
-    for(i=0;i<transfer->suma_size;i++){
-        MT=transfer->suma[i].master_table;
-        HT=transfer->suma[i].here_table;
-        CL=transfer->suma[i].col;
-        column=master_table->tables[MT].Full_Table[CL].Column;
 
-        for(j=0;j<midle->num_inserted;j++){
-            if(CL==midle->inserted[j])
-                ins_id=j;
-            break;
+printf("ADDING!!\n");
+
+    if(midle->size>0) {
+
+
+        sums = (uint64_t *) calloc(transfer->suma_size, sizeof(uint64_t));
+        for (i = 0; i < transfer->suma_size; i++) {
+            MT = transfer->suma[i].master_table;
+            HT = transfer->suma[i].here_table;
+            CL = transfer->suma[i].col;
+            column = master_table->tables[MT].Full_Table[CL].Column;
+
+            for (j = 0; j < midle->num_inserted; j++) {
+                if (HT == midle->inserted[j]){
+                    ins_id = j;
+                    printf("j: %d : ",j);
+                    break;}
+            }
+
+            for (j = 0; j < midle->size; j++) {
+                table_id = midle->table[ins_id][j];
+                if(table_id<master_table->tables[MT].tube_num){
+                sums[i] += column[table_id];}
+                else{
+                    for(i=0;i<midle->num_inserted;i++)
+                        printf(": %d \n",midle->table[i][j]);
+                    exit(1);
+                }
+
+            }
+
+            printf(" SUM%d ::%"PRIu64 "\n", i, sums[i]);
+
+
         }
-
-        for(j=0;j<midle->size;j++){
-            table_id=midle->table[ins_id][j];
-        sums[i]+=column[table_id];}
-
-        printf(" SUM%d ::%"PRIu64 "\n",i,sums[i]);
-
-
 
     }
     free(sums);
@@ -951,7 +979,25 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
 
 
 
+int** get_id_list(tableid * idlist){
+    int j,size2=idlist->size;
+    int ** list2;
+    list2=(int**)malloc(sizeof(int*));
 
+    // for(j=0;j<1;j++) {
+    list2[0] = malloc(sizeof(int)*size2);
+    //  }
+
+    for(j=0;j<idlist->size;j++){
+        list2[0][j]=idlist->id_list[j];
+    }
+    if(list2!=NULL){
+        return list2;}
+    else {
+        printf("  god why ? \n");
+        exit(1);
+    }
+}
 
 void free_list(int** list,int size){
     int i;
@@ -987,12 +1033,15 @@ void free_midle(middle* midle){
 
 void free_transfer(just_transfer* transfer){
     int i,j;
+    //int k=transfer->tables_ids[0].id_list[1];
+    for(i=0;i<transfer->num_of_tables;i++)
+   free(transfer->tables_ids[i].id_list);
+
    free( transfer->tables);
     free(transfer->priority1);
     free(transfer->suma);
 
-    for(i=0;i<transfer->num_of_tables;i++)
-        free(transfer->tables_ids[i].id_list);
+
     free(transfer->tables_ids);
     free(transfer);
 
@@ -1009,10 +1058,11 @@ void free_big(List_of_Tables* master){
         }
 
 
-free(master->tables);
+
 
     }
-
+    free(master->tables->Full_Table);
+    free(master->tables);
 
 
 }

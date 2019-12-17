@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "Result_List.h"
 //#include "relations.h"
-#define  quick_short 100
+#define  quick_short 500
 #define  SizeofDataFileName 100
 #define  middle__size 500
 //=================================================================================================================

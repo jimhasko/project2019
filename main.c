@@ -11,8 +11,10 @@ int main(int argc, char** argv) {
 
 
     List_of_Tables master_table;
+    int this_is_fine = 0;
 
-    master_table = get_data_from_file( master_table, argc, argv);
+    this_is_fine = do_the_work(master_table, argc, argv);
+
 
     clock_t stop = clock(); //End timer
     double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;

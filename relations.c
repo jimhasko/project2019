@@ -140,16 +140,18 @@ int do_the_work(List_of_Tables master_table, int argc, char* argv[]) {
 
             athrisma(bad_word, test, &master_table);
             lines++;
+            //if (lines == 1)
+                //break;
         }
         else {
             batches++;
+            //if (batches == 1)
+                //break;
         }
     }
 
     free(line);
     free_big(&master_table);
-
-
 
 
     return true;

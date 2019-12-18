@@ -98,6 +98,7 @@ void get_size(priority* prior,int priority_number,just_transfer* just, int now);
 int** get_id_list(tableid * idlist);
 void midle_scan(middle* midle,priority* prior,List_of_Tables* master_table);
 List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* argv[]);
+int do_the_work(List_of_Tables master_table, int argc, char* argv[]);
 
 
 void free_list(int** list,int size);

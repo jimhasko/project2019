@@ -453,7 +453,7 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
         j = table->location[i] + j;
 
 
-    int zeros = 0;
+    /*int zeros = 0;
     int ones = 0;
 
     for (i = 0; i < table->rows; i++) {
@@ -473,7 +473,7 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
             }
         }
     }
-    printf(" zer0s : %d , ones : %d \n",zeros,ones);
+    printf(" zer0s : %d , ones : %d \n",zeros,ones);*/
 
     free_table(table);
 not_yet->columns=colums;
@@ -483,7 +483,7 @@ not_yet->columns=colums;
 //=================================================================================================================
 void free_table(Table_Info *table) {            // self explanatory
     int i;
-    printf("rows %d\n",table->rows);
+    //printf("rows %d\n",table->rows);
     for (i = 0; i < table->rows; i++) {   // <-- THAT WORKS .FIX YOUR PC!!! and get some bloody linux
         free(table->TableA[i]);
        free(table->TableB[i]);
@@ -597,8 +597,8 @@ int added=0;
     }
 
     free_results(A);
-   free_results(B);
-    printf("\n  added: %d\n", added);
+    free_results(B);
+    //printf("\n  added: %d\n", added);
 
     //midle->columns=columns;
     *size=added;

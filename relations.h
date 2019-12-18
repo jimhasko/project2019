@@ -70,11 +70,12 @@ typedef struct summa {
 typedef struct just_transfer{
     priority* priority1;
     int priority_number;
-    summa * suma;
-    int num_of_tables,suma_size;//posa ine ta from tables
-    int* tables;// pia einai ta from tables
+    summa* suma;
+    int num_of_tables,suma_size;    //posa ine ta from tables
+    int* tables;                    // pia einai ta from tables
     tableid* tables_ids;
-}just_transfer;
+} just_transfer;
+
 uint64_t Sto64(const char *s);
 void priority_tree(priority* prior,int priority_number,just_transfer* just);
 int min_priority(priority* prior,int priority_number);

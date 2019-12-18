@@ -779,27 +779,18 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
         if (transfer->priority1[i].type == 1) {             //self join 111111111111111111111111111111111111111111111111111111111111111
 
+        //   0|0.1=0.1
 
+        /*   for(j=0;j<transfer->tables_ids[ht1].size;j++){
+            id=transfer->tables_ids[ht1].id_list[j];
+            if(col1[id]==col2[id]){
+            new[idcounter]=id;
+            idcounter++;
+            }
 
-
-//   0|0.1=0.1
-
-         /*   for(j=0;j<transfer->tables_ids[ht1].size;j++){
-                id=transfer->tables_ids[ht1].id_list[j];
-                if(col1[id]==col2[id]){
-                new[idcounter]=id;
-                idcounter++;
-                }
-
-
-            }*/
-
-
+        }*/
 
         }
-
-
-
 
         else if (transfer->priority1[i].type == 2) {        //column=number     2222222222222222222222222222222222222222222222222222222222
 
@@ -887,16 +878,19 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
                 for(j=0;j<midle->num_inserted;j++){
                   if(ht1==midle->inserted[j]){
                     isin1=1;
-                    needed=j;}
-                     //  needed1=i;
-                     if(ht2==midle->inserted[j]){
+                    needed=j;
+                  }
+                  //  needed1=i;
+                 if(ht2==midle->inserted[j]){
                     isin2=1;
-                     needed=j;}}
-                 if(isin1+isin2==2){
+                    needed=j;
+                 }
+                }
+                if(isin1+isin2==2){
                     midle_scan(midle,(&transfer->priority1[i]),master_table);
 
 
-                 } else {
+                } else {
 
                      if (isin1 == 1) {
                          if(transfer->priority1[i-1].col1==column1&&transfer->priority1[i-1].here_table1==ht1) {
@@ -1010,13 +1004,8 @@ uint64_t * column2=master_table->tables[prior->master_table2].Full_Table[prior->
                     }
                     temp[k]=test;
                 }
-
-
             }
-
         }
-
-
     }
 
     free_midle_table(midle);
@@ -1032,6 +1021,9 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
     uint64_t * sums;
 
     //printf("ADDING!!\n");
+    FILE * fptrs;
+
+    fptrs = fopen (work_slave,"a");
 
     if(midle->size>0) {
 
@@ -1063,21 +1055,25 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
             }
 
             printf("%"PRIu64 " ",  sums[i]);
+            fprintf (fptrs, "%"PRIu64 " ",  sums[i]);
 
 
         }
         free(sums);
     }else{
-        for(j=0;j<transfer->suma_size;j++)
-            printf("NULL  ");
+        for(j=0;j<transfer->suma_size;j++) {
+            printf("NULL ");
+            fprintf(fptrs, "NULL ");
+        }
     }
     printf("\n");
+    fprintf(fptrs, "\n");
 
+    fclose(fptrs);
 
     free_midle(midle);
     //free_transfer(transfer);
     //free_big(master_table);
-
 
 }
 

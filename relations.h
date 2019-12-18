@@ -11,7 +11,7 @@
 #include "Radix.h"
 
 #define max_line_length 500
-#define init_filename_length 5
+#define work_slave "mywork.txt"
 
 typedef struct Row_Table{
 

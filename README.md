@@ -1,4 +1,4 @@
-# Project Part 1 <h1>
+# Project Part 2 <h1>
 
 ## Στοιχεία Φοιτητών: <h2>
 
@@ -31,6 +31,7 @@ work, καθώς και τα αρχεία πινάκων.
 ### Εντολή εκτέλεσης
 
 >./myexe small.init small.work
+
 >./myexe medium.init medium.work
 
 

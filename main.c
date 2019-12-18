@@ -4,7 +4,6 @@
 #include <inttypes.h>
 
 
-
 int main(int argc, char** argv) {
 
     clock_t start = clock(); //Start timer

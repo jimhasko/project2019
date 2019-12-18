@@ -596,7 +596,7 @@ int added=0;
         }
     }
 
- free_results(A);
+    free_results(A);
    free_results(B);
     printf("\n  added: %d\n", added);
 
@@ -619,3 +619,33 @@ void free_results(results * A){
 }
 
 //=================================================================================================================
+
+results* get_old_results(uint64_t* col,int** idlist,int colums,int rows,int needed){
+    int i,j;
+    Table_Info *table;
+    table = get_table(col,idlist,colums,rows,needed);
+    results *not_yet = (struct results *)malloc(sizeof(results));       //malloc the results
+    not_yet->rows = table->rows;
+    not_yet->matrix = (uint64_t **) malloc(sizeof(uint64_t *) * table->rows);
+
+    for (i = 0; i < table->rows; i++) {
+
+        not_yet->matrix[i] = (uint64_t*) malloc(sizeof(uint64_t) * (colums+1));
+    }
+
+    for (i = 0; i < table->rows; i++) {                     //get the data from the correct matrix
+
+
+            for(j=0;j<colums;j++)
+                not_yet->matrix[i][j] = table->TableA[i][j];
+            not_yet->matrix[i][colums] = table->TableA[i][colums];
+
+
+    }
+
+    free_table(table);
+    not_yet->columns=colums;
+    return  not_yet;
+
+
+}

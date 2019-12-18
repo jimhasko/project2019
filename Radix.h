@@ -108,6 +108,7 @@ void free_table(Table_Info *table);
 int** join_matrices(results* A, results* B,int needed,int middle_matrix_size,int * size);
 //results *  simple_mesure(results* A,uint64_t num,char operator);
 void free_results(results * A);
+results* get_old_results(uint64_t* col,int** idlist,int colums,int rows,int needed);
 //=================================================================================================================
 //=================================================================================================================
 

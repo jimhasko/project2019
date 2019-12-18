@@ -519,7 +519,7 @@ int len,counter_guard=10;
                 priority_series[counter].number=Sto64(last+1);
 
 
-            }else   if(((here_table1)==(here_table2)&&(master_table->tables[table1].table_name==master_table->tables[table2].table_name))){// self join
+            }else   if(((here_table1)==(here_table2)&&(master_table->tables[table1].table_name==master_table->tables[table2].table_name)&&(column1==column2))){// self join
 
                 priority_series[counter].type=1;
 
@@ -676,7 +676,10 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
     ht1 = 0;
     ht2 = 0;
 
-
+    int ** list1;
+    results * res1;
+    results * res2;
+    res1=NULL;
     priority_number=transfer->priority_number;
 short_priority(transfer->priority1,priority_number);
     uint64_t * col1;
@@ -732,9 +735,9 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
 
 
 
+//   0|0.1=0.1
 
-
-            for(j=0;j<transfer->tables_ids[ht1].size;j++){
+         /*   for(j=0;j<transfer->tables_ids[ht1].size;j++){
                 id=transfer->tables_ids[ht1].id_list[j];
                 if(col1[id]==col2[id]){
                 new[idcounter]=id;
@@ -742,7 +745,7 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
                 }
 
 
-            }
+            }*/
 
 
 
@@ -792,9 +795,7 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
 
         }else{                                              //tablejoin!!!!!!!!!!!!!!5555555555555555555///////////////
 
-            int ** list1;
-            results * res1;
-            results * res2;
+
             int isin1,isin2,mid_size,needed1,needed=0;
 
             if(midle->num_inserted==0) {  //////first runnnnn
@@ -851,15 +852,28 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
                  } else {
 
                      if (isin1 == 1) {
-
+                         if(transfer->priority1[i-1].col1==column1&&transfer->priority1[i-1].here_table1==ht1) {
+                             res1=get_old_results(col1,midle->table,midle->num_inserted,midle->size,needed);
+                         }else{
+                             //free_results(res1);
+                             res1=big_short(col1,midle->table,midle->num_inserted,midle->size,needed);
+                         }
                          list1= get_id_list(&transfer->tables_ids[ht2]);
-                         res1=big_short(col1,midle->table,midle->num_inserted,midle->size,needed);
+
                          res2=big_short(col2,list1,1,transfer->tables_ids[ht2].size,0);
+
                          midle->inserted[midle->num_inserted]=ht2;
                          free_list(list1,transfer->tables_ids[ht2].size);
                      } else {
+                         if(transfer->priority1[i-1].col2==column2&&transfer->priority1[i-1].here_table2==ht2) {
+                             res1=get_old_results(col2,midle->table,midle->num_inserted,midle->size,needed);
+                         }else{
+                            // free_results(res1);
+                             res1=big_short(col2,midle->table,midle->num_inserted,midle->size,needed);
+                         }
+
                         list1= get_id_list(&transfer->tables_ids[ht1]);
-                         res1=big_short(col2,midle->table,midle->num_inserted,midle->size,needed);
+
                          res2=big_short(col1,list1,1,transfer->tables_ids[ht1].size,0);
                          midle->inserted[midle->num_inserted]=ht1;
                          free_list(list1,transfer->tables_ids[ht1].size);
@@ -879,7 +893,7 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
             }
 
         }
-        if(transfer->priority1[i].type !=5){
+        if(transfer->priority1[i].type !=5&&transfer->priority1[i].type !=1){
         transfer->tables_ids[ht1].size=idcounter;
         transfer->priority1[i].size=idcounter;
         free(transfer->tables_ids[ht1].id_list);
@@ -897,6 +911,8 @@ printf(" priority %d : %s \n",i, transfer->priority1[i].command);
 
 
     }
+   // if(res1!=NULL)
+     //   free_results(res1);
     return midle;
 
 }

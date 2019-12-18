@@ -50,7 +50,7 @@ void short_priority(priority* prior,int prior_num){
 List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* argv[]) {
 
     if (argc != 3 ) {
-        printf("\n\nError with arguments! input-> Init_file Work_file!\n");
+        printf("\n\nError with arguments! input-> ./myexe Init_file Work_file!\n");
     }
     else {
 
@@ -78,6 +78,7 @@ List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* 
 
         // master_table = (List_of_Tables*) malloc (sizeof(List_of_Tables));
         master_table.num_of_tables = lines;
+        master_table.work_file = NULL;
         lines = 0;
         master_table.tables=(Single_Table*)malloc(sizeof(Single_Table)*master_table.num_of_tables);
         while (EOF != fscanf(fptri, "%[^\n]\n", line)) {
@@ -87,6 +88,7 @@ List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* 
             lines++;
         }
         free(line);
+        fclose(fptri);
     }
 
 
@@ -104,7 +106,8 @@ int do_the_work(List_of_Tables master_table, int argc, char* argv[]) {
     char * line =  (char*) malloc( sizeof(char) * max_line_length);
 
     fptrw = fopen(argv[2], "r");
-    if(fptrw == NULL) {
+
+    if (fptrw == NULL) {
         printf("No such work_file in the working directory!");
         return false;
     }
@@ -775,7 +778,7 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
     midle->num_inserted=0;
     midle->start=NULL;
     midle->columns=0;
-    midle->size=0;
+    midle->size=-1;
  //   middle.start  //kane initialize ti lista
     for (i = 0; i < priority_number; i++) {         //gia ola ta queries
                 counter=0;
@@ -871,18 +874,10 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
             if(midle->num_inserted==0) {  //////first runnnnn
 
-
-
-
                //    priority_tree(transfer->priority1, transfer->priority_number, transfer);
                 int ** list2;
                     list1=get_id_list(&transfer->tables_ids[ht1]);
                     list2=get_id_list(&transfer->tables_ids[ht2]);
-
-
-
-
-
 
 
                 res1=big_short(col1,list1,1,transfer->tables_ids[ht1].size,needed);
@@ -997,28 +992,33 @@ void midle_scan(middle* midle,priority* prior,List_of_Tables* master_table){
     int i,j,k,size;
     int* test;
     size=midle->size;
-uint64_t * column1=master_table->tables[prior->master_table1].Full_Table[prior->col1].Column;
-uint64_t * column2=master_table->tables[prior->master_table2].Full_Table[prior->col2].Column;
-  int  ht1=prior->here_table1;
-  int  ht2=prior->here_table2;
-  int col1=prior->col1;
-  int col2=prior->col2;
-  int id1;
-  int id2;
+    uint64_t * column1=master_table->tables[prior->master_table1].Full_Table[prior->col1].Column;
+    uint64_t * column2=master_table->tables[prior->master_table2].Full_Table[prior->col2].Column;
+    int  nht1=prior->here_table1;
+    int  nht2=prior->here_table2;
+    int col1=prior->col1;
+    int col2=prior->col2;
+    int id1;
+    int id2;
+    int ht1,ht2;
 
-    int** temp=(int**)malloc(sizeof(int*)*(midle->num_inserted));
+    int** temp=(int**)malloc(sizeof(int)*(midle->num_inserted));
     if(temp==NULL){
         printf(" out of memory ");
         exit(1);
     }
+    /*for(i=0;i<(midle->num_inserted);i++)
+        printf(": %d",midle->inserted[i]);
+    printf("\n");*/
     for(i=0;i<(midle->num_inserted);i++) {               ///table[rows][columns]
         temp[i] = malloc(sizeof(int) * size);
-        if(midle->inserted[i]==ht1)
-            ht1=i;
-        if(midle->inserted[i]==ht2)
-            ht2=i;
+        if(midle->inserted[i]==nht1){
+            ht1=i;}
+        if(midle->inserted[i]==nht2){
+            ht2=i;}
     }
     int added=0;
+
 ///////////
     for(j=0;j<size;j++){
         id1=midle->table[ht1][j];
@@ -1054,10 +1054,29 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
     uint64_t * sums;
 
     //printf("ADDING!!\n");
-    FILE * fptrs;
+    FILE * fptrs = NULL;
 
-    fptrs = fopen (work_slave,"a");
+    fptrs = master_table->work_file;
+    if (fptrs == NULL) {
 
+        fptrs = fopen (work_slave,"w");
+        if (fptrs == NULL) {
+            printf("\n\nCant write to save file!\n");
+            return;
+        }
+        else {
+            master_table->work_file = fptrs;
+        }
+    }
+    else {
+
+        fptrs = fopen(work_slave, "a");
+
+        if (fptrs == NULL) {
+            printf("\n\nCant write to save file!\n");
+            return;
+        }
+    }
 
     if(midle->size>0) {
 
@@ -1100,15 +1119,14 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
             fprintf(fptrs, "NULL ");
         }
     }
+
     printf("\n");
     fprintf(fptrs, "\n");
 
     fclose(fptrs);
 
     free_midle(midle);
-    //free_transfer(transfer);
-    //free_big(master_table);
-
+    free_transfer(transfer);
 }
 
 

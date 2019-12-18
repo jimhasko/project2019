@@ -447,7 +447,7 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
         }
     }
 
-    j = 0;
+    /*j = 0;
 
     for (i = 0; i < 1000; i++)
         j = table->location[i] + j;
@@ -476,7 +476,7 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
     printf(" zer0s : %d , ones : %d \n",zeros,ones);*/
 
     free_table(table);
-not_yet->columns=colums;
+    not_yet->columns=colums;
     return not_yet;
 }
 

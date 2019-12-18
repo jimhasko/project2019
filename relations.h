@@ -48,6 +48,7 @@ typedef struct neibour_node{
 
 typedef struct Tables_Table{
     int num_of_tables;
+    FILE* work_file;
     struct Single_Table* tables;
 
 }List_of_Tables;
@@ -62,12 +63,11 @@ typedef struct priority {
 
 typedef struct summa {
 
-
     int col,master_table,here_table;
 }summa;
 
 
-typedef struct just_transfer{
+typedef struct just_transfer {
     priority* priority1;
     int priority_number;
     summa* suma;

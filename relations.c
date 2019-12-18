@@ -50,7 +50,7 @@ void short_priority(priority* prior,int prior_num){
 List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* argv[]) {
 
     if (argc != 3 ) {
-        printf("Error with arguments! input-> Init_file Work_file!");
+        printf("\n\nError with arguments! input-> Init_file Work_file!\n");
     }
     else {
 
@@ -60,7 +60,7 @@ List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* 
 
         fptri = fopen(argv[1], "r");
         if(fptri == NULL) {
-            printf("No such init_file in the working directory!");
+            printf("\n\nNo such init_file in the working directory!\n");
         }
 
         while(!feof(fptri)) {
@@ -73,7 +73,7 @@ List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* 
 
         if (lines <= 0 ) {
 
-            printf("Init_file was empty, check file again!");
+            printf("\n\nInit_file was empty, check file again!\n");
         }
 
         // master_table = (List_of_Tables*) malloc (sizeof(List_of_Tables));
@@ -92,6 +92,69 @@ List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* 
 
     return master_table;
 }
+
+int do_the_work(List_of_Tables master_table, int argc, char* argv[]) {
+
+    master_table = get_data_from_file( master_table, argc, argv);
+
+    FILE * fptrw = NULL;
+    int lines = 0;
+    int batches = 0;
+    char cur_char;
+    char * line =  (char*) malloc( sizeof(char) * max_line_length);
+
+    fptrw = fopen(argv[2], "r");
+    if(fptrw == NULL) {
+        printf("No such work_file in the working directory!");
+    }
+
+    while(!feof(fptrw)) {
+        cur_char = fgetc(fptrw);
+        if(cur_char== '\n') {
+            lines++;
+        }
+
+        if(cur_char== 'F') {
+            batches++;
+        }
+    }
+
+    fseek(fptrw, 0, SEEK_SET);
+
+    if (lines <= 0 ) {
+
+        printf("Work_file was empty, check file again!");
+    }
+
+    just_transfer * test;
+    middle* bad_word;
+    lines=0;
+    batches =0;
+
+    while (EOF != fscanf(fptrw, "%[^\n]\n", line)) {
+
+        if(strcmp(line, "F") != 0) {
+            test = analise(line, &master_table);
+
+            bad_word = run_filters(&master_table, test);
+
+            athrisma(bad_word, test, &master_table);
+            lines++;
+        }
+        else {
+            batches++;
+        }
+    }
+
+    free(line);
+    free_big(&master_table);
+
+
+
+
+    return true;
+}
+
 
 int min_priority(priority* prior,int priority_number){
     int i,min;

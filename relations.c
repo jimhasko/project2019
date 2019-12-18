@@ -1025,6 +1025,7 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
 
     fptrs = fopen (work_slave,"a");
 
+
     if(midle->size>0) {
 
 

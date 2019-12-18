@@ -78,7 +78,7 @@ List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* 
 
         // master_table = (List_of_Tables*) malloc (sizeof(List_of_Tables));
         master_table.num_of_tables = lines;
-        master_table.work_file = NULL;
+        master_table.work_file = false;
         lines = 0;
         master_table.tables=(Single_Table*)malloc(sizeof(Single_Table)*master_table.num_of_tables);
         while (EOF != fscanf(fptri, "%[^\n]\n", line)) {
@@ -1056,8 +1056,7 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
     //printf("ADDING!!\n");
     FILE * fptrs = NULL;
 
-    fptrs = master_table->work_file;
-    if (fptrs == NULL) {
+    if (master_table->work_file == false) {
 
         fptrs = fopen (work_slave,"w");
         if (fptrs == NULL) {
@@ -1065,7 +1064,7 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
             return;
         }
         else {
-            master_table->work_file = fptrs;
+            master_table->work_file = true;
         }
     }
     else {

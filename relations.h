@@ -48,7 +48,7 @@ typedef struct neibour_node{
 
 typedef struct Tables_Table{
     int num_of_tables;
-    FILE* work_file;
+    int work_file;
     struct Single_Table* tables;
 
 }List_of_Tables;

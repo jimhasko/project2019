@@ -106,6 +106,7 @@ int do_the_work(List_of_Tables master_table, int argc, char* argv[]) {
     fptrw = fopen(argv[2], "r");
     if(fptrw == NULL) {
         printf("No such work_file in the working directory!");
+        return false;
     }
 
     while(!feof(fptrw)) {
@@ -124,6 +125,7 @@ int do_the_work(List_of_Tables master_table, int argc, char* argv[]) {
     if (lines <= 0 ) {
 
         printf("Work_file was empty, check file again!");
+        return false;
     }
 
     just_transfer * test;

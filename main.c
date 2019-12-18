@@ -15,6 +15,15 @@ int main(int argc, char** argv) {
 
     this_is_fine = do_the_work(master_table, argc, argv);
 
+    if(this_is_fine == true) {
+
+        printf("\n\nFuck Yeah!\n\n");
+    }
+    else {
+
+        printf("\n\nThis is not fine ;(\n\n");
+        return 1;
+    }
 
     clock_t stop = clock(); //End timer
     double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;

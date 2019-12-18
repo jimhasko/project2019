@@ -147,8 +147,8 @@ int do_the_work(List_of_Tables master_table, int argc, char* argv[]) {
         }
         else {
             batches++;
-            if (batches == 1)
-                break;
+            //if (batches == 2)
+                //break;
         }
     }
 
@@ -475,12 +475,19 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
             guard=str[i-1];
         if((str[i]=='|')&&(first==0)&&(guard!=str[i])){
 
+
             first=i;}
+
+
+
+
 
         if((str[i]=='|')&&(i>first)&&(second==0)&&(guard!=str[i])){
             second=i;
 
         }
+
+
 
         if((str[i]=='|')&&(i>second)&&(second>0)&&(guard!=str[i])){
             third=i;
@@ -492,19 +499,29 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
 
     }
 
+
+
+
     strncat(sxesi,str,first);                   //spai to work se komatia diaxorismena me |
     //printf("sxesi %s| len :%ld \n",sxesi,strlen(sxesi));
-    //char t=sxesi[0];
+//char t=sxesi[0];
     strncat(katigorima,str+first+1,second-first-1);
     //printf("katigorima %s \n",katigorima);
 
     strncat(proboli,str+second+1,third-second);
     //printf("proboli %s \n",proboli);
 
-   //List_of_Tables* temp_table;
 
-  //  temp_table->num_of_tables=(int)strlen(sxesi)/2+1;
-  //  temp_table->tables=(Single_Table*)malloc(sizeof(Single_Table)*temp_table->num_of_tables);
+
+
+
+
+
+
+    //List_of_Tables* temp_table;
+
+    //  temp_table->num_of_tables=(int)strlen(sxesi)/2+1;
+    //  temp_table->tables=(Single_Table*)malloc(sizeof(Single_Table)*temp_table->num_of_tables);
     priority* priority_series;
     priority_series=(priority*)malloc(sizeof(priority)*10);
     int * from;
@@ -517,18 +534,18 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
     from=malloc(sizeof(int)*master_table->num_of_tables);
     while(ptr != NULL)
     {
-       j=atoi(ptr);
+        j=atoi(ptr);
         from[i]=j;
-      // printf("j-> %d ",j);
-      // printf("'%s'\n", ptr);
+        // printf("j-> %d ",j);
+        // printf("'%s'\n", ptr);
 
-      //  temp_table->tables[i]=master_table.tables[j];
-      //  temp_table->tables[i].table_name=j;
+        //  temp_table->tables[i]=master_table.tables[j];
+        //  temp_table->tables[i].table_name=j;
         ptr = strtok(NULL, delim);
         i++;
 
     }
-from_number=i;
+    from_number=i;
 
 
 ////////////////////////////////////type:1 = self join; type:2==int; type:3=>int;type:4=<int;type:5=table_join
@@ -537,28 +554,29 @@ from_number=i;
     int priority_number=0;
 
 
-    int swap,max_rows;
+    int swap,max_rows,l;
     ptr = strtok(katigorima, delimkat);
-int table1,table2,column1,column2,here_table1,here_table2,counter=0;
-int len,counter_guard=10;
+    int table1,table2,column1,column2,here_table1,here_table2,counter=0;
+    int len,counter_guard=10;
     char *last;
-   // Row_table replace;
+    // Row_table replace;
     while(ptr != NULL)
     {   priority_number++;
         priority_series[counter].command=ptr;
         //printf("ptr %s \n",ptr);
-    len=strlen(ptr);
-    here_table1=ptr[0]-48;
-    table1=from[here_table1];
-    column1=ptr[2]-48;
-    if(len>6){
-        here_table2=ptr[4]-48;
-        table2=from[here_table2];
-        column2=ptr[6]-48;}
-    else{
-        table2=-1;
-        column2=-1;
-    }
+        len=strlen(ptr);
+        here_table1=ptr[0]-48;
+        table1=from[here_table1];
+        column1=ptr[2]-48;
+        if(len>6){
+            here_table2=ptr[4]-48;
+            table2=from[here_table2];
+            column2=ptr[6]-48;}
+        else{
+            table2=-1;
+            column2=-1;
+            here_table2=-1;
+        }
 
 
 
@@ -585,20 +603,34 @@ int len,counter_guard=10;
 
                 }
 
-              if(here_table2<here_table1){
-                swap=here_table2;
-                  here_table2=here_table1;
-                  here_table1=swap;
-                  swap=column2;
-                  column2=column1;
-                  column1=swap;
-                  swap=table2;
-                  table2=table1;
-                  table1=swap;
-              }
+                if(here_table2<here_table1){
+                    swap=here_table2;
+                    here_table2=here_table1;
+                    here_table1=swap;
+                    swap=column2;
+                    column2=column1;
+                    column1=swap;
+                    swap=table2;
+                    table2=table1;
+                    table1=swap;
+                }
 
                 priority_series[counter].type = 5;
+
+
+                for(l=0;l<counter;l++){
+                    if( priority_series[l].type ==5){
+                        if(priority_series[l].here_table1==here_table1&&priority_series[l].here_table2==here_table2&&priority_series[l].col1==column1&&priority_series[l].col2==column2){
+                            priority_series[counter].type=1;
+                        }
+                    }
+
+
+                }
+
+
             }
+
         }
         if(ptr[3]=='>'){
 
@@ -632,7 +664,7 @@ int len,counter_guard=10;
         }
         ptr = strtok(NULL, delimkat);
 
-}
+    }
 
 
     just_transfer* transfer;
@@ -646,7 +678,7 @@ int len,counter_guard=10;
         transfer->tables_ids[i].id_list=malloc(sizeof(int)*master_table->tables[from[i]].tube_num);
 
     }
-   max_rows=max(from,from_number,master_table);
+    max_rows=max(from,from_number,master_table);
     for(i=0;i<max_rows;i++){
         for(j=0;j<from_number;j++) {
             if (i < master_table->tables[from[j]].tube_num)
@@ -655,7 +687,7 @@ int len,counter_guard=10;
     }
     for(j=0;j<from_number;j++) {
 
-            transfer->tables_ids[j].size=(int)master_table->tables[from[j]].tube_num;
+        transfer->tables_ids[j].size=(int)master_table->tables[from[j]].tube_num;
     }
 /////////////////
     char* temp;
@@ -685,7 +717,7 @@ int len,counter_guard=10;
 
 
         ptr = strtok(NULL, delim);
-       i++;
+        i++;
 
     }
     transfer->suma_size=size;
@@ -698,6 +730,7 @@ int len,counter_guard=10;
 
 
 }
+
 
 int max(int* from,int from_num,List_of_Tables* master_table){
     int i,max;

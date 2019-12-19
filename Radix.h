@@ -64,7 +64,7 @@ typedef struct results {
 
 typedef struct tableid{
 
-    int* id_list;
+    int** id_list;
     int size;
 
 

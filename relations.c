@@ -47,10 +47,11 @@ void short_priority(priority* prior,int prior_num){
 }
 
 
-List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* argv[]) {
+List_of_Tables* get_data_from_file( List_of_Tables* master_table, int argc, char* argv[]) {
 
     if (argc != 3 ) {
         printf("\n\nError with arguments! input-> ./myexe Init_file Work_file!\n");
+        exit(1);
     }
     else {
 
@@ -61,6 +62,7 @@ List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* 
         fptri = fopen(argv[1], "r");
         if(fptri == NULL) {
             printf("\n\nNo such init_file in the working directory!\n");
+            exit(1);
         }
 
         while(!feof(fptri)) {
@@ -74,16 +76,17 @@ List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* 
         if (lines <= 0 ) {
 
             printf("\n\nInit_file was empty, check file again!\n");
+            exit(1);
         }
 
         // master_table = (List_of_Tables*) malloc (sizeof(List_of_Tables));
-        master_table.num_of_tables = lines;
-        master_table.work_file = false;
+        master_table->num_of_tables = lines;
+        master_table->work_file = false;
         lines = 0;
-        master_table.tables=(Single_Table*)malloc(sizeof(Single_Table)*master_table.num_of_tables);
+        master_table->tables=(Single_Table*)malloc(sizeof(Single_Table)*master_table->num_of_tables);
         while (EOF != fscanf(fptri, "%[^\n]\n", line)) {
 
-            master_table.tables[lines]=fill(line, lines);
+            master_table->tables[lines]=fill(line, lines);
             //printf("%s %d\n",line, lines);
             lines++;
         }
@@ -95,7 +98,7 @@ List_of_Tables get_data_from_file( List_of_Tables master_table, int argc, char* 
     return master_table;
 }
 
-int do_the_work(List_of_Tables master_table, int argc, char* argv[]) {
+int do_the_work(List_of_Tables* master_table, int argc, char* argv[]) {
 
     master_table = get_data_from_file( master_table, argc, argv);
 
@@ -139,11 +142,11 @@ int do_the_work(List_of_Tables master_table, int argc, char* argv[]) {
     while (EOF != fscanf(fptrw, "%[^\n]\n", line)) {
 
         if(strcmp(line, "F") != 0) {
-            test = analise(line, &master_table);
+            test = analise(line, master_table);
 
-            bad_word = run_filters(&master_table, test);
+            bad_word = run_filters(master_table, test);
 
-            athrisma(bad_word, test, &master_table);
+            athrisma(bad_word, test, master_table);
             lines++;
             //if (lines == 1)
                 //break;
@@ -156,7 +159,7 @@ int do_the_work(List_of_Tables master_table, int argc, char* argv[]) {
     }
 
     free(line);
-    free_big(&master_table);
+    free_big(master_table);
 
 
     return true;
@@ -678,14 +681,18 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
     transfer->num_of_tables=from_number;
     transfer->tables_ids=(tableid*)malloc(sizeof(tableid)*from_number);
     for(i=0;i<from_number;i++){
-        transfer->tables_ids[i].id_list=malloc(sizeof(int)*master_table->tables[from[i]].tube_num);
+        transfer->tables_ids[i].id_list=(int**)malloc(sizeof(int*)*1);
+
 
     }
+    for(i=0;i<from_number;i++)
+    transfer->tables_ids[i].id_list[0]=malloc(sizeof(int*)*master_table->tables[from[i]].tube_num);
+
     max_rows=max(from,from_number,master_table);
     for(i=0;i<max_rows;i++){
         for(j=0;j<from_number;j++) {
             if (i < master_table->tables[from[j]].tube_num)
-                transfer->tables_ids[j].id_list[i]=i;
+                transfer->tables_ids[j].id_list[0][i]=i;
         }
     }
     for(j=0;j<from_number;j++) {
@@ -817,23 +824,17 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
         //   0|0.1=0.1
 
-        /*   for(j=0;j<transfer->tables_ids[ht1].size;j++){
-            id=transfer->tables_ids[ht1].id_list[j];
-            if(col1[id]==col2[id]){
-            new[idcounter]=id;
-            idcounter++;
-            }
 
-        }*/
 
         }
 
         else if (transfer->priority1[i].type == 2) {        //column=number     2222222222222222222222222222222222222222222222222222222222
 
             for(j=0;j<transfer->tables_ids[ht1].size;j++){
-                id=transfer->tables_ids[ht1].id_list[j];
+                id=transfer->tables_ids[ht1].id_list[0][j];
                 if(col1[id]==transfer->priority1[i].number){
-                    new[idcounter]=id;
+                    transfer->tables_ids[ht1].id_list[0][idcounter]=id;
+                   // new[idcounter]=id;
                     idcounter++;
                 }
 
@@ -844,9 +845,10 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
         else if (transfer->priority1[i].type == 3) {        //column>number   3333333333333333333333333333333333333333333333333333333333333333333333333
 
             for(j=0;j<transfer->tables_ids[ht1].size;j++){
-                id=transfer->tables_ids[ht1].id_list[j];
+                id=transfer->tables_ids[ht1].id_list[0][j];
                 if(col1[id]>transfer->priority1[i].number){
-                    new[idcounter]=id;
+                    transfer->tables_ids[ht1].id_list[0][idcounter]=id;
+                    // new[idcounter]=id;
                     idcounter++;
                 }
 
@@ -858,9 +860,10 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
         if (transfer->priority1[i].type == 4) {                          //column<number     444444444444444444444444444444444444444444444444444444444444444444444444
 
             for(j=0;j<transfer->tables_ids[ht1].size;j++){
-                id=transfer->tables_ids[ht1].id_list[j];
+                id=transfer->tables_ids[ht1].id_list[0][j];
                 if(col1[id]<transfer->priority1[i].number){
-                    new[idcounter]=id;
+                    transfer->tables_ids[ht1].id_list[0][idcounter]=id;
+                    // new[idcounter]=id;
                     idcounter++;
                 }
 
@@ -965,8 +968,8 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
         if(transfer->priority1[i].type !=5&&transfer->priority1[i].type !=1){
         transfer->tables_ids[ht1].size=idcounter;
         transfer->priority1[i].size=idcounter;
-        free(transfer->tables_ids[ht1].id_list);
-        transfer->tables_ids[ht1].id_list=new;
+       // free(transfer->tables_ids[ht1].id_list);
+       // transfer->tables_ids[ht1].id_list=new;
         midle->size=idcounter;
         //new=NULL;
         }
@@ -1132,7 +1135,7 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
 
 int** get_id_list(tableid * idlist){
     int j,size2=idlist->size;
-    int ** list2;
+   /* int ** list2;
     list2=(int**)malloc(sizeof(int*));
 
     // for(j=0;j<1;j++) {
@@ -1147,7 +1150,8 @@ int** get_id_list(tableid * idlist){
     else {
         printf("  god why ? \n");
         exit(1);
-    }
+    }*/
+   return idlist->id_list;
 }
 
 void free_list(int** list,int size){
@@ -1186,9 +1190,12 @@ void free_midle(middle* midle){
 void free_transfer(just_transfer* transfer){
     int i,j;
     //int k=transfer->tables_ids[0].id_list[1];
-    for(i=0;i<transfer->num_of_tables;i++)
-   free(transfer->tables_ids[i].id_list);
-
+    for(i=0;i<transfer->num_of_tables;i++) {
+        //free(transfer->tables_ids[i].id_list);
+    for(j=0;j<transfer->tables_ids[i].size;j++)
+        free(transfer->tables_ids[i].id_list[0]);
+    free(transfer->tables_ids[i].id_list);
+    }
    free( transfer->tables);
     free(transfer->priority1);
     free(transfer->suma);
@@ -1216,7 +1223,7 @@ void free_big(List_of_Tables* master){
     free(master->tables->Full_Table);
     free(master->tables);
 
-
+free(master);
 }
 
 

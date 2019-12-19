@@ -8,7 +8,6 @@ int main(int argc, char** argv) {
 
     clock_t start = clock(); //Start timer
 
-
     List_of_Tables master_table;
     int this_is_fine = 0;
 

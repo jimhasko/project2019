@@ -62,11 +62,17 @@ typedef struct results {
 
 //=================================================================================================================
 
+typedef struct statistics{
+    uint64_t upper,lower,distinct,full,table,row;
+}statistics;
+
+
+
 typedef struct tableid{
 
     int** id_list;
     int size;
-
+    statistics * stats;
 
 }tableid;
 

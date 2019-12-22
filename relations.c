@@ -211,7 +211,7 @@ void get_size(priority* prior,int priority_number,just_transfer* just, int now){
 
 }
 
-void priority_tree(priority* prior,int priority_number,just_transfer* just){
+void priority_tree(List_of_Tables* master_table,priority* prior,int priority_number,just_transfer* just){
     int i,j,min,k,now=0;
 
     for(j=0;j<priority_number;j++){
@@ -219,6 +219,7 @@ void priority_tree(priority* prior,int priority_number,just_transfer* just){
             now=j;
         break;}
     }
+    run_stats(master_table,just,priority_number);
     get_size(prior,priority_number,just,now);
     min=min_priority(prior,priority_number);
 
@@ -239,7 +240,7 @@ void priority_tree(priority* prior,int priority_number,just_transfer* just){
 
 
 
-
+/*
 Single_Table*  simple_mesure(Single_Table* table,uint64_t num,int type,int column){
     int i,j,new_rows=0;
 
@@ -295,7 +296,7 @@ Single_Table*  simple_mesure(Single_Table* table,uint64_t num,int type,int colum
 
 
 }
-
+*/
 
 
 int power(int basi,int pano){
@@ -328,11 +329,11 @@ Single_Table fill(char* filename,int name){     //diabazi binary k gemizi ti mni
 
     Table_Node.Full_Table=(Row_table*)malloc(sizeof(Row_table)*Table_Node.column_num);
     Table_Node.stats=(statistics*)malloc(sizeof(statistics)*Table_Node.column_num);
-    Table_Node.id_table=malloc(sizeof(int)*Table_Node.tube_num);
+   // Table_Node.id_table=malloc(sizeof(int)*Table_Node.tube_num);
     Table_Node.table_name=name;
     int j,bool_test,i,k=0;
     j=0;
-    //uint64_t i,max;
+    uint64_t max;
     //int kl=0;
 
 
@@ -356,7 +357,7 @@ Single_Table fill(char* filename,int name){     //diabazi binary k gemizi ti mni
     for(i=0;i<Table_Node.tube_num*Table_Node.column_num;i++){
 
         if(i / Table_Node.tube_num>j) {
-         /*   // Table_Node.Full_Table[j]=temp;
+            // Table_Node.Full_Table[j]=temp;
             //  temp=(uint64_t*)malloc(sizeof(uint64_t)*Table_Node.tube_num);
             //  k=0;
             //  j++;
@@ -378,7 +379,7 @@ Single_Table fill(char* filename,int name){     //diabazi binary k gemizi ti mni
                 }
 
             }
-*/
+            free(distinct);
 
             k=0;
             j++;
@@ -386,7 +387,7 @@ Single_Table fill(char* filename,int name){     //diabazi binary k gemizi ti mni
         }
     if(j==0){
 
-        Table_Node.id_table[i]=i;
+        //Table_Node.id_table[i]=i;
     }
          //   printf("\n %ld  <",i);
          int result;
@@ -558,7 +559,7 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
     char delimkat[] = "&";
 
     int priority_number=0;
-
+int col_num;
 
     int swap,max_rows,l;
     ptr = strtok(katigorima, delimkat);
@@ -671,7 +672,7 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
         ptr = strtok(NULL, delimkat);
 
     }
-
+///end of while
 
     just_transfer* transfer;
     transfer=(just_transfer*)malloc(sizeof(just_transfer));
@@ -680,11 +681,28 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
     transfer->tables=from;
     transfer->num_of_tables=from_number;
     transfer->tables_ids=(tableid*)malloc(sizeof(tableid)*from_number);
+
+
     for(i=0;i<from_number;i++){
         transfer->tables_ids[i].id_list=(int**)malloc(sizeof(int*)*1);
 
 
     }
+
+    for(i=0;i<from_number;i++){
+        col_num=master_table->tables[from[i]].column_num;
+        transfer->tables_ids[i].stats=(statistics*)malloc(sizeof(statistics)*col_num);
+
+
+    }
+    for(i=0;i<from_number;i++){
+        col_num=master_table->tables[from[i]].column_num;
+        for(j=0;j<col_num;j++)
+            transfer->tables_ids[i].stats[j]=master_table->tables[from[i]].stats[j];
+
+
+    }
+
     for(i=0;i<from_number;i++)
     transfer->tables_ids[i].id_list[0]=malloc(sizeof(int*)*master_table->tables[from[i]].tube_num);
 
@@ -695,13 +713,20 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
                 transfer->tables_ids[j].id_list[0][i]=i;
         }
     }
+
+
+///////
+
+
+    /////////
+
     for(j=0;j<from_number;j++) {
 
         transfer->tables_ids[j].size=(int)master_table->tables[from[j]].tube_num;
     }
 /////////////////
     char* temp;
-    temp=malloc(sizeof(char)*strlen(proboli));
+    temp=(char*)malloc(sizeof(char)*strlen(proboli));
     strcpy(temp,proboli);
     char delimprov[] = " ";
     ptr = strtok(temp, delimprov);
@@ -733,9 +758,9 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
     transfer->suma_size=size;
     transfer->suma=suma;
     free(temp);
-    //free(proboli);
-    //free(katigorima);
-    //free(sxesi);
+    free(proboli);
+    free(katigorima);
+    free(sxesi);
     return transfer;
 
 
@@ -790,7 +815,7 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
     for (i = 0; i < priority_number; i++) {         //gia ola ta queries
                 counter=0;
     if(transfer->priority1[i].type == 5 && midle->num_inserted==0)
-        priority_tree(transfer->priority1, transfer->priority_number, transfer);
+        priority_tree(master_table,transfer->priority1, transfer->priority_number, transfer);
         //printf(" priority %d : %s \n",i, transfer->priority1[i].command);
         idcounter=0;
 
@@ -812,13 +837,13 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
         }
 
 
-    if(transfer->priority1[i].type!=5){
+   /* if(transfer->priority1[i].type!=5){
        // printf("made A  new %d",transfer->tables_ids[ht1].size);
-        new=malloc(sizeof(int)*transfer->tables_ids[ht1].size);
+       new=malloc(sizeof(int)*transfer->tables_ids[ht1].size);
         if(new == NULL) {
             perror("malloc");
         exit(1);
-        }}
+        }}*/
 
         if (transfer->priority1[i].type == 1) {             //self join 111111111111111111111111111111111111111111111111111111111111111
 
@@ -879,13 +904,13 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
                //    priority_tree(transfer->priority1, transfer->priority_number, transfer);
                 int ** list2;
-                    list1=get_id_list(&transfer->tables_ids[ht1]);
-                    list2=get_id_list(&transfer->tables_ids[ht2]);
+                   // list1=get_id_list(&transfer->tables_ids[ht1]);
+                  //  list2=get_id_list(&transfer->tables_ids[ht2]);
 
 
-                res1=big_short(col1,list1,1,transfer->tables_ids[ht1].size,needed);
+                res1=big_short(col1,transfer->tables_ids[ht1].id_list,1,transfer->tables_ids[ht1].size,needed);
 
-                res2=big_short(col2,list2,1,transfer->tables_ids[ht2].size,needed);
+                res2=big_short(col2,transfer->tables_ids[ht2].id_list,1,transfer->tables_ids[ht2].size,needed);
 
                  midle->table =join_matrices(res1,res2,0,middle__size,(&midle->size));        ////////< join
 
@@ -893,8 +918,8 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
                 midle->inserted[0]=ht1;
                 midle->inserted[1]=ht2;
                 midle->columns=2;
-                free_list(list1,transfer->tables_ids[ht1].size);
-                free_list(list2,transfer->tables_ids[ht2].size);
+               // free_list(list1,transfer->tables_ids[ht1].size);
+               // free_list(list2,transfer->tables_ids[ht2].size);
 
 
             }
@@ -921,7 +946,9 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
                     midle_scan(midle,(&transfer->priority1[i]),master_table);
 
 
-                } else {
+                }
+                /*
+                else {
 
                      if (isin1 == 1) {
                          if(transfer->priority1[i-1].col1==column1&&transfer->priority1[i-1].here_table1==ht1) {
@@ -930,12 +957,12 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
                              //free_results(res1);
                              res1=big_short(col1,midle->table,midle->num_inserted,midle->size,needed);
                          }
-                         list1= get_id_list(&transfer->tables_ids[ht2]);
-
-                         res2=big_short(col2,list1,1,transfer->tables_ids[ht2].size,0);
+                        // list1= get_id_list(&transfer->tables_ids[ht2]);
+                      //  list1= transfer->tables_ids[ht2];
+                         res2=big_short(col2,transfer->tables_ids[ht2].id_list,1,transfer->tables_ids[ht2].size,0);
 
                          midle->inserted[midle->num_inserted]=ht2;
-                         free_list(list1,transfer->tables_ids[ht2].size);
+                        // free_list(list1,transfer->tables_ids[ht2].size);
                      } else {
                          if(transfer->priority1[i-1].col2==column2&&transfer->priority1[i-1].here_table2==ht2) {
                              res1=get_old_results(col2,midle->table,midle->num_inserted,midle->size,needed);
@@ -944,11 +971,11 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
                              res1=big_short(col2,midle->table,midle->num_inserted,midle->size,needed);
                          }
 
-                        list1= get_id_list(&transfer->tables_ids[ht1]);
+                       // list1= get_id_list(&transfer->tables_ids[ht1]);
 
-                         res2=big_short(col1,list1,1,transfer->tables_ids[ht1].size,0);
+                         res2=big_short(col1,transfer->tables_ids[ht1].id_list,1,transfer->tables_ids[ht1].size,0);
                          midle->inserted[midle->num_inserted]=ht1;
-                         free_list(list1,transfer->tables_ids[ht1].size);
+                         //free_list(list1,transfer->tables_ids[ht1].size);
 
                      }
                         free_midle_table(midle);
@@ -960,7 +987,7 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
                  }
 
-
+*/
 
             }
 
@@ -968,9 +995,10 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
         if(transfer->priority1[i].type !=5&&transfer->priority1[i].type !=1){
         transfer->tables_ids[ht1].size=idcounter;
         transfer->priority1[i].size=idcounter;
-       // free(transfer->tables_ids[ht1].id_list);
-       // transfer->tables_ids[ht1].id_list=new;
         midle->size=idcounter;
+       // fr ee(transfer->tables_ids[ht1].id_list);
+       // transfer->tables_ids[ht1].id_list=new;
+
         //new=NULL;
         }
 
@@ -985,6 +1013,9 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
     }
    // if(res1!=NULL)
      //   free_results(res1);
+
+
+
     return midle;
 
 }
@@ -1056,7 +1087,7 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
     uint64_t * column;
     uint64_t * sums;
 
-    //printf("ADDING!!\n");
+   // printf("ADDING!!\n");
     FILE * fptrs = NULL;
 
     if (master_table->work_file == false) {
@@ -1126,44 +1157,15 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
     fprintf(fptrs, "\n");
 
     fclose(fptrs);
-
-    free_midle(midle);
     free_transfer(transfer);
-}
-
-
-
-int** get_id_list(tableid * idlist){
-    int j,size2=idlist->size;
-   /* int ** list2;
-    list2=(int**)malloc(sizeof(int*));
-
-    // for(j=0;j<1;j++) {
-    list2[0] = malloc(sizeof(int)*size2);
-    //  }
-
-    for(j=0;j<idlist->size;j++){
-        list2[0][j]=idlist->id_list[j];
-    }
-    if(list2!=NULL){
-        return list2;}
-    else {
-        printf("  god why ? \n");
-        exit(1);
-    }*/
-   return idlist->id_list;
-}
-
-void free_list(int** list,int size){
-    int i;
-    /* for(i=1;i<size;i++)
-     {
-         free(list[i]);
-     }*/
-    free(list[0]);
-    free(list);
+    free_midle(midle);
 
 }
+
+
+
+
+
 
 void free_midle_table(middle* midle){
     int i,col;
@@ -1188,14 +1190,17 @@ void free_midle(middle* midle){
 
 
 void free_transfer(just_transfer* transfer){
-    int i,j;
-    //int k=transfer->tables_ids[0].id_list[1];
+    int i,j,from_number;
+    from_number=transfer->num_of_tables;
+    int k=transfer->tables_ids[0].id_list[0][1];
     for(i=0;i<transfer->num_of_tables;i++) {
-        //free(transfer->tables_ids[i].id_list);
-    for(j=0;j<transfer->tables_ids[i].size;j++)
         free(transfer->tables_ids[i].id_list[0]);
-    free(transfer->tables_ids[i].id_list);
+
     }
+    for(i=0;i<transfer->num_of_tables;i++){
+        free(transfer->tables_ids[i].stats);
+        free(transfer->tables_ids[i].id_list);}
+
    free( transfer->tables);
     free(transfer->priority1);
     free(transfer->suma);
@@ -1205,12 +1210,13 @@ void free_transfer(just_transfer* transfer){
     free(transfer);
 
 }
+
 void free_big(List_of_Tables* master){
     int i,j,col;
     for(i=0;i<master->num_of_tables;i++){
-       col= master->tables[i].column_num;
+       col= (int)master->tables[i].column_num;
         free(master->tables[i].stats);
-        free(master->tables[i].id_table);
+//        free(master->tables[i].id_table);
         for(j=0;j<col;j++){
            free(master->tables[i].Full_Table[j].Column);
 
@@ -1220,12 +1226,387 @@ void free_big(List_of_Tables* master){
 
 
     }
-    free(master->tables->Full_Table);
+
+    for(i=0;i<master->num_of_tables;i++)
+        free(master->tables[i].Full_Table);
+   // free(master->tables->Full_Table);
     free(master->tables);
 
 free(master);
 }
 
+
+
+uint64_t max_num(uint64_t a,uint64_t b){
+
+    if(a>b){
+        return a;}
+        else return b;
+}
+
+uint64_t min_num(uint64_t a,uint64_t b){
+
+    if(a<b){
+        return a;}
+    else return b;
+}
+/////////////////////////////////
+
+
+
+
+List_of_Tables* cost(int table1,int table2,int column1,int column2 ,List_of_Tables* temp_table){
+    uint64_t temp1,temp2,n,i;
+    if(temp_table->tables[table1].stats[column1].lower<temp_table->tables[table2].stats[column2].lower){
+        temp_table->tables[table1].stats[column1].lower=temp_table->tables[table2].stats[column2].lower;
+
+    }else{
+
+        temp_table->tables[table2].stats[column2].lower=temp_table->tables[table1].stats[column1].lower;
+    }
+
+    if(temp_table->tables[table1].stats[column1].upper<temp_table->tables[table2].stats[column2].upper){
+        temp_table->tables[table1].stats[column1].upper=temp_table->tables[table2].stats[column2].upper;
+
+    }else{
+
+        temp_table->tables[table2].stats[column2].upper=temp_table->tables[table1].stats[column1].upper;
+    }
+
+    if((n=temp_table->tables[table2].stats[column2].upper-temp_table->tables[table1].stats[column1].lower+1)>bool_num){
+        n=bool_num;
+    }
+
+    temp_table->tables[table1].stats[column1].full=temp_table->tables[table1].stats[column1].full*temp_table->tables[table2].stats[column2].full/n;
+    temp_table->tables[table2].stats[column2].full= temp_table->tables[table1].stats[column1].full;
+
+    temp1= temp_table->tables[table1].stats[column1].distinct;
+    temp2= temp_table->tables[table2].stats[column2].distinct;
+    temp_table->tables[table1].stats[column1].distinct=temp_table->tables[table1].stats[column1].distinct*temp_table->tables[table2].stats[column2].distinct/n;
+    temp_table->tables[table2].stats[column2].distinct= temp_table->tables[table1].stats[column1].distinct;
+    temp1= temp_table->tables[table1].stats[column1].distinct/temp1;
+    temp2= temp_table->tables[table1].stats[column1].distinct/temp2;
+    for(i=0;i<temp_table->tables[table1].column_num;i++){                                   //other columns//////////////////////////////////////////////
+        if(i!=column1) {
+            temp_table->tables[table1].stats[i].full=temp_table->tables[table1].stats[column1].full;
+            temp_table->tables[table1].stats[i].distinct=(1-power(1-temp1,temp_table->tables[table1].stats[i].full/temp_table->tables[table1].stats[i].distinct));
+        }
+
+    }
+
+
+
+    for(i=0;i<temp_table->tables[table2].column_num;i++){                                   //other columns//////////////////////////////////////////////
+        if(i!=column2) {
+            temp_table->tables[table2].stats[i].full=temp_table->tables[table2].stats[column2].full;
+            temp_table->tables[table2].stats[i].distinct=(1-power(1-temp2,temp_table->tables[table2].stats[i].full/temp_table->tables[table2].stats[i].distinct));
+        }
+
+    }
+
+
+
+    return temp_table;
+
+
+
+}
+
+
+///////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+void run_stats(List_of_Tables* master_table,just_transfer* transfer,int priority_number) {
+
+
+int comparison, i, j,inside_counter,temp, n,inside_counter_guard = 500;
+statistics * dedomena;
+int counter = 0;
+uint64_t min,max;
+int counter_guard = 10;
+dedomena=(statistics*)malloc(sizeof(statistics)*master_table->num_of_tables); //statistika gia tous pinakes
+
+int table1,column1,ht1,ht2,table2,column2;
+
+
+
+
+
+
+
+
+
+
+
+
+uint64_t lower,upper,stat_size,distinct,distinct_old_h1,distinct_old_h2,distinct_diff,full_old,full,full_diff,upper_old,lower_old;
+for (i = 0; i < priority_number; i++) {         //gia ola ta queries
+counter=0;
+
+
+
+
+    table1=transfer->priority1[i].master_table1;
+    column1=transfer->priority1[i].col1;
+    ht1=transfer->priority1[i].here_table1;
+
+    ht2=ht1;
+
+    table2=table1;
+    column2=column1;
+    if(transfer->priority1[i].type==5||transfer->priority1[i].type==1){// if it needs 2 matrixes
+
+        table2=transfer->priority1[i].master_table2;
+        column2=transfer->priority1[i].col2;
+        ht2=transfer->priority1[i].here_table2;
+
+    }
+
+
+
+
+if (transfer->priority1[i].type == 1) {             //column==column(same matrix) 111111111111111111111111111111111111111111111111111111111111111
+
+
+//upper lower
+
+    max=max_num(transfer->tables_ids[ht1].stats[column1].lower,transfer->tables_ids[ht1].stats[column2].lower);
+    min=min_num(transfer->tables_ids[ht1].stats[column1].upper,transfer->tables_ids[ht1].stats[column2].upper);
+    transfer->tables_ids[ht1].stats[column1].lower=max;
+    transfer->tables_ids[ht1].stats[column2].lower=max;
+
+    transfer->tables_ids[ht1].stats[column1].upper=min;
+    transfer->tables_ids[ht1].stats[column2].upper=min;
+
+    //full
+
+    n=min-max+1;
+    full_old=transfer->tables_ids[ht1].stats[column1].full;
+    full=full_old/n;
+    transfer->tables_ids[ht1].stats[column1].full=full;
+    transfer->tables_ids[ht1].stats[column2].full= full;
+    //distinct
+
+    distinct=transfer->tables_ids[ht1].stats[column1].distinct;
+    distinct=distinct*(1-power(1-(full/full_old),full_old/distinct));
+    transfer->tables_ids[ht1].stats[column1].distinct=distinct;
+    transfer->tables_ids[ht1].stats[column2].distinct=distinct;
+
+
+    for(j=0;j<master_table->tables[ht1].column_num;j++){///other columns on table 1
+        if(i!=column1&&i!=column2){
+            full_diff=transfer->tables_ids[ht1].stats[i].full;
+            distinct=transfer->tables_ids[ht1].stats[i].distinct;
+            transfer->tables_ids[ht1].stats[i].distinct=distinct*(1-power(1-(full/full_old),full_diff/distinct));
+            transfer->tables_ids[ht1].stats[i].full=full;
+        }
+
+
+    }
+
+
+
+    }
+
+
+
+
+
+
+else if (transfer->priority1[i].type == 2) {        //column=number     2222222222222222222222222222222222222222222222222222222222
+    upper=transfer->tables_ids[ht1].stats[column1].upper;
+    lower=transfer->tables_ids[ht1].stats[column1].lower;
+
+    distinct=transfer->tables_ids[ht1].stats[i].distinct;
+    full_old= transfer->tables_ids[ht1].stats[column1].full;
+    if(transfer->priority1[i].number<upper&&transfer->priority1[i].number>lower){
+        transfer->tables_ids[ht1].stats[column1].distinct=1;
+        transfer->tables_ids[ht1].stats[column1].full=transfer->tables_ids[ht1].stats[column1].full/distinct;
+
+
+    }else{
+        transfer->tables_ids[ht1].stats[column1].distinct=0;
+        transfer->tables_ids[ht1].stats[column1].full=0;
+
+    }
+    transfer->tables_ids[ht1].stats[column1].upper=transfer->priority1[i].number;
+    transfer->tables_ids[ht1].stats[column1].lower=transfer->priority1[i].number;
+
+
+
+
+
+
+    full= transfer->tables_ids[ht1].stats[column1].full;
+
+    for(j=0;j<master_table->tables[ht1].column_num;j++){///other columns on table 1
+        if(i!=column1){
+            full_diff=transfer->tables_ids[ht1].stats[i].full;
+            distinct=transfer->tables_ids[ht1].stats[i].distinct;
+            transfer->tables_ids[ht1].stats[i].distinct=distinct*(1-power(1-(full/full_old),full_diff/distinct));
+            transfer->tables_ids[ht1].stats[i].full=full;
+        }
+
+
+    }
+
+
+
+
+
+}
+else if (transfer->priority1[i].type == 3) {        //column>number   3333333333333333333333333333333333333333333333333333333333333333333333333
+
+    upper_old=transfer->tables_ids[ht1].stats[column1].upper;
+    lower_old=transfer->tables_ids[ht1].stats[column1].lower;
+    transfer->tables_ids[ht1].stats[column1].lower=transfer->priority1[i].number;
+    upper=transfer->tables_ids[ht1].stats[column1].upper;
+    lower=transfer->tables_ids[ht1].stats[column1].lower;
+
+
+    distinct=transfer->tables_ids[ht1].stats[column1].distinct;
+    full_old=transfer->tables_ids[ht1].stats[column1].full;
+    transfer->tables_ids[ht1].stats[column1].distinct=((upper-lower)/(upper_old-lower_old))*distinct;
+    transfer->tables_ids[ht1].stats[column1].full=((upper-lower)/(upper_old-lower_old))*full_old;
+    full=transfer->tables_ids[ht1].stats[column1].full;
+
+
+    for(j=0;j<master_table->tables[ht1].column_num;j++){///other columns on table 1
+        if(i!=column1){
+            full_diff=transfer->tables_ids[ht1].stats[i].full;
+            distinct=transfer->tables_ids[ht1].stats[i].distinct;
+            transfer->tables_ids[ht1].stats[i].distinct=distinct*(1-power(1-(full/full_old),full_diff/distinct));
+            transfer->tables_ids[ht1].stats[i].full=full;
+        }
+
+
+    }
+
+
+
+
+
+
+}else
+if (transfer->priority1[i].type == 4) {                          //column<number     444444444444444444444444444444444444444444444444444444444444444444444444
+
+
+
+
+
+
+
+    upper_old=transfer->tables_ids[ht1].stats[column1].upper;
+    lower_old=transfer->tables_ids[ht1].stats[column1].lower;
+    transfer->tables_ids[ht1].stats[column1].upper=transfer->priority1[i].number;
+    upper=transfer->tables_ids[ht1].stats[column1].upper;
+    lower=transfer->tables_ids[ht1].stats[column1].lower;
+
+
+    distinct=transfer->tables_ids[ht1].stats[column1].distinct;
+    full_old=transfer->tables_ids[ht1].stats[column1].full;
+    transfer->tables_ids[ht1].stats[column1].distinct=((upper-lower)/(upper_old-lower_old))*distinct;
+    transfer->tables_ids[ht1].stats[column1].full=((upper-lower)/(upper_old-lower_old))*full_old;
+    full=transfer->tables_ids[ht1].stats[column1].full;
+
+
+    for(j=0;j<master_table->tables[ht1].column_num;j++){///other columns on table 1
+        if(i!=column1){
+            full_diff=transfer->tables_ids[ht1].stats[i].full;
+            distinct=transfer->tables_ids[ht1].stats[i].distinct;
+            transfer->tables_ids[ht1].stats[i].distinct=distinct*(1-power(1-(full/full_old),full_diff/distinct));
+            transfer->tables_ids[ht1].stats[i].full=full;
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+}else{                                                                          //555555555555555555555555555555555
+
+
+
+
+
+
+    //upper lower
+
+    max=max_num(transfer->tables_ids[ht1].stats[column1].lower,transfer->tables_ids[ht2].stats[column2].lower);
+    min=min_num(transfer->tables_ids[ht2].stats[column1].upper,transfer->tables_ids[ht2].stats[column2].upper);
+    transfer->tables_ids[ht1].stats[column1].lower=max;
+    transfer->tables_ids[ht2].stats[column2].lower=max;
+
+    transfer->tables_ids[ht1].stats[column1].upper=min;
+    transfer->tables_ids[ht2].stats[column2].upper=min;
+
+    //full
+
+    n=min-max+1;
+    //full_old=transfer->tables_ids[ht1].stats[column1].full;
+    full=(transfer->tables_ids[ht1].stats[column1].full*transfer->tables_ids[ht2].stats[column2].full)/n;
+    transfer->tables_ids[ht1].stats[column1].full=full;
+    transfer->tables_ids[ht2].stats[column2].full= full;
+    //distinct
+    distinct_old_h1=transfer->tables_ids[ht1].stats[column1].distinct;
+    distinct_old_h2=transfer->tables_ids[ht2].stats[column2].distinct;
+    distinct=(transfer->tables_ids[ht1].stats[column1].distinct*transfer->tables_ids[ht2].stats[column2].distinct)/n;
+    //distinct=distinct*(1-power(1-(full/full_old),full_old/distinct));
+    transfer->tables_ids[ht1].stats[column1].distinct=distinct;
+    transfer->tables_ids[ht2].stats[column2].distinct=distinct;
+
+
+    for(j=0;j<master_table->tables[ht1].column_num;j++){///other columns on table 1
+        if(i!=column1){
+            full_diff=transfer->tables_ids[ht1].stats[i].full;
+            distinct_diff=transfer->tables_ids[ht1].stats[i].distinct;
+            transfer->tables_ids[ht1].stats[i].distinct=distinct_diff*(1-power(1-(distinct/distinct_old_h1),full_diff/distinct_diff));
+            transfer->tables_ids[ht1].stats[i].full=full;
+        }
+
+
+    }
+
+    for(j=0;j<master_table->tables[ht2].column_num;j++){///other columns on table 1
+        if(i!=column2){
+            full_diff=transfer->tables_ids[ht2].stats[i].full;
+            distinct_diff=transfer->tables_ids[ht2].stats[i].distinct;
+            transfer->tables_ids[ht2].stats[i].distinct=distinct_diff*(1-power(1-(distinct/distinct_old_h1),full_diff/distinct_diff));
+            transfer->tables_ids[ht2].stats[i].full=full;
+        }
+
+
+    }
+
+
+
+
+
+
+
+}
+}
+
+
+
+}
 
 
 

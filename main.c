@@ -2,7 +2,7 @@
 #include <time.h>
 #include "relations.h"
 #include <inttypes.h>
-
+//good one
 
 int main(int argc, char** argv) {
 

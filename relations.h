@@ -21,9 +21,6 @@ typedef struct Row_Table{
 
 
 
-typedef struct statistics{
-    uint64_t upper,lower,distinct,full,table,row;
-}statistics;
 
 
 typedef struct Single_Table{
@@ -74,10 +71,11 @@ typedef struct just_transfer {
     int num_of_tables,suma_size;    //posa ine ta from tables
     int* tables;                    // pia einai ta from tables
     tableid* tables_ids;
+
 } just_transfer;
 
 uint64_t Sto64(const char *s);
-void priority_tree(priority* prior,int priority_number,just_transfer* just);
+void priority_tree(List_of_Tables* master_table,priority* prior,int priority_number,just_transfer* just);
 int min_priority(priority* prior,int priority_number);
 void swap_priority(priority* prior,int from,int to);
 void short_priority(priority* prior,int prior_num);
@@ -108,5 +106,9 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
 void free_midle(middle* midle);
 void free_big(List_of_Tables* master);
 void free_transfer(just_transfer* transfer);
-
+List_of_Tables *cost(int table1,int table2,int column1,int column2 ,List_of_Tables* temp_table);
+int power(int basi,int pano);
+uint64_t min_num(uint64_t a,uint64_t b);
+uint64_t max_num(uint64_t a,uint64_t b);
+void run_stats(List_of_Tables* master_table,just_transfer* transfer,int priority_number);
 #endif //RELATIONS_H

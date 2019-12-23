@@ -239,7 +239,7 @@ void priority_tree(priority* prior,int priority_number,just_transfer* just){
 
 
 
-
+/*
 Single_Table*  simple_mesure(Single_Table* table,uint64_t num,int type,int column){
     int i,j,new_rows=0;
 
@@ -295,7 +295,7 @@ Single_Table*  simple_mesure(Single_Table* table,uint64_t num,int type,int colum
 
 
 }
-
+*/
 
 
 int power(int basi,int pano){
@@ -328,11 +328,11 @@ Single_Table fill(char* filename,int name){     //diabazi binary k gemizi ti mni
 
     Table_Node.Full_Table=(Row_table*)malloc(sizeof(Row_table)*Table_Node.column_num);
     Table_Node.stats=(statistics*)malloc(sizeof(statistics)*Table_Node.column_num);
-    Table_Node.id_table=malloc(sizeof(int)*Table_Node.tube_num);
+   // Table_Node.id_table=malloc(sizeof(int)*Table_Node.tube_num);
     Table_Node.table_name=name;
     int j,bool_test,i,k=0;
     j=0;
-    //uint64_t i,max;
+    uint64_t max;
     //int kl=0;
 
 
@@ -356,7 +356,7 @@ Single_Table fill(char* filename,int name){     //diabazi binary k gemizi ti mni
     for(i=0;i<Table_Node.tube_num*Table_Node.column_num;i++){
 
         if(i / Table_Node.tube_num>j) {
-         /*   // Table_Node.Full_Table[j]=temp;
+            // Table_Node.Full_Table[j]=temp;
             //  temp=(uint64_t*)malloc(sizeof(uint64_t)*Table_Node.tube_num);
             //  k=0;
             //  j++;
@@ -378,7 +378,7 @@ Single_Table fill(char* filename,int name){     //diabazi binary k gemizi ti mni
                 }
 
             }
-*/
+            free(distinct);
 
             k=0;
             j++;
@@ -386,7 +386,7 @@ Single_Table fill(char* filename,int name){     //diabazi binary k gemizi ti mni
         }
     if(j==0){
 
-        Table_Node.id_table[i]=i;
+        //Table_Node.id_table[i]=i;
     }
          //   printf("\n %ld  <",i);
          int result;
@@ -695,13 +695,20 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
                 transfer->tables_ids[j].id_list[0][i]=i;
         }
     }
+
+
+///////
+
+
+    /////////
+
     for(j=0;j<from_number;j++) {
 
         transfer->tables_ids[j].size=(int)master_table->tables[from[j]].tube_num;
     }
 /////////////////
     char* temp;
-    temp=malloc(sizeof(char)*strlen(proboli));
+    temp=(char*)malloc(sizeof(char)*strlen(proboli));
     strcpy(temp,proboli);
     char delimprov[] = " ";
     ptr = strtok(temp, delimprov);
@@ -733,9 +740,9 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
     transfer->suma_size=size;
     transfer->suma=suma;
     free(temp);
-    //free(proboli);
-    //free(katigorima);
-    //free(sxesi);
+    free(proboli);
+    free(katigorima);
+    free(sxesi);
     return transfer;
 
 
@@ -812,13 +819,13 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
         }
 
 
-    if(transfer->priority1[i].type!=5){
+   /* if(transfer->priority1[i].type!=5){
        // printf("made A  new %d",transfer->tables_ids[ht1].size);
-        new=malloc(sizeof(int)*transfer->tables_ids[ht1].size);
+       new=malloc(sizeof(int)*transfer->tables_ids[ht1].size);
         if(new == NULL) {
             perror("malloc");
         exit(1);
-        }}
+        }}*/
 
         if (transfer->priority1[i].type == 1) {             //self join 111111111111111111111111111111111111111111111111111111111111111
 
@@ -879,13 +886,13 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
                //    priority_tree(transfer->priority1, transfer->priority_number, transfer);
                 int ** list2;
-                    list1=get_id_list(&transfer->tables_ids[ht1]);
-                    list2=get_id_list(&transfer->tables_ids[ht2]);
+                   // list1=get_id_list(&transfer->tables_ids[ht1]);
+                  //  list2=get_id_list(&transfer->tables_ids[ht2]);
 
 
-                res1=big_short(col1,list1,1,transfer->tables_ids[ht1].size,needed);
+                res1=big_short(col1,transfer->tables_ids[ht1].id_list,1,transfer->tables_ids[ht1].size,needed);
 
-                res2=big_short(col2,list2,1,transfer->tables_ids[ht2].size,needed);
+                res2=big_short(col2,transfer->tables_ids[ht2].id_list,1,transfer->tables_ids[ht2].size,needed);
 
                  midle->table =join_matrices(res1,res2,0,middle__size,(&midle->size));        ////////< join
 
@@ -893,8 +900,8 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
                 midle->inserted[0]=ht1;
                 midle->inserted[1]=ht2;
                 midle->columns=2;
-                free_list(list1,transfer->tables_ids[ht1].size);
-                free_list(list2,transfer->tables_ids[ht2].size);
+               // free_list(list1,transfer->tables_ids[ht1].size);
+               // free_list(list2,transfer->tables_ids[ht2].size);
 
 
             }
@@ -930,12 +937,12 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
                              //free_results(res1);
                              res1=big_short(col1,midle->table,midle->num_inserted,midle->size,needed);
                          }
-                         list1= get_id_list(&transfer->tables_ids[ht2]);
-
-                         res2=big_short(col2,list1,1,transfer->tables_ids[ht2].size,0);
+                        // list1= get_id_list(&transfer->tables_ids[ht2]);
+                      //  list1= transfer->tables_ids[ht2];
+                         res2=big_short(col2,transfer->tables_ids[ht2].id_list,1,transfer->tables_ids[ht2].size,0);
 
                          midle->inserted[midle->num_inserted]=ht2;
-                         free_list(list1,transfer->tables_ids[ht2].size);
+                        // free_list(list1,transfer->tables_ids[ht2].size);
                      } else {
                          if(transfer->priority1[i-1].col2==column2&&transfer->priority1[i-1].here_table2==ht2) {
                              res1=get_old_results(col2,midle->table,midle->num_inserted,midle->size,needed);
@@ -944,11 +951,11 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
                              res1=big_short(col2,midle->table,midle->num_inserted,midle->size,needed);
                          }
 
-                        list1= get_id_list(&transfer->tables_ids[ht1]);
+                       // list1= get_id_list(&transfer->tables_ids[ht1]);
 
-                         res2=big_short(col1,list1,1,transfer->tables_ids[ht1].size,0);
+                         res2=big_short(col1,transfer->tables_ids[ht1].id_list,1,transfer->tables_ids[ht1].size,0);
                          midle->inserted[midle->num_inserted]=ht1;
-                         free_list(list1,transfer->tables_ids[ht1].size);
+                         //free_list(list1,transfer->tables_ids[ht1].size);
 
                      }
                         free_midle_table(midle);
@@ -968,9 +975,10 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
         if(transfer->priority1[i].type !=5&&transfer->priority1[i].type !=1){
         transfer->tables_ids[ht1].size=idcounter;
         transfer->priority1[i].size=idcounter;
-       // free(transfer->tables_ids[ht1].id_list);
-       // transfer->tables_ids[ht1].id_list=new;
         midle->size=idcounter;
+       // fr ee(transfer->tables_ids[ht1].id_list);
+       // transfer->tables_ids[ht1].id_list=new;
+
         //new=NULL;
         }
 
@@ -985,6 +993,9 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
     }
    // if(res1!=NULL)
      //   free_results(res1);
+
+
+
     return midle;
 
 }
@@ -1056,7 +1067,7 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
     uint64_t * column;
     uint64_t * sums;
 
-    //printf("ADDING!!\n");
+   // printf("ADDING!!\n");
     FILE * fptrs = NULL;
 
     if (master_table->work_file == false) {
@@ -1126,9 +1137,9 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
     fprintf(fptrs, "\n");
 
     fclose(fptrs);
-
-    free_midle(midle);
     free_transfer(transfer);
+    free_midle(midle);
+
 }
 
 
@@ -1188,14 +1199,16 @@ void free_midle(middle* midle){
 
 
 void free_transfer(just_transfer* transfer){
-    int i,j;
-    //int k=transfer->tables_ids[0].id_list[1];
+    int i,j,from_number;
+    from_number=transfer->num_of_tables;
+    int k=transfer->tables_ids[0].id_list[0][1];
     for(i=0;i<transfer->num_of_tables;i++) {
-        //free(transfer->tables_ids[i].id_list);
-    for(j=0;j<transfer->tables_ids[i].size;j++)
         free(transfer->tables_ids[i].id_list[0]);
-    free(transfer->tables_ids[i].id_list);
+
     }
+    for(i=0;i<transfer->num_of_tables;i++)
+    free(transfer->tables_ids[i].id_list);
+
    free( transfer->tables);
     free(transfer->priority1);
     free(transfer->suma);
@@ -1205,12 +1218,13 @@ void free_transfer(just_transfer* transfer){
     free(transfer);
 
 }
+
 void free_big(List_of_Tables* master){
     int i,j,col;
     for(i=0;i<master->num_of_tables;i++){
-       col= master->tables[i].column_num;
+       col= (int)master->tables[i].column_num;
         free(master->tables[i].stats);
-        free(master->tables[i].id_table);
+//        free(master->tables[i].id_table);
         for(j=0;j<col;j++){
            free(master->tables[i].Full_Table[j].Column);
 
@@ -1220,7 +1234,10 @@ void free_big(List_of_Tables* master){
 
 
     }
-    free(master->tables->Full_Table);
+
+    for(i=0;i<master->num_of_tables;i++)
+        free(master->tables[i].Full_Table);
+   // free(master->tables->Full_Table);
     free(master->tables);
 
 free(master);

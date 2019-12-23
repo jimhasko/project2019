@@ -75,7 +75,7 @@ typedef struct just_transfer {
 } just_transfer;
 
 uint64_t Sto64(const char *s);
-void priority_tree(List_of_Tables* master_table,priority* prior,int priority_number,just_transfer* just);
+void priority_tree(priority* prior,int priority_number,just_transfer* just);
 int min_priority(priority* prior,int priority_number);
 void swap_priority(priority* prior,int from,int to);
 void short_priority(priority* prior,int prior_num);

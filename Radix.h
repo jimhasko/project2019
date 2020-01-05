@@ -72,7 +72,7 @@ typedef struct tableid{
 
     int** id_list;
     int size;
-    statistics * stats;
+    statistics* stats;
 
 }tableid;
 

@@ -9,7 +9,7 @@
 #include<stdint.h>
 #include <stdbool.h>
 #include "Radix.h"
-
+#include <math.h>
 #define max_line_length 500
 #define work_slave "mywork.txt"
 
@@ -75,7 +75,7 @@ typedef struct just_transfer {
 } just_transfer;
 
 uint64_t Sto64(const char *s);
-void priority_tree(priority* prior,int priority_number,just_transfer* just);
+void priority_tree(priority* prior,int priority_number,just_transfer* just,List_of_Tables* master_table);
 int min_priority(priority* prior,int priority_number);
 void swap_priority(priority* prior,int from,int to);
 void short_priority(priority* prior,int prior_num);
@@ -87,7 +87,8 @@ just_transfer* analise(char* str,List_of_Tables* master_table);
 //void quicksort(priority* number,int first,int last);
 //middle* run_filters(List_of_Tables temp_table,priority* priority_series,int priority_number, int max_priority);
 middle* run_filters(List_of_Tables* master_table,just_transfer* transfer);
-int power(int basi,int pano);
+
+
 List_of_Tables run_joins(List_of_Tables* temp_table,middle* mid_table,int priority_number,int max_priority,priority* priority_series);
 int parag(int input);
 List_of_Tables* cost(int table1,int table2,int column1,int column2 ,List_of_Tables* temp_table);
@@ -107,8 +108,12 @@ void free_midle(middle* midle);
 void free_big(List_of_Tables* master);
 void free_transfer(just_transfer* transfer);
 List_of_Tables *cost(int table1,int table2,int column1,int column2 ,List_of_Tables* temp_table);
-int power(int basi,int pano);
+float power(float basi,float pano);
 uint64_t min_num(uint64_t a,uint64_t b);
 uint64_t max_num(uint64_t a,uint64_t b);
-void run_stats(List_of_Tables* master_table,just_transfer* transfer,int priority_number);
+
+
+void run_stats_filters(List_of_Tables* master_table,just_transfer* transfer,int priority_number);
+void run_stats_joins(List_of_Tables* master_table,just_transfer* transfer,int prior);
+void test_run_stats_joins(List_of_Tables* master_table,just_transfer* transfer,int priority_number);
 #endif //RELATIONS_H

@@ -142,10 +142,11 @@ int do_the_work(List_of_Tables* master_table, int argc, char* argv[]) {
     while (EOF != fscanf(fptrw, "%[^\n]\n", line)) {
 
         if(strcmp(line, "F") != 0) {
+       //     printf("analyse\n");
             test = analise(line, master_table);
-
+         //   printf("filters\n");
             bad_word = run_filters(master_table, test);
-
+        //    printf("athrisma\n");
             athrisma(bad_word, test, master_table);
             lines++;
             //if (lines == 1)
@@ -222,11 +223,19 @@ void priority_tree(priority* prior,int priority_number,just_transfer* just,List_
    test_run_stats_joins(master_table,just,priority_number);
 
 while(now<priority_number){
+
     min=min_priority(prior,priority_number);
     if(min!=now){
         swap_priority(prior,min,now);}
     run_stats_joins(master_table,just,now);
     now++;
+    for(i=now;i<priority_number;i++){
+        if((prior[now-1].here_table1==prior[i].here_table1&&prior[now-1].col1==prior[i].col1)||(prior[now-1].here_table2==prior[i].here_table2&&prior[now-1].col2==prior[i].col2)){
+            swap_priority(prior,i,now);
+            now++;
+
+        }
+    }
     test_run_stats_joins(master_table,just,priority_number);
 }
     //get_size(prior,priority_number,just,now);
@@ -439,8 +448,7 @@ Single_Table fill(char* filename,int name){     //diabazi binary k gemizi ti mni
 
 
 
-int read_init(char *filename)
-{
+int read_init(char *filename) {
     // count the number of lines in the file called filename
     FILE *fp = fopen(filename,"r");
     int ch=0;
@@ -703,7 +711,7 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
     for(i=0;i<from_number;i++)
     transfer->tables_ids[i].id_list[0]=malloc(sizeof(int*)*master_table->tables[from[i]].tube_num);
 
-    max_rows=max(from,from_number,master_table);
+   max_rows=max(from,from_number,master_table);
     for(i=0;i<max_rows;i++){
         for(j=0;j<from_number;j++) {
             if (i < master_table->tables[from[j]].tube_num)
@@ -904,7 +912,7 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
             }
 
         }else{                                              //tablejoin!!!!!!!!!!!!!!5555555555555555555///////////////
-
+    printf("has 5\n");
 
             int isin1,isin2,mid_size,needed1,needed=0;
 
@@ -1673,7 +1681,7 @@ void run_stats_joins(List_of_Tables* master_table,just_transfer* transfer,int pr
 //upper lower
 
     max=max_num(transfer->tables_ids[ht1].stats[column1].lower,transfer->tables_ids[ht2].stats[column2].lower);
-    min=min_num(transfer->tables_ids[ht2].stats[column1].upper,transfer->tables_ids[ht2].stats[column2].upper);
+    min=min_num(transfer->tables_ids[ht1].stats[column1].upper,transfer->tables_ids[ht2].stats[column2].upper);
     transfer->tables_ids[ht1].stats[column1].lower=max;
     transfer->tables_ids[ht2].stats[column2].lower=max;
 

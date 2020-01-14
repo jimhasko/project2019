@@ -30,7 +30,7 @@ void list_Add_Bucket(Radix_Head **head1, int from, int to) {
 }
 
 //=================================================================================================================
-Head *init_List() {
+Head *init_List()  {
 
     Head *temp;
     temp = malloc(sizeof(Head));
@@ -117,7 +117,7 @@ int **radix_Sort(Table_Info *table, int time, int from, int to) { // table kai p
     int location = 0;
     for (i = from; i < to; i++) {
 
-        location = bithash2(table->TableA[i][columns], time);//itan needed anti columns
+        location = bithash2(table->TableA[columns][i], time);//itan needed anti columns
         list_Add_Id(&refarray[location], i);
         hist[location][1]++;
     }
@@ -144,8 +144,8 @@ int **radix_Sort(Table_Info *table, int time, int from, int to) { // table kai p
 
         while (kl != NULL) {
             for(k=0;k<columns;k++){
-            table->TableB[j][k] = table->TableA[kl->id][k];}
-            table->TableB[j][columns] = table->TableA[kl->id][columns];
+            table->TableB[k][j] = table->TableA[k][kl->id];}
+            table->TableB[columns][j] = table->TableA[columns][kl->id];
 
             j++;
             kl = kl->next;
@@ -276,13 +276,23 @@ Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed 
     columls = colums+1;
 
     Table_Info *retur = malloc(sizeof(Table_Info));
-    retur->TableA = (uint64_t **)malloc(sizeof(uint64_t *) * rows);
-    retur->TableB = (uint64_t **)malloc(sizeof(uint64_t *) * rows);
+    retur->TableA = (uint64_t **)malloc(sizeof(uint64_t *) * columls);
+    retur->TableB = (uint64_t **)malloc(sizeof(uint64_t *) * columls);
     retur->location = malloc(sizeof(int *) * rows);
 
-    for (i = 0; i < rows; i++) {
-        retur->TableA[i] = malloc(sizeof(uint64_t) * columls);
-        retur->TableB[i] = malloc( sizeof(uint64_t) * columls);
+    for (i = 0; i < columls; i++) {
+        retur->TableA[i] = malloc(sizeof(uint64_t) * rows);
+        if(retur->TableA[i]==NULL)
+        {
+            printf("Error! memory not allocated at get table. row %d \n",i);
+            exit(0);
+        }
+        retur->TableB[i] = malloc( sizeof(uint64_t) * rows);
+        if(retur->TableB[i]==NULL)
+        {
+            printf("Error! memory not allocated at get table.row %d \n",i);
+            exit(0);
+        }
     }
 
     retur->rows = rows;
@@ -299,10 +309,10 @@ Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed 
         retur->location[i] = 1; //initialise possition matrix
         for(j=0;j<colums;j++) {
 
-            retur->TableA[i][j] = idlist[j][i];
+            retur->TableA[j][i] = idlist[j][i];
 
         }
-       retur->TableA[i][colums]=col[idlist[needed][i]];//retur->TableA[i][colums]=col[i];
+       retur->TableA[colums][i]=col[idlist[needed][i]];//retur->TableA[i][colums]=col[i];
       //  printf(",%"PRIu64 "\n",retur->TableA[i][colums]);
 
 
@@ -435,14 +445,14 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
 
         if (table->location[i] == 0) {
             for(j=0;j<colums;j++)
-                not_yet->matrix[i][j] = table->TableA[i][j];
-           not_yet->matrix[i][colums] = table->TableA[i][colums];
+                not_yet->matrix[i][j] = table->TableA[j][i];
+           not_yet->matrix[i][colums] = table->TableA[colums][i];
         }
         else {
 
             for(j=0;j<colums;j++)
-                not_yet->matrix[i][j] = table->TableB[i][j];
-            not_yet->matrix[i][colums] = table->TableB[i][colums];
+                not_yet->matrix[i][j] = table->TableB[j][i];
+            not_yet->matrix[i][colums] = table->TableB[colums][i];
 
         }
     }
@@ -484,7 +494,7 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
 void free_table(Table_Info *table) {            // self explanatory
     int i;
     //printf("rows %d\n",table->rows);
-    for (i = 0; i < table->rows; i++) {   // <-- THAT WORKS .FIX YOUR PC!!! and get some bloody linux
+    for (i = 0; i < table->columns; i++) {   // <-- THAT WORKS .FIX YOUR PC!!! and get some bloody linux
         free(table->TableA[i]);
        free(table->TableB[i]);
 
@@ -637,8 +647,8 @@ results* get_old_results(uint64_t* col,int** idlist,int colums,int rows,int need
 
 
             for(j=0;j<colums;j++)
-                not_yet->matrix[i][j] = table->TableA[i][j];
-            not_yet->matrix[i][colums] = table->TableA[i][colums];
+                not_yet->matrix[i][j] = table->TableA[j][i];
+            not_yet->matrix[i][colums] = table->TableA[colums][i];
 
 
     }

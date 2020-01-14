@@ -14,11 +14,11 @@ void quicksort(uint64_t **partition, int from, int to,int columns) {
 
         while (i < j) {
 
-            while (partition[i][columns] <= partition[pivot][columns] && i < to) {
+            while (partition[columns][i] <= partition[columns][pivot] && i < to) {
 
                 i++;
             }
-            while (partition[j][columns] > partition[pivot][columns]) {
+            while (partition[columns][j] > partition[columns][pivot]) {
 
                 j--;
             }
@@ -26,25 +26,25 @@ void quicksort(uint64_t **partition, int from, int to,int columns) {
 
 
                 for(n=0;n<columns;n++){
-                idtemp = partition[i][n];
-                partition[i][n] = partition[j][n];
-                partition[j][n] = idtemp;}
+                idtemp = partition[n][i];
+                partition[n][i] = partition[n][j];
+                partition[n][j] = idtemp;}
 
-                temp = partition[i][columns];
-                partition[i][columns] = partition[j][columns];
-                partition[j][columns] = temp;
+                temp = partition[columns][i];
+                partition[columns] [i]= partition[columns] [j];
+                partition[columns] [j] = temp;
 
             }
         }
 
-        temp = partition[pivot][columns];
-        partition[pivot][columns] = partition[j][columns];
-        partition[j][columns] = temp;
+        temp = partition[columns][pivot];
+        partition[columns][pivot]= partition[columns][j];
+        partition[columns][j] = temp;
 
         for(n=0;n<columns;n++){
-            idtemp = partition[pivot][n];
-            partition[pivot][n] = partition[j][n];
-            partition[j][n] = idtemp;}
+            idtemp = partition[n][pivot];
+            partition[n][pivot] = partition[n][j];
+            partition[n][j] = idtemp;}
 
         quicksort(partition, from, j - 1,columns);
         quicksort(partition, j + 1, to,columns);

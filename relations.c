@@ -142,13 +142,14 @@ int do_the_work(List_of_Tables* master_table, int argc, char* argv[]) {
     while (EOF != fscanf(fptrw, "%[^\n]\n", line)) {
 
         if(strcmp(line, "F") != 0) {
-       //     printf("analyse\n");
+           // printf("analyse\n");
             test = analise(line, master_table);
-         //   printf("filters\n");
+          //  printf("filters\n");
             bad_word = run_filters(master_table, test);
-        //    printf("athrisma\n");
+           // printf("athrisma\n");
             athrisma(bad_word, test, master_table);
             lines++;
+          //  exit(1);
             //if (lines == 1)
                 //break;
         }
@@ -912,20 +913,20 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
             }
 
         }else{                                              //tablejoin!!!!!!!!!!!!!!5555555555555555555///////////////
-    printf("has 5\n");
+   //f printf("has 5\n");
 
             int isin1,isin2,mid_size,needed1,needed=0;
 
             if(midle->num_inserted==0) {  //////first runnnnn
 
                //    prior ity_tree(transfer->priority1, transfer->priority_number, transfer);
-                int ** list2;
+              //  int ** list2;
                    // list1=get_id_list(&transfer->tables_ids[ht1]);
                   //  list2=get_id_list(&transfer->tables_ids[ht2]);
 
 
                 res1=big_short(col1,transfer->tables_ids[ht1].id_list,1,transfer->tables_ids[ht1].size,needed);
-
+//exit(1);
                 res2=big_short(col2,transfer->tables_ids[ht2].id_list,1,transfer->tables_ids[ht2].size,needed);
 
                  midle->table =join_matrices(res1,res2,0,middle__size,(&midle->size));        ////////< join

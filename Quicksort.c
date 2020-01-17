@@ -7,6 +7,7 @@ void quicksort(uint64_t **partition, int from, int to,int columns) {
     uint64_t temp;
 //uint64_t **partition=table->TableB;
 //columns=table->columns;
+
     if (from < to) {
         pivot = from;
         i = from;
@@ -40,7 +41,7 @@ void quicksort(uint64_t **partition, int from, int to,int columns) {
         temp = partition[columns][pivot];
         partition[columns][pivot]= partition[columns][j];
         partition[columns][j] = temp;
-
+n=0;
         for(n=0;n<columns;n++){
             idtemp = partition[n][pivot];
             partition[n][pivot] = partition[n][j];

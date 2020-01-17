@@ -11,12 +11,67 @@ void list_Add_Id(Head **head1, int id) {
 
     Listnode *temp = malloc(sizeof(Listnode));
     temp->id = id;
-    temp->next = NULL;
-    temp->next = (*head1)->first;
-    (*head1)->first = temp;
+    temp->next=NULL;
+    temp->prev=NULL;
+
+
+
+    if((*head1)->first!=NULL){
+
+
+
+
+    (*head1)->last->next=temp;
+
+    temp->prev=(*head1)->last;
+    (*head1)->last=temp;}
+    //temp->next = (*head1)->first;
+    // (*head1)->first = temp;
+
+    if((*head1)->first==NULL){
+        (*head1)->last=temp;
+        (*head1)->first=temp;
+    }
+
+
     (*head1)->size++;
 }
 
+//=================================================================================================================
+
+void list_Add_Id2(Head **head1,Head **from, int location,Listnode *temp) {
+
+    // Listnode *temp = malloc(sizeof(Listnode));
+    // temp->id = id;
+    if(temp==(*from)->first){
+        (*from)->first=(*from)->first->next;
+    }
+    if(temp==(*from)->last){
+        //temp->prev->next=NULL;
+        (*from)->last=temp->prev;
+    }
+    if(temp->next!=NULL)
+        temp->next->prev=temp->prev;
+
+    if(temp->prev!=NULL)
+        temp->prev->next=temp->next;
+
+
+    temp->were=location;
+    temp->next = NULL;
+    temp->prev = NULL;
+    if((*head1)->first==NULL){
+        (*head1)->last = temp;
+        (*head1)->first = temp;
+    }else{
+    temp->prev=(*head1)->last;
+    (*head1)->last->next=temp;
+    (*head1)->last=temp;}
+
+
+  //  (*head1)->first = temp;
+    (*head1)->size++;
+}
 //=================================================================================================================
 void list_Add_Bucket(Radix_Head **head1, int from, int to) {
 
@@ -30,7 +85,7 @@ void list_Add_Bucket(Radix_Head **head1, int from, int to) {
 }
 
 //=================================================================================================================
-Head *init_List()  {
+Head *init_List() {
 
     Head *temp;
     temp = malloc(sizeof(Head));
@@ -87,7 +142,7 @@ void print(Table_Info *table, int from, int to,int columns) {
 }
 
 //=================================================================================================================
-int **radix_Sort(Table_Info *table, int time, int from, int to) { // table kai pia 8ada bits na pari kai pia kolona
+usefull* radix_Sort(Table_Info *table, int time, int from, int to) { // table kai pia 8ada bits na pari kai pia kolona
 
     int needed,columns ;//= 1;
     int i, k,hist_size = 256;
@@ -143,16 +198,18 @@ int **radix_Sort(Table_Info *table, int time, int from, int to) { // table kai p
         kl = refarray[i]->first;
 
         while (kl != NULL) {
-            for(k=0;k<columns;k++){
+          //  table->TableB[j]=(uint64_t*) malloc( sizeof(uint64_t) * (columns+1));
+            for(k=0;k<columns+1;k++){
             table->TableB[k][j] = table->TableA[k][kl->id];}
-            table->TableB[columns][j] = table->TableA[columns][kl->id];
 
+            //table->TableB[j][columns] = table->TableA[kl->id][columns];
+           // free(table->TableA[kl->id]);
             j++;
             kl = kl->next;
         }
     }
 
-
+/*
     Listnode *deleter;
     for (i = 0; i < hist_size; i++) {
 
@@ -166,103 +223,170 @@ int **radix_Sort(Table_Info *table, int time, int from, int to) { // table kai p
         free(refarray[i]);
     }
     free(refarray);
+*/
+    for (i = 0; i < hist_size; i++)
+        free(hist[i]);
+    free(hist);
+
+    usefull* test;
+    test=(usefull*)malloc(sizeof(usefull));
+    test->sumlist=sumlist;
+    test->refarray=refarray;
+
+    return test;
+}
+
+//=================================================================================================================
+void radix_Sort2(Table_Info *table, int time,Head* use_this, int from, int to,Listnode* temp) { // table kai pia 8ada bits na pari kai pia kolona
+    int is_first = 0;
+    int needed, columns;//= 1;
+    int i, j, k, hist_size = 256;
+    needed = table->needed;
+    columns = table->columns;
+
+int max=to;
+  /*  Listnode *safekeep;
+    safekeep = temp->prev;
+    if (safekeep == NULL)
+        is_first = 1;*/
+
+
+    int **hist = malloc(sizeof(int *) * hist_size);      //History list
+    for (i = 0; i < hist_size; i++)
+        hist[i] = malloc(sizeof(int) * 2);
+
+
+    int **sumlist = malloc(sizeof(int *) * hist_size);   //Summed history list
+    for (i = 0; i < hist_size; i++)
+        sumlist[i] = malloc(sizeof(int) * 2);
+
+    Head **refarray;
+    refarray = malloc(sizeof(Head) * hist_size);
+
+
+    for (i = 0; i < hist_size; i++) {
+        refarray[i] = init_List();
+        hist[i][0] = i;
+        hist[i][1] = 0;
+        sumlist[i][0] = i;
+    }
+
+
+    int location = 0;
+    int count = 0;
+    Listnode *more_temp;
+    // temp=use_this->first;
+
+    if(time==5){
+        int brakk=0;
+    }
+    temp=use_this->first;
+    while (count < to - from) {
+
+        location = bithash2(table->TableA[columns][temp->id], time);//itan needed anti columns
+        more_temp = temp->next;
+
+        list_Add_Id2(&refarray[location], &use_this, location, temp);
+        hist[location][1]++;
+        if(location==18){
+            int brakagin=0;
+        }
+        temp = more_temp;
+        count++;
+
+    }
+   // if(time==6)
+     //   printf("%d \n",hist[18][1]);
+    sumlist[0][1] = from;
+    for (i = 1; i < hist_size; i++) {
+
+        sumlist[i][1] = hist[i - 1][1] + sumlist[i - 1][1];
+       // if(refarray[i]->size>0)
+        // printf("%d : %d :i %d \n",sumlist[i][1],refarray[i]->size,i);
+    }
+
+    /*  int j = from;
+      for (i = 0; i < hist_size; i++) {
+          kl = refarray[i]->first;
+
+          while (kl != NULL) {
+              for(k=0;k<columns;k++){
+                  table->TableB[k][j] = table->TableA[k][kl->id];}
+              table->TableB[columns][j] = table->TableA[columns][kl->id];
+
+              j++;
+              kl = kl->next;
+          }
+      }*/
+
+
+    Listnode *kl;
+
+    if(time==6){
+        int brak=0;
+    }
+    for (i = 0; i < hist_size; i++) {
+        kl = refarray[i]->first;
+        if (kl != NULL){
+
+        from = sumlist[i][1];
+        if (i < hist_size - 1) {
+            to = sumlist[i + 1][1];
+        } else {
+            to = max;
+        }
+        if (to - from > quick_short && time != 7) {
+          /*  if (is_first == 1) {
+                use_this->first = refarray[i]->first;
+                use_this->last = refarray[i]->last;
+                safekeep = use_this->last;
+                is_first = 0;
+            } else {
+                safekeep->next = refarray[i]->first;
+                refarray[i]->first->prev = safekeep;
+                safekeep->next = refarray[i]->first;
+                safekeep = refarray[i]->last;
+            }*/
+
+
+            radix_Sort2(table, time + 1, refarray[i], from, to, kl);
+        } else {
+            for (k = from; k < to; k++) {
+                Listnode * deleter,*temp;
+             //   table->TableB[k] =(uint64_t*)  malloc(sizeof(uint64_t) * (columns + 1));
+                for (j = 0; j < columns+1 ; j++) {
+                    table->TableB[j][k] = table->TableA[j][kl->id];
+                }
+              //  table->TableB[k][columns] = table->TableA[kl->id][columns];
+               // free(table->TableA[kl->id]);
+                deleter=kl;
+                kl=kl->next;
+                refarray[i]->first=kl;
+
+                free(deleter);
+
+            }
+            quicksort(table->TableB, from, to - 1, columns);
+
+        }
+    }
+}
+    for (i = 0; i < hist_size; i++) {
+
+        free(refarray[i]);
+    }
+    free(refarray);
 
     for (i = 0; i < hist_size; i++)
         free(hist[i]);
     free(hist);
 
-    /*
-    printf("RADIX TIME:%d \n",table->time);
-    for(i=0;i<table->rows;i++)
-        printf("{ %d , %d } \n",sumlist[i][0],sumlist[i][1]);
-    */
+    for (i = 0; i < hist_size; i++) {
 
-    return sumlist;
+        free(sumlist[i]);
+    }
+    free(sumlist);
 }
-
-//=================================================================================================================
-/*
-Table_Info *get_table(char *filename, int needed) {// initialises a table from filename
-
-    char ch;
-    int i;
-    int colum_orig, rows, one = 1;
-    colum_orig = 2;
-    rows = 0;
-    FILE *fp = fopen(filename, "r");
-
-    while (!feof(fp))//get rows and columns
-    {
-        ch = (char)fgetc(fp);
-
-        if (one == 1 && ch == ',')
-            colum_orig++;
-        if (ch == '\n') {
-            rows++;
-            one = 0;
-        }
-    }
-
-    rewind(fp);
-    char line[500];
-    char *usless;
-    int columls, count = 0;
-    columls = 2;
-
-    Table_Info *retur = malloc(sizeof(Table_Info));
-    retur->TableA = malloc(sizeof(uint64_t *) * rows);
-    retur->TableB = malloc(sizeof(uint64_t *) * rows);
-    retur->location = malloc(sizeof(int *) * rows);
-
-    for (i = 0; i < rows; i++) {
-        retur->TableA[i] = malloc(sizeof(int) * columls);
-        retur->TableB[i] = malloc(sizeof(int) * columls);
-    }
-
-    retur->rows = rows;
-    retur->time = 0;
-    retur->Bucket_list = malloc(sizeof(Radix_Head) * 8);//holds the buckets to re-radix
-
-    for (i = 0; i < 8; i++) {
-
-        retur->Bucket_list[i] = init_radix_List();
-    }
-
-
-    while (fgets(line, 500, fp) != NULL) {
-
-        retur->location[count] = 1; //initialise possition matrix
-        columls = 1;
-        retur->TableA[count][0] = count;//pass id
-
-        usless = strtok(line, ",");
-
-        if (columls == needed)
-            retur->TableA[count][1] = Sto64(usless);// pass values
-
-        columls++;
-
-        while (usless != NULL) {
-
-            usless = strtok(NULL, ",");
-
-            if (usless != NULL) {
-                if (columls == needed)
-                    retur->TableA[count][1] = Sto64(usless);
-
-                columls++;
-            }
-        }
-
-
-        count++;
-    }
-
-    fclose(fp);
-    return retur;
-
-}
-*/
 //=================================================================================================================
 Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed ) {// initialises a table from filename
 
@@ -339,88 +463,104 @@ Table_Info *flip_tables(Table_Info *table) {
 //=================================================================================================================
 results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
 
-    int from, to, i, j, hist_size = 256;
+    int from, to, i, j, k,hist_size = 256;
 //needed=colums;
     Table_Info *table;
     table = get_table(col,idlist,colums,rows,needed);
-    int **sumlist;
+   usefull* test;
     from = 0;
     to = table->rows;
-
-    sumlist = radix_Sort(table, table->time, from, to);          //initial mandatory radix
-
+    Listnode* kl;
+    test = radix_Sort(table, table->time, from, to);          //initial mandatory radix
+    table=flip_tables(table);
     for (i = 0; i < hist_size; i++) {
 
         if (i < hist_size - 1) {
-            to = sumlist[i + 1][1];
+            to = test->sumlist[i + 1][1];
         }
 
         if (i == hist_size - 1)
             to = table->rows;
-        from = sumlist[i][1];
+        from = test->sumlist[i][1];
 
+        if(to-from>quick_short){
+            radix_Sort2(table,table->time,test->refarray[i],from,to,test->refarray[i]->first);
+        }else{
+            kl=test->refarray[i]->first;
+            for (k = from; k < to; k++) {
+                Listnode * deleter,*temp;
+              //  table->TableB[k] =(uint64_t*)  malloc(sizeof(uint64_t) * (colums + 1));
+                for (j = 0; j < (colums+1) ; j++) {
+                    table->TableB[j][k] = table->TableA[j][kl->id];
+                }
+                //  table->TableB[k][columns] = table->TableA[kl->id][columns];
+              //  free(table->TableA[kl->id]);
+                deleter=kl;
+                kl=kl->next;
+                test->refarray[i]->first=kl;
 
-        if (from < to) {
-            if (to - from + 1 > quick_short) {
-
-
-                list_Add_Bucket(&table->Bucket_list[0], from, to);//add the buckets to be radixed to the bucket list
+                free(deleter);
 
             }
-            else {
-
-
-                quicksort(table->TableB, from, to - 1,colums);  // else quickshort it
-
-               // printf("quickshorted");
-               // print(table,from,to);
+            quicksort(table->TableB, from, to - 1, colums);
+            if(kl!=NULL){
+                int  i_beg_you_work=0;
             }
         }
+
     }
 
+
     for (i = 0; i < hist_size; i++)         //free the last radix result
-        free(sumlist[i]);
-    free(sumlist);
+        free(test->sumlist[i]);
+    free(test->sumlist);
 
-    for (j = 0; j < 8; j++) {                //runs the list of to do radix_short
-        flip_tables(table);
-        Radix_List *kl = table->Bucket_list[j]->first;
+    for (i = 0; i < hist_size; i++) {
 
-
-        while (kl != NULL) {                 //for all the radix shorts to be done in that table state & bits
-
-            sumlist = radix_Sort(table, table->time, kl->from, kl->to);
-         //   print(table,10,70,colums);
-            for (i = kl->from; i < kl->to; i++) {
-                table->location[i] = 1 - table->location[i];            //save data matrix location
-            }
+        free(test->refarray[i]);
+    }
+    free(test->refarray);
+    free(test);
+    /*
+       for (j = 0; j < 8; j++) {                //runs the list of to do radix_short
+           flip_tables(table);
+           Radix_List *kl = table->Bucket_list[j]->first;
 
 
-            for (i = 0; i < hist_size; i++) {
+          while (kl != NULL) {                 //for all the radix shorts to be done in that table state & bits
 
-                if (i < hist_size - 1) {
-                    to = sumlist[i + 1][1];
-                }
-                if (i == hist_size - 1)
-                    to = kl->to;
-                from = sumlist[i][1];       // get from to
+               sumlist = radix_Sort(table, table->time, kl->from, kl->to);
+            //   print(table,10,70,colums);
+               for (i = kl->from; i < kl->to; i++) {
+                   table->location[i] = 1 - table->location[i];            //save data matrix location
+               }
 
 
-                if (from < to) {
+               for (i = 0; i < hist_size; i++) {
 
-                    if (((to - from + 1) > quick_short) && j < 7) {
+                   if (i < hist_size - 1) {
+                       to = sumlist[i + 1][1];
+                   }
+                   if (i == hist_size - 1)
+                       to = kl->to;
+                   from = sumlist[i][1];       // get from to
 
-                        list_Add_Bucket(&table->Bucket_list[j + 1], from, to);  //if its over the limit add to radix to do list
-                    }
-                    else {
 
-                        quicksort(table->TableB, from, to - 1,colums);     //if not quickshort it
+                   if (from < to) {
 
-                        //printf("quickshorted hash: %d \n",sumlist[i][0]);
-                         //print(table,from,to,colums);
-                    }
-                }
-            }
+                       if (((to - from + 1) > quick_short) && j < 7) {
+
+                           list_Add_Bucket(&table->Bucket_list[j + 1], from, to);  //if its over the limit add to radix to do list
+                       }
+                       else {
+
+                           quicksort(table->TableB, from, to - 1,colums);     //if not quickshort it
+
+                           //printf("quickshorted hash: %d \n",sumlist[i][0]);
+                            //print(table,from,to,colums);
+                       }
+                   }
+               }
 
             kl = kl->next;
 
@@ -430,9 +570,10 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
 
         }
     }
+*/
+table=flip_tables(table);
 
-
-    results *not_yet = (struct results *)malloc(sizeof(results));       //malloc the results
+        results *not_yet = (struct results *)malloc(sizeof(results));       //malloc the results
     not_yet->rows = table->rows;
     not_yet->matrix = (uint64_t **) malloc(sizeof(uint64_t *) * table->rows);
 
@@ -443,27 +584,21 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
 
     for (i = 0; i < table->rows; i++) {                     //get the data from the correct matrix
 
-        if (table->location[i] == 0) {
+
+
+
+
+
             for(j=0;j<colums;j++)
                 not_yet->matrix[i][j] = table->TableA[j][i];
-           not_yet->matrix[i][colums] = table->TableA[colums][i];
-        }
-        else {
+            not_yet->matrix[i][colums] = table->TableA[colums][i];
 
-            for(j=0;j<colums;j++)
-                not_yet->matrix[i][j] = table->TableB[j][i];
-            not_yet->matrix[i][colums] = table->TableB[colums][i];
 
-        }
     }
 
-    /*j = 0;
 
-    for (i = 0; i < 1000; i++)
-        j = table->location[i] + j;
-
-
-    /*int zeros = 0;
+/*
+    int zeros = 0;
     int ones = 0;
 
     for (i = 0; i < table->rows; i++) {
@@ -483,8 +618,8 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
             }
         }
     }
-    printf(" zer0s : %d , ones : %d \n",zeros,ones);*/
-
+    printf(" zer0s : %d , ones : %d \n",zeros,ones);
+*/
     free_table(table);
     not_yet->columns=colums;
     return not_yet;
@@ -494,7 +629,7 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
 void free_table(Table_Info *table) {            // self explanatory
     int i;
     //printf("rows %d\n",table->rows);
-    for (i = 0; i < table->columns; i++) {   // <-- THAT WORKS .FIX YOUR PC!!! and get some bloody linux
+    for (i = 0; i < table->columns+1; i++) {   // <-- THAT WORKS .FIX YOUR PC!!! and get some bloody linux
         free(table->TableA[i]);
        free(table->TableB[i]);
 

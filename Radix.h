@@ -11,8 +11,9 @@
 //=================================================================================================================
 typedef struct Listnode {
 
-    int id;
+    int id,were;
     struct Listnode *next;
+    struct Listnode *prev;
 
 } Listnode;
 
@@ -21,6 +22,7 @@ typedef struct head {
 
     int size;
     Listnode *first;
+    Listnode *last;
 
 } Head;
 
@@ -76,6 +78,17 @@ typedef struct tableid{
 
 }tableid;
 
+
+
+typedef struct usefull{
+
+    int** sumlist;
+    Head **refarray;
+
+}usefull;
+
+
+
 typedef struct middle_struct{
     int ** table;
     info_node* start;
@@ -100,8 +113,8 @@ int bithash2(uint64_t hash_value, int time);
 
 void print(Table_Info *table, int from, int to,int columns);
 
-int **radix_Sort(Table_Info *table, int time, int from, int to);
-
+usefull* radix_Sort(Table_Info *table, int time, int from, int to);
+void radix_Sort2(Table_Info *table, int time,Head* use_this, int from, int to,Listnode* temp);
 //Table_Info *get_table(char *filename, int needed);
 Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed );
 //uint64_t Sto64(const char *s);
@@ -113,6 +126,7 @@ void free_table(Table_Info *table);
 
 int** join_matrices(results* A, results* B,int needed,int middle_matrix_size,int * size);
 //results *  simple_mesure(results* A,uint64_t num,char operator);
+void list_Add_Id2(Head **head1,Head **from, int location,Listnode *temp);
 void free_results(results * A);
 results* get_old_results(uint64_t* col,int** idlist,int colums,int rows,int needed);
 //=================================================================================================================

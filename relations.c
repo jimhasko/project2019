@@ -13,7 +13,7 @@
 }
 */
 
-int curr = 0;
+int curr = 2;
 pthread_cond_t condd = PTHREAD_COND_INITIALIZER;
 
 uint64_t Sto64(const char *s) { // string to number
@@ -1882,23 +1882,24 @@ void* big_thread(void* kk){
     while(1) {
         pthread_mutex_lock (&mutexsumbig);
         i = Queue->used;
+        printf("got i %d :\"%d\"\n",i, self);
         Queue->used++;
         pthread_mutex_unlock (&mutexsumbig);
         if (i< Queue->size) {
-
+printf(" i: %d , self %d \n",i,self);
             test = analise(Queue->jobs[i].line, Queue->jobs[i].master_table);
 
             bad_word = run_filters(Queue->jobs[i].master_table, test);
 
             athrisma(bad_word, test, Queue->jobs[i].master_table);
-
+            printf("done i: %d , self %d \n",i,self);
         } else {
             break;
         }
     }
 
-    pthread_cond_signal(&condd);
-    pthread_mutex_unlock(&mutexbig);
+  //  pthread_cond_signal(&condd);
+    //pthread_mutex_unlock(&mutexbig);
     pthread_exit(NULL);
 }
 

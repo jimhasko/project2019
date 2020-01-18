@@ -9,9 +9,9 @@
 #define  quick_short 500
 #define  SizeofDataFileName 100
 #define  middle__size 500
-#define sort_threads 3
+#define sort_threads 2
 #define big_threads 2
-#define do_big_thread 0
+#define do_big_thread 1
 pthread_mutex_t mutexsum;
 pthread_mutex_t mutex;
 

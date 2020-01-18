@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
 
     List_of_Tables* master_table;
     int this_is_fine = 0;
-master_table=(List_of_Tables*)malloc(sizeof(List_of_Tables));
+    master_table=(List_of_Tables*)malloc(sizeof(List_of_Tables));
     this_is_fine = do_the_work(master_table, argc, argv);
 
     if(this_is_fine == true) {

@@ -25,9 +25,6 @@ typedef struct Row_Table{
 }Row_table;
 
 
-
-
-
 typedef struct Single_Table{
     uint64_t column_num;
     uint64_t tube_num;

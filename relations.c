@@ -13,7 +13,8 @@
 }
 */
 
-
+int curr = 0;
+pthread_cond_t condd = PTHREAD_COND_INITIALIZER;
 
 uint64_t Sto64(const char *s) { // string to number
 
@@ -136,22 +137,51 @@ int do_the_work(List_of_Tables* master_table, int argc, char* argv[]) {
 
     just_transfer * test;
     middle* bad_word;
+  //  lines=0;
+   // batches =0;
+
+
+    int wut,i;
+
+    jobqueue_big* jobquery;
+
+    jobquery=(jobqueue_big*)malloc(sizeof(jobqueue_big));
+    jobquery->jobs=(job_big*)malloc(sizeof(job_big)*lines);
+    jobquery->size=0;
+    jobquery->used=0;
+    jobquery->thread_num=0;
+    pthread_t* thread_matrix_big;
+    thread_matrix_big=(pthread_t*)malloc(sizeof(pthread_t)*big_threads);
+    pthread_mutex_init(&mutexbig, NULL);
+    pthread_mutex_init(&mutexsumbig, NULL);
+    pthread_cond_init(&condd, NULL);
+
+
+
+
     lines=0;
     batches =0;
 
     while (EOF != fscanf(fptrw, "%[^\n]\n", line)) {
 
         if(strcmp(line, "F") != 0) {
-           // printf("analyse\n");
-            test = analise(line, master_table);
-          //  printf("filters\n");
-            bad_word = run_filters(master_table, test);
-           // printf("athrisma\n");
-            athrisma(bad_word, test, master_table);
+if(do_big_thread==0) {
+    test = analise(line, master_table);
+
+     bad_word = run_filters(master_table, test);
+
+     athrisma(bad_word, test, master_table);
+}else {
+    jobquery->jobs[lines].line = (char *) malloc(sizeof(char) * strlen(line));
+    strcpy(jobquery->jobs[lines].line, line);
+    jobquery->jobs[lines].master_table = master_table;
+
+    jobquery->size++;
+
+}
+
             lines++;
-          //  exit(1);
-            //if (lines == 1)
-                //break;
+
         }
         else {
             batches++;
@@ -160,10 +190,26 @@ int do_the_work(List_of_Tables* master_table, int argc, char* argv[]) {
         }
     }
 
+    if(do_big_thread==1) {
+        for (i = 0; i < big_threads; i++) {
+
+            wut = pthread_create(&thread_matrix_big[i], NULL, big_thread, (void *) jobquery);
+        }
+
+
+        for (i = 0; i < big_threads; i++)
+            pthread_join(thread_matrix_big[i], NULL);
+
+        for (i = 0; i < lines; i++){
+           free( jobquery->jobs[lines].line);
+        }
+
+        free(thread_matrix_big);
+        free(jobquery->jobs);
+        free(jobquery);
+    }
     free(line);
     free_big(master_table);
-
-
     return true;
 }
 
@@ -1789,3 +1835,82 @@ void test_run_stats_joins(List_of_Tables* master_table,just_transfer* transfer,i
 
     }
 }
+
+
+
+
+
+
+
+
+
+void* big_thread(void* kk){
+    int i;
+    just_transfer * test;
+    middle* bad_word;
+
+    pthread_mutex_lock(&mutexbig);
+    int self = curr++;
+    pthread_t tid = pthread_self();
+
+    jobqueue_big* Queue;
+    Queue=(jobqueue_big*)kk;
+    // printf("got \"%02x\"\n", (unsigned)tid);
+    // numn++;
+    Queue->thread_num++;
+
+    if(Queue->thread_num==big_threads) {
+        //  printf("%d awaken \n", Queue->thread_num);
+        pthread_cond_broadcast(&condd);
+        pthread_mutex_unlock(&mutexbig);
+
+    }
+
+    while(Queue->thread_num<big_threads) {
+        // printf("got \"%d\"\n", self);
+
+        pthread_cond_wait(&condd, &mutexbig);
+    }
+    pthread_mutex_unlock(&mutexbig);
+
+
+    // printf("got more \"%d\"\n", self);
+
+    //if(Queue->thread==Queue->thread_num)
+    //  pthread_cond_signal(&cond);
+
+    while(1) {
+        pthread_mutex_lock (&mutexsumbig);
+        i = Queue->used;
+        Queue->used++;
+        pthread_mutex_unlock (&mutexsumbig);
+        if (i< Queue->size) {
+
+            test = analise(Queue->jobs[i].line, Queue->jobs[i].master_table);
+
+            bad_word = run_filters(Queue->jobs[i].master_table, test);
+
+            athrisma(bad_word, test, Queue->jobs[i].master_table);
+
+        } else {
+            break;
+        }
+    }
+
+    pthread_cond_signal(&condd);
+    pthread_mutex_unlock(&mutexbig);
+    pthread_exit(NULL);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

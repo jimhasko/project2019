@@ -6,6 +6,13 @@
 
 #include <stdint.h>
 
+
+int cur = 0;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
+int cur_join = 0;
+pthread_cond_t cond_join = PTHREAD_COND_INITIALIZER;
+
 //=================================================================================================================
 void list_Add_Id(Head **head1, int id) {
 
@@ -108,7 +115,6 @@ Radix_Head *init_radix_List() {
 //=================================================================================================================
 
 
-//=================================================================================================================
 int bithash2(uint64_t hash_value, int time) { //time starts at 0 and ads by one
 
     int from;
@@ -237,13 +243,13 @@ usefull* radix_Sort(Table_Info *table, int time, int from, int to) { // table ka
 }
 
 //=================================================================================================================
-void radix_Sort2(Table_Info *table, int time,Head* use_this, int from, int to,Listnode* temp) { // table kai pia 8ada bits na pari kai pia kolona
+void radix_Sort2(Table_Info *table, int time,Head* use_this, int from, int to) { // table kai pia 8ada bits na pari kai pia kolona
     int is_first = 0;
     int needed, columns;//= 1;
     int i, j, k, hist_size = 256;
     needed = table->needed;
     columns = table->columns;
-
+    Listnode* temp;
 int max=to;
   /*  Listnode *safekeep;
     safekeep = temp->prev;
@@ -349,7 +355,7 @@ int max=to;
             }*/
 
 
-            radix_Sort2(table, time + 1, refarray[i], from, to, kl);
+            radix_Sort2(table, time + 1, refarray[i], from, to);
         } else {
             for (k = from; k < to; k++) {
                 Listnode * deleter,*temp;
@@ -473,6 +479,23 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
     Listnode* kl;
     test = radix_Sort(table, table->time, from, to);          //initial mandatory radix
     table=flip_tables(table);
+
+  int wut;
+
+    jobqueue* jobquery;
+
+    jobquery=(jobqueue*)malloc(sizeof(jobqueue));
+    jobquery->jobs=(job_r2*)malloc(sizeof(job_r2)*255);
+    jobquery->size=0;
+    jobquery->used=0;
+    jobquery->thread_num=0;
+    pthread_t* thread_matrix;
+    thread_matrix=(pthread_t*)malloc(sizeof(pthread_t)*sort_threads);
+    pthread_mutex_init(&mutex, NULL);
+    pthread_mutex_init(&mutexsum, NULL);
+    pthread_cond_init(&cond, NULL);
+
+
     for (i = 0; i < hist_size; i++) {
 
         if (i < hist_size - 1) {
@@ -484,7 +507,14 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
         from = test->sumlist[i][1];
 
         if(to-from>quick_short){
-            radix_Sort2(table,table->time,test->refarray[i],from,to,test->refarray[i]->first);
+            jobquery->jobs[i].table=table;
+            jobquery->jobs[i].time=table->time;
+            jobquery->jobs[i].use_this=test->refarray[i];
+            jobquery->jobs[i].from=from;
+            jobquery->jobs[i].to=to;
+            jobquery->size++;
+
+          //  radix_Sort2(table,table->time,test->refarray[i],from,to);
         }else{
             kl=test->refarray[i]->first;
             for (k = from; k < to; k++) {
@@ -509,6 +539,22 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
         }
 
     }
+
+
+
+    for(i=0;i<sort_threads;i++) {
+
+        wut = pthread_create(&thread_matrix[i], NULL, short_thread, (void *) jobquery);
+    }
+
+    //  sleep(1);
+    //  pthread_mutex_unlock (&mutex);
+
+
+    for(i=0;i<sort_threads;i++)
+        pthread_join(thread_matrix[i], NULL);
+
+
 
 
     for (i = 0; i < hist_size; i++)         //free the last radix result
@@ -620,6 +666,9 @@ table=flip_tables(table);
     }
     printf(" zer0s : %d , ones : %d \n",zeros,ones);
 */
+    free(thread_matrix);
+    free(jobquery->jobs);
+    free(jobquery);
     free_table(table);
     not_yet->columns=colums;
     return not_yet;
@@ -794,3 +843,149 @@ results* get_old_results(uint64_t* col,int** idlist,int colums,int rows,int need
 
 
 }
+
+
+
+//=================================================================================================================
+
+
+
+void* short_thread(void* kk){
+    int i;
+
+
+    pthread_mutex_lock(&mutex);
+    int self = cur++;
+    pthread_t tid = pthread_self();
+
+    jobqueue* Queue;
+    Queue=(jobqueue*)kk;
+   // printf("got \"%02x\"\n", (unsigned)tid);
+    // numn++;
+    Queue->thread_num++;
+
+    if(Queue->thread_num==sort_threads) {
+      //  printf("%d awaken \n", Queue->thread_num);
+        pthread_cond_broadcast(&cond);
+        pthread_mutex_unlock(&mutex);
+
+    }
+
+    while(Queue->thread_num<sort_threads) {
+       // printf("got \"%d\"\n", self);
+
+        pthread_cond_wait(&cond, &mutex);
+    }
+    pthread_mutex_unlock(&mutex);
+
+
+   // printf("got more \"%d\"\n", self);
+
+    //if(Queue->thread==Queue->thread_num)
+    //  pthread_cond_signal(&cond);
+
+    while(1) {
+        pthread_mutex_lock (&mutexsum);
+        i = Queue->used;
+        Queue->used++;
+        pthread_mutex_unlock (&mutexsum);
+        if (i< Queue->size) {
+
+           // pthread_mutex_lock (&mutexsum);
+           // i = Queue->used;
+          //  Queue->used++;
+
+
+            radix_Sort2(Queue->jobs[i].table,Queue->jobs[i].time,Queue->jobs[i].use_this,Queue->jobs[i].from,Queue->jobs[i].to);
+
+           // pthread_mutex_unlock (&mutexsum);
+
+        } else {
+            break;
+        }
+    }
+
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&mutex);
+    pthread_exit(NULL);
+}
+
+
+
+//=================================================================================================================
+
+
+
+void* join_thread(void* kk){
+    int i;
+
+
+    pthread_mutex_lock(&mutex_join);
+    int self = cur_join++;
+    pthread_t tid = pthread_self();
+
+    jobqueue* Queue;
+    Queue=(jobqueue*)kk;
+    // printf("got \"%02x\"\n", (unsigned)tid);
+    // numn++;
+    Queue->thread_num++;
+
+    if(Queue->thread_num==sort_threads) {
+        //  printf("%d awaken \n", Queue->thread_num);
+        pthread_cond_broadcast(&cond_join);
+        pthread_mutex_unlock(&mutex_join);
+
+    }
+
+    while(Queue->thread_num<sort_threads) {
+        // printf("got \"%d\"\n", self);
+
+        pthread_cond_wait(&cond_join, &mutex_join);
+    }
+    pthread_mutex_unlock(&mutex_join);
+
+
+    // printf("got more \"%d\"\n", self);
+
+    //if(Queue->thread==Queue->thread_num)
+    //  pthread_cond_signal(&cond);
+
+    while(1) {
+        pthread_mutex_lock (&mutexsum_join);
+        i = Queue->used;
+        Queue->used++;
+        pthread_mutex_unlock (&mutexsum_join);
+        if (i< Queue->size) {
+
+            // pthread_mutex_lock (&mutexsum);
+            // i = Queue->used;
+            //  Queue->used++;
+
+
+         //   radix_Sort2(Queue->jobs[i].table,Queue->jobs[i].time,Queue->jobs[i].use_this,Queue->jobs[i].from,Queue->jobs[i].to);
+
+            // pthread_mutex_unlock (&mutexsum);
+
+        } else {
+            break;
+        }
+    }
+
+    pthread_cond_signal(&cond_join);
+    pthread_mutex_unlock(&mutex_join);
+    pthread_exit(NULL);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

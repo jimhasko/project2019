@@ -4,10 +4,22 @@
 #include "Quicksort.h"
 #include <stdint.h>
 #include "Result_List.h"
+#include <pthread.h>
 //#include "relations.h"
 #define  quick_short 500
 #define  SizeofDataFileName 100
 #define  middle__size 500
+#define sort_threads 3
+#define big_threads 2
+#define do_big_thread 0
+pthread_mutex_t mutexsum;
+pthread_mutex_t mutex;
+
+pthread_mutex_t mutexsum_join;
+pthread_mutex_t mutex_join;
+
+
+
 //=================================================================================================================
 typedef struct Listnode {
 
@@ -99,6 +111,45 @@ typedef struct middle_struct{
 }middle;
 
 
+
+typedef struct job_r2{
+    Table_Info *table;
+    int time;
+    Head* use_this;
+    int from;
+    int to;
+
+
+
+}job_r2;
+
+typedef struct jobqueue_sort{
+    job_r2* jobs;
+    int size;
+    int used;
+    int thread_num;
+}jobqueue;
+
+
+
+typedef struct job_join{
+    results* A;
+    results* B;
+    int needed;
+    int middle_matrix_size;
+    int * size;
+
+}job_join;
+
+typedef struct jobqueue_join{
+    job_join* jobs;
+    int size;
+    int used;
+    int thread_num;
+}jobqueue_join;
+
+
+
 Radix_Head *init_radix_List();
 
 void list_Add_Id(Head **head1, int id);
@@ -114,7 +165,7 @@ int bithash2(uint64_t hash_value, int time);
 void print(Table_Info *table, int from, int to,int columns);
 
 usefull* radix_Sort(Table_Info *table, int time, int from, int to);
-void radix_Sort2(Table_Info *table, int time,Head* use_this, int from, int to,Listnode* temp);
+void radix_Sort2(Table_Info *table, int time,Head* use_this, int from, int to);
 //Table_Info *get_table(char *filename, int needed);
 Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed );
 //uint64_t Sto64(const char *s);
@@ -129,6 +180,8 @@ int** join_matrices(results* A, results* B,int needed,int middle_matrix_size,int
 void list_Add_Id2(Head **head1,Head **from, int location,Listnode *temp);
 void free_results(results * A);
 results* get_old_results(uint64_t* col,int** idlist,int colums,int rows,int needed);
+void* short_thread(void* kk);
+void* join_thread(void* kk);
 //=================================================================================================================
 //=================================================================================================================
 

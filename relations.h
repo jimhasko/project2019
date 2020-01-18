@@ -13,6 +13,11 @@
 #define max_line_length 500
 #define work_slave "mywork.txt"
 
+
+pthread_mutex_t mutexsumbig;
+pthread_mutex_t mutexbig;
+
+
 typedef struct Row_Table{
 
     uint64_t *Column;
@@ -74,6 +79,22 @@ typedef struct just_transfer {
 
 } just_transfer;
 
+
+
+typedef struct job_big{
+    char * line;
+    List_of_Tables* master_table;
+}job_big;
+
+typedef struct jobqueue_big{
+    job_big* jobs;
+    int size;
+    int used;
+    int thread_num;
+}jobqueue_big;
+
+
+
 uint64_t Sto64(const char *s);
 void priority_tree(priority* prior,int priority_number,just_transfer* just,List_of_Tables* master_table);
 int min_priority(priority* prior,int priority_number);
@@ -116,4 +137,5 @@ uint64_t max_num(uint64_t a,uint64_t b);
 void run_stats_filters(List_of_Tables* master_table,just_transfer* transfer,int priority_number);
 void run_stats_joins(List_of_Tables* master_table,just_transfer* transfer,int prior);
 void test_run_stats_joins(List_of_Tables* master_table,just_transfer* transfer,int priority_number);
+void* big_thread(void* kk);
 #endif //RELATIONS_H

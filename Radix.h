@@ -11,7 +11,9 @@
 #define  middle__size 500
 #define sort_threads 2
 #define big_threads 2
+#define join_threads 2
 #define do_big_thread 1
+#define do_join_thread 1
 pthread_mutex_t mutexsum;
 pthread_mutex_t mutex;
 
@@ -119,8 +121,6 @@ typedef struct job_r2{
     int from;
     int to;
 
-
-
 }job_r2;
 
 typedef struct jobqueue_sort{
@@ -181,7 +181,8 @@ void list_Add_Id2(Head **head1,Head **from, int location,Listnode *temp);
 void free_results(results * A);
 results* get_old_results(uint64_t* col,int** idlist,int colums,int rows,int needed);
 void* short_thread(void* kk);
-void* join_thread(void* kk);
+
+
 //=================================================================================================================
 //=================================================================================================================
 

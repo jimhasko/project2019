@@ -10,9 +10,6 @@
 int cur = 0;
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 
-int cur_join = 0;
-pthread_cond_t cond_join = PTHREAD_COND_INITIALIZER;
-
 //=================================================================================================================
 void list_Add_Id(Head **head1, int id) {
 
@@ -250,7 +247,7 @@ void radix_Sort2(Table_Info *table, int time,Head* use_this, int from, int to) {
     needed = table->needed;
     columns = table->columns;
     Listnode* temp;
-int max=to;
+    int max=to;
   /*  Listnode *safekeep;
     safekeep = temp->prev;
     if (safekeep == NULL)
@@ -470,10 +467,10 @@ Table_Info *flip_tables(Table_Info *table) {
 results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
 
     int from, to, i, j, k,hist_size = 256;
-//needed=colums;
+    //needed=colums;
     Table_Info *table;
     table = get_table(col,idlist,colums,rows,needed);
-   usefull* test;
+    usefull* test;
     from = 0;
     to = table->rows;
     Listnode* kl;
@@ -728,67 +725,67 @@ int** join_matrices(results* A, results* B,int needed,int middle_matrix_size ,in
 
 
     current_looked = 0;
-int added=0;
-   for (i = 0; i < A->rows; i++) {
+    int added=0;
+       for (i = 0; i < A->rows; i++) {
 
-        targetA = A->matrix[i][A->columns];
-        targetIDA = A->matrix[i][needed];
-        for (j = current_looked;  j < B->rows ; j++) {
+            targetA = A->matrix[i][A->columns];
+            targetIDA = A->matrix[i][needed];
+            for (j = current_looked;  j < B->rows ; j++) {
 
-            targetB = B->matrix[j][B->columns];
-            targetIDB = B->matrix[j][0];
-            if (targetA == targetB) {
+                targetB = B->matrix[j][B->columns];
+                targetIDB = B->matrix[j][0];
+                if (targetA == targetB) {
 
-                if(added<middle_matrix_size){   ///add all the columns
-                    for(k=0;k<A->columns;k++){
+                    if(added<middle_matrix_size){   ///add all the columns
+                        for(k=0;k<A->columns;k++){
 
-                        table[k][added]=(int)A->matrix[i][k];
-                    wtf=table[k][added];}
-                   // for(k=A->columns;k<(A->columns+B->columns);k++)
-                    //    table[k][added]=(int)B->matrix[j][k];
-                   // for(k=A->columns;k<(A->columns+1);k++)
-                        table[A->columns][added]=(int)B->matrix[j][0];
+                            table[k][added]=(int)A->matrix[i][k];
+                        wtf=table[k][added];}
+                       // for(k=A->columns;k<(A->columns+B->columns);k++)
+                        //    table[k][added]=(int)B->matrix[j][k];
+                       // for(k=A->columns;k<(A->columns+1);k++)
+                            table[A->columns][added]=(int)B->matrix[j][0];
 
-                }else{
-                                            ///realloc if no space////////
-                    middle_matrix_size=2*middle_matrix_size;
-                     for(k=0;k<(A->columns+B->columns);k++){
-                    test=(int*)realloc(table[k],(size_t)middle_matrix_size*sizeof(int));
-                    if(test==0){
-                        printf("MIDLE MATRIX REALLOC=NULL \n");
-                        exit(1);
+                    }else{
+                                                ///realloc if no space////////
+                        middle_matrix_size=2*middle_matrix_size;
+                         for(k=0;k<(A->columns+B->columns);k++){
+                        test=(int*)realloc(table[k],(size_t)middle_matrix_size*sizeof(int));
+                        if(test==0){
+                            printf("MIDLE MATRIX REALLOC=NULL \n");
+                            exit(1);
+                        }
+                        table[k]=test;
+                         }
+
+
+
+                        for(k=0;k<A->columns;k++)
+                            table[k][added]=(int)A->matrix[i][k];     // add all the columns
+                        for(k=A->columns;k<(A->columns+1);k++)
+                            table[A->columns][added]=(int)B->matrix[j][0];
+
+
                     }
-                    table[k]=test;
-                     }
+                    added++;
+                   // list_insert(list, targetIDA, targetIDB, &cur_node);
+                    //printf("%d \n",list->start->size);
+                }
+                else if ((targetA < targetB)&&(i<A->rows-1)) {
+                     if(A->matrix[i][A->columns]<A->matrix[i+1][A->columns]){
+                     current_looked = j;
+                 //   printf(" looked :%d \n", j);
+                     break;}
+                        else{
 
-
-
-                    for(k=0;k<A->columns;k++)
-                        table[k][added]=(int)A->matrix[i][k];     // add all the columns
-                    for(k=A->columns;k<(A->columns+1);k++)
-                        table[A->columns][added]=(int)B->matrix[j][0];
-
+                        break;
+                    }
+                }else if((targetA > targetB)&&(j==current_looked)){
+                    current_looked++;
 
                 }
-                added++;
-               // list_insert(list, targetIDA, targetIDB, &cur_node);
-                //printf("%d \n",list->start->size);
-            }
-            else if ((targetA < targetB)&&(i<A->rows-1)) {
-                 if(A->matrix[i][A->columns]<A->matrix[i+1][A->columns]){
-                 current_looked = j;
-             //   printf(" looked :%d \n", j);
-                 break;}
-                    else{
-
-                    break;
-                }
-            }else if((targetA > targetB)&&(j==current_looked)){
-                current_looked++;
-
             }
         }
-    }
 
     free_results(A);
     free_results(B);
@@ -915,66 +912,7 @@ void* short_thread(void* kk){
 //=================================================================================================================
 
 
-
-void* join_thread(void* kk){
-    int i;
-
-
-    pthread_mutex_lock(&mutex_join);
-    int self = cur_join++;
-    pthread_t tid = pthread_self();
-
-    jobqueue* Queue;
-    Queue=(jobqueue*)kk;
-    // printf("got \"%02x\"\n", (unsigned)tid);
-    // numn++;
-    Queue->thread_num++;
-
-    if(Queue->thread_num==sort_threads) {
-        //  printf("%d awaken \n", Queue->thread_num);
-        pthread_cond_broadcast(&cond_join);
-        pthread_mutex_unlock(&mutex_join);
-
-    }
-
-    while(Queue->thread_num<sort_threads) {
-        // printf("got \"%d\"\n", self);
-
-        pthread_cond_wait(&cond_join, &mutex_join);
-    }
-    pthread_mutex_unlock(&mutex_join);
-
-
-    // printf("got more \"%d\"\n", self);
-
-    //if(Queue->thread==Queue->thread_num)
-    //  pthread_cond_signal(&cond);
-
-    while(1) {
-        pthread_mutex_lock (&mutexsum_join);
-        i = Queue->used;
-        Queue->used++;
-        pthread_mutex_unlock (&mutexsum_join);
-        if (i< Queue->size) {
-
-            // pthread_mutex_lock (&mutexsum);
-            // i = Queue->used;
-            //  Queue->used++;
-
-
-         //   radix_Sort2(Queue->jobs[i].table,Queue->jobs[i].time,Queue->jobs[i].use_this,Queue->jobs[i].from,Queue->jobs[i].to);
-
-            // pthread_mutex_unlock (&mutexsum);
-
-        } else {
-            break;
-        }
-    }
-
-    pthread_cond_signal(&cond_join);
-    pthread_mutex_unlock(&mutex_join);
-    pthread_exit(NULL);
-}
+//=================================================================================================================
 
 
 

@@ -9,11 +9,10 @@
 #define  quick_short 500
 #define  SizeofDataFileName 100
 #define  middle__size 500
-#define sort_threads 2
+#define sort_threads 3
+#define join_threads 3
 #define big_threads 2
-#define join_threads 2
-#define do_big_thread 1
-#define do_join_thread 1
+#define do_big_thread 0
 pthread_mutex_t mutexsum;
 pthread_mutex_t mutex;
 
@@ -121,6 +120,8 @@ typedef struct job_r2{
     int from;
     int to;
 
+
+
 }job_r2;
 
 typedef struct jobqueue_sort{
@@ -128,8 +129,13 @@ typedef struct jobqueue_sort{
     int size;
     int used;
     int thread_num;
-}jobqueue;
+}jobqueue_sort;
 
+typedef struct hold_more{
+    int** holl_up;
+    struct hold_more*  next;
+    int id;
+}hold_more;
 
 
 typedef struct job_join{
@@ -137,8 +143,10 @@ typedef struct job_join{
     results* B;
     int needed;
     int middle_matrix_size;
-    int * size;
-
+    int added;
+    int to;
+    int from;
+    int** new_middle;
 }job_join;
 
 typedef struct jobqueue_join{
@@ -146,7 +154,9 @@ typedef struct jobqueue_join{
     int size;
     int used;
     int thread_num;
+    hold_more* hold_all;
 }jobqueue_join;
+
 
 
 
@@ -181,9 +191,10 @@ void list_Add_Id2(Head **head1,Head **from, int location,Listnode *temp);
 void free_results(results * A);
 results* get_old_results(uint64_t* col,int** idlist,int colums,int rows,int needed);
 void* short_thread(void* kk);
-
-
+void* join_thread(void* kk);
+void*join_test(job_join* join);
 //=================================================================================================================
+
 //=================================================================================================================
 
 #endif //RADIX_RADIX_H

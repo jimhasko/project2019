@@ -25,6 +25,9 @@ typedef struct Row_Table{
 }Row_table;
 
 
+
+
+
 typedef struct Single_Table{
     uint64_t column_num;
     uint64_t tube_num;
@@ -135,6 +138,4 @@ void run_stats_filters(List_of_Tables* master_table,just_transfer* transfer,int 
 void run_stats_joins(List_of_Tables* master_table,just_transfer* transfer,int prior);
 void test_run_stats_joins(List_of_Tables* master_table,just_transfer* transfer,int priority_number);
 void* big_thread(void* kk);
-void* join_thread(void* kk);
-
 #endif //RELATIONS_H

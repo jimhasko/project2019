@@ -13,11 +13,8 @@
 }
 */
 
-int curr = 2;
+int curr = 0;
 pthread_cond_t condd = PTHREAD_COND_INITIALIZER;
-
-int cur_join = 0;
-pthread_cond_t cond_join = PTHREAD_COND_INITIALIZER;
 
 uint64_t Sto64(const char *s) { // string to number
 
@@ -168,20 +165,20 @@ int do_the_work(List_of_Tables* master_table, int argc, char* argv[]) {
     while (EOF != fscanf(fptrw, "%[^\n]\n", line)) {
 
         if(strcmp(line, "F") != 0) {
+if(do_big_thread==0) {
+    test = analise(line, master_table);
 
-            if(do_big_thread==0) {
-                test = analise(line, master_table);
+     bad_word = run_filters(master_table, test);
 
-                 bad_word = run_filters(master_table, test);
+     athrisma(bad_word, test, master_table);
+}else {
+    jobquery->jobs[lines].line = (char *) malloc(sizeof(char) * strlen(line));
+    strcpy(jobquery->jobs[lines].line, line);
+    jobquery->jobs[lines].master_table = master_table;
 
-                 athrisma(bad_word, test, master_table);
-            }else {
-                jobquery->jobs[lines].line = (char *) malloc(sizeof(char) * strlen(line));
-                strcpy(jobquery->jobs[lines].line, line);
-                jobquery->jobs[lines].master_table = master_table;
+    jobquery->size++;
 
-                jobquery->size++;
-            }
+}
 
             lines++;
 
@@ -211,7 +208,6 @@ int do_the_work(List_of_Tables* master_table, int argc, char* argv[]) {
         free(jobquery->jobs);
         free(jobquery);
     }
-
     free(line);
     free_big(master_table);
     return true;
@@ -230,6 +226,10 @@ int min_priority(priority* prior,int priority_number){
         }
     }
     return min;
+
+
+
+
 
 }
 
@@ -783,7 +783,7 @@ just_transfer* analise(char* str,List_of_Tables* master_table){              //d
     }
 /////////////////
     char* temp;
-    temp=(char*)malloc(sizeof(char)*strlen(proboli));
+    temp=(char*)malloc(sizeof(char)*strlen(proboli)+1);
     strcpy(temp,proboli);
     char delimprov[] = " ";
     ptr = strtok(temp, delimprov);
@@ -870,22 +870,7 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
     midle->size=-1;
  //   middle.start  //kane initialize ti lista
 
-    jobqueue_join* jobjoin;
-    pthread_t* thread_matrix_join;
 
-    if(do_join_thread == 1){
-
-        jobjoin=(jobqueue_join*)malloc(sizeof(jobqueue_join));
-        jobjoin->jobs=(job_join*)malloc(sizeof(job_join)*255);
-        jobjoin->size=0;
-        jobjoin->used=0;
-        jobjoin->thread_num=0;
-
-        thread_matrix_join=(pthread_t*)malloc(sizeof(pthread_t)*big_threads);
-        pthread_mutex_init(&mutex_join, NULL);
-        pthread_mutex_init(&mutexsum_join, NULL);
-        pthread_cond_init(&cond_join, NULL);
-    }
 
     run_stats_filters(master_table,transfer,priority_number);
 
@@ -978,7 +963,7 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
             int isin1,isin2,mid_size,needed1,needed=0;
 
-            if(midle->num_inserted==0) {  ///first runnnnn
+            if(midle->num_inserted==0) {  //////first runnnnn
 
                //    prior ity_tree(transfer->priority1, transfer->priority_number, transfer);
               //  int ** list2;
@@ -990,35 +975,7 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 //exit(1);
                 res2=big_short(col2,transfer->tables_ids[ht2].id_list,1,transfer->tables_ids[ht2].size,needed);
 
-
-
-                if(do_join_thread == 1) {
-
-                    jobjoin->jobs[i].A = res1;
-                    jobjoin->jobs[i].B = res2;
-                    jobjoin->jobs[i].size = &midle->size;
-                    jobjoin->jobs[i].middle_matrix_size = middle__size;
-                    jobjoin->jobs[i].needed = 0;
-
-                    int wut;
-                    for (i = 0; i < join_threads; i++) {
-
-                        wut = pthread_create(&thread_matrix_join[i], NULL, join_thread, (void *) jobjoin);
-                    }
-
-
-                    for (i = 0; i < join_threads; i++)
-                        pthread_join(thread_matrix_join[i], NULL);
-
-
-                    free(thread_matrix_join);
-                    free(jobjoin->jobs);
-                    free(jobjoin);
-                }
-                else {
-
-                    midle->table = join_matrices(res1, res2, 0, middle__size, (&midle->size));        ////////< join
-                }
+                 midle->table =join_matrices(res1,res2,0,middle__size,(&midle->size));        ////////< join
 
                 midle->num_inserted=2;
                 midle->inserted[0]=ht1;
@@ -1030,6 +987,8 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
             }
             else{       //////secomnd run//////////////////
+
+
 
 
                 isin1=0;
@@ -1080,36 +1039,9 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
                          //free_list(list1,transfer->tables_ids[ht1].size);
 
                      }
+                        free_midle_table(midle);
+                     midle->table =join_matrices(res1,res2,needed,middle__size,(&midle->size));            ////////< join
 
-                     free_midle_table(midle);
-
-                    if(do_join_thread == 1) {
-
-                        jobjoin->jobs[i].A = res1;
-                        jobjoin->jobs[i].B = res2;
-                        jobjoin->jobs[i].size = &midle->size;
-                        jobjoin->jobs[i].middle_matrix_size = middle__size;
-                        jobjoin->jobs[i].needed = needed;
-
-                        int wut;
-                        for (i = 0; i < join_threads; i++) {
-
-                            wut = pthread_create(&thread_matrix_join[i], NULL, join_thread, (void *) jobjoin);
-                        }
-
-
-                        for (i = 0; i < join_threads; i++)
-                            pthread_join(thread_matrix_join[i], NULL);
-
-
-                        free(thread_matrix_join);
-                        free(jobjoin->jobs);
-                        free(jobjoin);
-                    }
-                    else {
-
-                        midle->table =join_matrices(res1,res2,needed,middle__size,(&midle->size));            ////////< join
-                    }
 
                      midle->num_inserted++;
                      midle->columns++;
@@ -1140,8 +1072,9 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
 
     }
-    // if(res1!=NULL)
-    //   free_results(res1);
+   // if(res1!=NULL)
+     //   free_results(res1);
+
 
 
     return midle;
@@ -1151,7 +1084,6 @@ middle* run_filters(List_of_Tables* master_table,just_transfer* transfer) {
 
 
 void midle_scan(middle* midle,priority* prior,List_of_Tables* master_table){
-
     int i,j,k,size;
     int* test;
     size=midle->size;
@@ -1905,6 +1837,13 @@ void test_run_stats_joins(List_of_Tables* master_table,just_transfer* transfer,i
 }
 
 
+
+
+
+
+
+
+
 void* big_thread(void* kk){
     int i;
     just_transfer * test;
@@ -1924,8 +1863,8 @@ void* big_thread(void* kk){
         //  printf("%d awaken \n", Queue->thread_num);
         pthread_cond_broadcast(&condd);
         pthread_mutex_unlock(&mutexbig);
-    }
 
+    }
 
     while(Queue->thread_num<big_threads) {
         // printf("got \"%d\"\n", self);
@@ -1943,75 +1882,28 @@ void* big_thread(void* kk){
     while(1) {
         pthread_mutex_lock (&mutexsumbig);
         i = Queue->used;
-        printf("got i %d :\"%d\"\n",i, self);
         Queue->used++;
         pthread_mutex_unlock (&mutexsumbig);
         if (i< Queue->size) {
-            //printf(" i: %d , self %d \n",i,self);
+
             test = analise(Queue->jobs[i].line, Queue->jobs[i].master_table);
 
             bad_word = run_filters(Queue->jobs[i].master_table, test);
 
             athrisma(bad_word, test, Queue->jobs[i].master_table);
-            //printf("done i: %d , self %d \n",i,self);
-        } else {
-            break;
-        }
-    }
-
-    //pthread_cond_signal(&condd);
-    //pthread_mutex_unlock(&mutexbig);
-    pthread_exit(NULL);
-}
-
-//=================================================================================================================
-
-void* join_thread(void* kk){
-
-    int i;
-
-    pthread_mutex_lock(&mutex_join);
-    int self = cur_join++;
-    pthread_t tid = pthread_self();
-
-    jobqueue_join* Queue;
-    Queue=(jobqueue_join*)kk;
-
-    Queue->thread_num++;
-
-    if(Queue->thread_num==sort_threads) {
-        //  printf("%d awaken \n", Queue->thread_num);
-        pthread_cond_broadcast(&cond_join);
-        pthread_mutex_unlock(&mutex_join);
-
-    }
-
-    while(Queue->thread_num<sort_threads) {
-        // printf("got \"%d\"\n", self);
-
-        pthread_cond_wait(&cond_join, &mutex_join);
-    }
-    pthread_mutex_unlock(&mutex_join);
-
-
-    while(1) {
-        pthread_mutex_lock (&mutexsum_join);
-        i = Queue->used;
-        Queue->used++;
-        pthread_mutex_unlock (&mutexsum_join);
-        if (i< Queue->size) {
-
-            join_matrices(Queue->jobs[i].A, Queue->jobs[i].B, Queue->jobs[i].needed, Queue->jobs[i].middle_matrix_size, Queue->jobs[i].size);
 
         } else {
             break;
         }
     }
 
-    pthread_cond_signal(&cond_join);
-    pthread_mutex_unlock(&mutex_join);
+    pthread_cond_signal(&condd);
+    pthread_mutex_unlock(&mutexbig);
     pthread_exit(NULL);
 }
+
+
+
 
 
 

@@ -200,7 +200,7 @@ if(do_big_thread==0) {
 
         for (i = 0; i < big_threads; i++)
             pthread_join(thread_matrix_big[i], NULL);
-if(print_in_line==1) {
+    if(print_in_line==1) {
     for (i = 0; i < lines; i++) {
         for (j = 0; j < jobquery->jobs[i].res->result_numb; j++) {
             if (jobquery->jobs[i].res->empty == 0) {
@@ -214,9 +214,9 @@ if(print_in_line==1) {
 
 
     for (i = 0; i < lines; i++) {
-        if (i == 43) {
+        /*if (i == 43) {
             int brolk = 0;
-        }
+        }*/
         if (jobquery->jobs[i].res->empty == 0) {
             free(jobquery->jobs[i].res->result);
         }

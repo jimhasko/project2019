@@ -2045,19 +2045,7 @@ void* thread_all(void* kk){
         if(Queues->done==1){
             break;
         }
-
-
-
-
-
     }
-
-
-
-
-
-
-
 }
 
 

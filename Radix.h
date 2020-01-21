@@ -16,6 +16,7 @@
 #define join_pieces 1
 #define total_threads 10// for skedjuler
 #define print_in_line 1//only if big thread =1
+
 pthread_mutex_t mutexsum;
 pthread_mutex_t mutex;
 

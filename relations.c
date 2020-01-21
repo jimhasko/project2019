@@ -15,6 +15,7 @@
 
 int curr = 0;
 pthread_cond_t condd = PTHREAD_COND_INITIALIZER;
+pthread_cond_t cond_total = PTHREAD_COND_INITIALIZER;
 
 uint64_t Sto64(const char *s) { // string to number
 
@@ -173,7 +174,7 @@ if(do_big_thread==0) {
      athrisma(bad_word, test, master_table,print_in_line);
      //exit(1);
 }else {
-    jobquery->jobs[lines].line = (char *) malloc(sizeof(char) * strlen(line));
+    jobquery->jobs[lines].line = (char *) malloc(sizeof(char) * strlen(line)+1);
     strcpy(jobquery->jobs[lines].line, line);
     jobquery->jobs[lines].master_table = master_table;
 
@@ -200,7 +201,7 @@ if(do_big_thread==0) {
 
         for (i = 0; i < big_threads; i++)
             pthread_join(thread_matrix_big[i], NULL);
-    if(print_in_line==1) {
+if(print_in_line==1) {
     for (i = 0; i < lines; i++) {
         for (j = 0; j < jobquery->jobs[i].res->result_numb; j++) {
             if (jobquery->jobs[i].res->empty == 0) {
@@ -214,14 +215,14 @@ if(do_big_thread==0) {
 
 
     for (i = 0; i < lines; i++) {
-        /*if (i == 43) {
+        if (i == 43) {
             int brolk = 0;
-        }*/
+        }
         if (jobquery->jobs[i].res->empty == 0) {
             free(jobquery->jobs[i].res->result);
         }
         free(jobquery->jobs[i].res);
-        // free( jobquery->jobs[i].line);
+         free( jobquery->jobs[i].line);
     }
 }
         free(thread_matrix_big);
@@ -1944,7 +1945,167 @@ void* big_thread(void* kk){
 }
 
 
+//failed job schedjuler
+/*
 
+void* thread_all(void* kk){
+    main_struct* Queues;
+    Queues=(main_struct*)kk;
+    int i,j,k,l;
+    i=0;
+    int what_is;
+    just_transfer * test;
+    middle* bad_word;
+    job_join* jobjoin=NULL;
+    job_sort* jobsort=NULL;
+    what_is=0;
+    Queues->tid= pthread_self();
+
+    Queues->start_together++;
+    pthread_mutex_lock(&mutexbigtotal);
+    if(Queues->start_together==total_threads) {
+        //  printf("%d awaken \n", Queue->thread_num);
+        pthread_cond_broadcast(&cond_total);
+        pthread_mutex_unlock(&mutexbigtotal);
+
+    }
+
+    while(Queues->start_together<total_threads) {
+        // printf("got \"%d\"\n", self);
+
+        pthread_cond_wait(&cond_total, &mutexbigtotal);
+    }
+    pthread_mutex_unlock(&mutexbigtotal);
+
+
+
+    while(1){
+        what_is=0;
+        pthread_mutex_lock(&mutexlocki);//////////////
+        if(Queues->big_jobs<2){
+
+            Queues->big_jobs++;
+            what_is=1;
+            i=Queues->used;
+            Queues->used++;
+        }
+        if(Queues->sort_jobs>-1&&(what_is==0)){
+            Queues->sort_jobs--;
+            jobsort=Queues->sort_queue->first;
+            Queues->sort_queue->first=Queues->sort_queue->first->next;
+            what_is=2;
+        }
+        if(Queues->join_jobs>-1&&(what_is==0)){
+            Queues->join_jobs--;
+            jobjoin=Queues->join_queue->first;
+            Queues->join_queue->first=Queues->join_queue->first->next;
+            what_is=3;
+        }
+
+        pthread_mutex_unlock(&mutexlocki);/////////////////
+
+        if(what_is==1){
+            printf(" got %d, %s\n",i,Queues->big_queue[i].line);
+            test = analise(Queues->big_queue[i].line, Queues->big_queue[i].master_table);
+
+            bad_word = run_filters(Queues->big_queue[i].master_table, test,Queues);
+
+            athrisma(bad_word, test, Queues->big_queue[i].master_table);
+
+            Queues->big_jobs--;
+            if(i==Queues->totaljobs){
+                Queues->done=1;
+            }
+
+        }
+
+        if(what_is==2){
+
+            radix_Sort2(jobsort->table,jobsort->time,jobsort->use_this,jobsort->from,jobsort->to);
+            //Queues->sort_jobs--;
+
+            if(jobsort->is_last==1){
+                pthread_cond_signal(&Queues->cond1);
+
+            }
+            free(jobsort);
+            jobsort=NULL;
+        }
+
+
+        if(what_is==3){
+
+
+            //   Queues->join_jobs--;
+            free(jobjoin);
+            jobjoin=NULL;
+
+        }
+
+        if(Queues->done==1){
+            break;
+        }
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+}
+
+
+void* add_big_job(main_struct* main,List_of_Tables* master_table,char* line,int size){
+
+
+    main->big_queue[ main->big_jobs].line=(char*)malloc(sizeof(char)*size+1);
+    strcpy(main->big_queue[ main->big_jobs].line, line);
+
+    main->big_queue[ main->big_jobs].master_table=master_table;
+    //   main->big_queue[ main->big_jobs]=*temp;
+    main->big_jobs++;
+
+
+}
+
+
+void* free_big_job(main_struct* main){
+    int i;
+    for(i=0;i<main->totaljobs;i++){
+        free(main->big_queue[i].line);
+
+    }
+    free(main->big_queue);
+
+
+
+
+}
+
+
+job_sort* add_sort_job(main_struct* main,job_sort* temp){
+    // job_sort* temp;
+
+
+
+    if( main->sort_queue->first==NULL){
+        main->sort_queue->last = temp;
+        main->sort_queue->first = temp;
+    }else{
+
+        main->sort_queue->last->next=temp;
+        main->sort_queue->last=temp;}
+    main->sort_jobs++;
+    main->sort_queue->used++;
+    return temp;
+}
+*/
 
 
 

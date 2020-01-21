@@ -481,18 +481,18 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
     Listnode* kl;
     test = radix_Sort(table, table->time, from, to);          //initial mandatory radix
     table=flip_tables(table);
+if(sort_threads>0) {
+    int wut;
 
-  int wut;
+    jobqueue_sort *jobquery;
 
-    jobqueue_sort* jobquery;
-
-    jobquery=(jobqueue_sort*)malloc(sizeof(jobqueue_sort));
-    jobquery->jobs=(job_r2*)malloc(sizeof(job_r2)*255);
-    jobquery->size=0;
-    jobquery->used=0;
-    jobquery->thread_num=0;
-    pthread_t* thread_matrix;
-    thread_matrix=(pthread_t*)malloc(sizeof(pthread_t)*sort_threads);
+    jobquery = (jobqueue_sort *) malloc(sizeof(jobqueue_sort));
+    jobquery->jobs = (job_sort *) malloc(sizeof(job_sort) * 255);
+    jobquery->size = 0;
+    jobquery->used = 0;
+    jobquery->thread_num = 0;
+    pthread_t *thread_matrix;
+    thread_matrix = (pthread_t *) malloc(sizeof(pthread_t) * sort_threads);
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_init(&mutexsum, NULL);
     pthread_cond_init(&cond, NULL);
@@ -508,50 +508,48 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
             to = table->rows;
         from = test->sumlist[i][1];
 
-        if(to-from>quick_short){
-            jobquery->jobs[i].table=table;
-            jobquery->jobs[i].time=table->time;
-            jobquery->jobs[i].use_this=test->refarray[i];
-            jobquery->jobs[i].from=from;
-            jobquery->jobs[i].to=to;
+        if (to - from > quick_short) {
+            jobquery->jobs[i].table = table;
+            jobquery->jobs[i].time = table->time;
+            jobquery->jobs[i].use_this = test->refarray[i];
+            jobquery->jobs[i].from = from;
+            jobquery->jobs[i].to = to;
             jobquery->size++;
 
-          //  radix_Sort2(table,table->time,test->refarray[i],from,to);
-        }else{
-            kl=test->refarray[i]->first;
+            //  radix_Sort2(table,table->time,test->refarray[i],from,to);
+        } else {
+            kl = test->refarray[i]->first;
             for (k = from; k < to; k++) {
-                Listnode * deleter,*temp;
-              //  table->TableB[k] =(uint64_t*)  malloc(sizeof(uint64_t) * (colums + 1));
-                for (j = 0; j < (colums+1) ; j++) {
+                Listnode *deleter, *temp;
+                //  table->TableB[k] =(uint64_t*)  malloc(sizeof(uint64_t) * (colums + 1));
+                for (j = 0; j < (colums + 1); j++) {
                     table->TableB[j][k] = table->TableA[j][kl->id];
                 }
                 //  table->TableB[k][columns] = table->TableA[kl->id][columns];
-              //  free(table->TableA[kl->id]);
-                deleter=kl;
-                kl=kl->next;
-                test->refarray[i]->first=kl;
+                //  free(table->TableA[kl->id]);
+                deleter = kl;
+                kl = kl->next;
+                test->refarray[i]->first = kl;
 
                 free(deleter);
 
             }
             quicksort(table->TableB, from, to - 1, colums);
-            if(kl!=NULL){
-                int  i_beg_you_work=0;
+            if (kl != NULL) {
+                int i_beg_you_work = 0;
             }
         }
 
     }
 
 
-
-    for(i=0;i<sort_threads;i++) {
+    for (i = 0; i < sort_threads; i++) {
 
         wut = pthread_create(&thread_matrix[i], NULL, short_thread, (void *) jobquery);
     }
 
 
-
-    for(i=0;i<sort_threads;i++)
+    for (i = 0; i < sort_threads; i++)
         pthread_join(thread_matrix[i], NULL);
 
 
@@ -559,6 +557,55 @@ results *big_short(uint64_t* col,int** idlist,int colums,int rows,int needed ) {
     pthread_mutex_destroy(&mutexsum);
     pthread_cond_destroy(&cond);
 
+    free(thread_matrix);
+    free(jobquery->jobs);
+    free(jobquery);
+
+}else{
+
+    for (i = 0; i < hist_size; i++) {
+
+    if (i < hist_size - 1) {
+        to = test->sumlist[i + 1][1];
+    }
+
+    if (i == hist_size - 1)
+        to = table->rows;
+    from = test->sumlist[i][1];
+
+    if(to-from>quick_short){
+        radix_Sort2(table,table->time,test->refarray[i],from,to);
+    }else{
+        kl=test->refarray[i]->first;
+        for (k = from; k < to; k++) {
+            Listnode * deleter,*temp;
+            //  table->TableB[k] =(uint64_t*)  malloc(sizeof(uint64_t) * (colums + 1));
+            for (j = 0; j < (colums+1) ; j++) {
+                table->TableB[j][k] = table->TableA[j][kl->id];
+            }
+            //  table->TableB[k][columns] = table->TableA[kl->id][columns];
+            //  free(table->TableA[kl->id]);
+            deleter=kl;
+            kl=kl->next;
+            test->refarray[i]->first=kl;
+
+            free(deleter);
+
+        }
+        quicksort(table->TableB, from, to - 1, colums);
+        if(kl!=NULL){
+            int  i_beg_you_work=0;
+        }
+    }
+
+}
+
+
+
+
+
+
+}
 
     for (i = 0; i < hist_size; i++)         //free the last radix result
         free(test->sumlist[i]);
@@ -669,9 +716,7 @@ table=flip_tables(table);
     }
     printf(" zer0s : %d , ones : %d \n",zeros,ones);
 */
-    free(thread_matrix);
-    free(jobquery->jobs);
-    free(jobquery);
+
     free_table(table);
     not_yet->columns=colums;
     return not_yet;
@@ -714,7 +759,7 @@ void free_table(Table_Info *table) {            // self explanatory
 
 int** join_matrices(results* A, results* B,int needed,int middle_matrix_size ,int* size) {  //join_matrices
     int** table;
-if(do_join_thread==1) {
+if(join_threads>1) {
     int i, j, k, wtf, wut;
     int *test;
     int added = 0;

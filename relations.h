@@ -18,24 +18,10 @@ pthread_mutex_t mutexsumbig;
 pthread_mutex_t mutexbig;
 
 
-typedef struct Row_Table{
+pthread_mutex_t mutextest;
+pthread_mutex_t mutexlocki;
+pthread_mutex_t mutexbigtotal;
 
-    uint64_t *Column;
-
-}Row_table;
-
-
-
-
-
-typedef struct Single_Table{
-    uint64_t column_num;
-    uint64_t tube_num;
-    Row_table* Full_Table;
-  //  int* id_table;
-    int table_name;
-    statistics* stats;
-}Single_Table;
 
 
 typedef struct neibour_node{
@@ -48,12 +34,6 @@ typedef struct neibour_node{
 
 
 
-typedef struct Tables_Table{
-    int num_of_tables;
-    int work_file;
-    struct Single_Table* tables;
-
-}List_of_Tables;
 
 typedef struct priority {
     char *command;
@@ -79,17 +59,7 @@ typedef struct just_transfer {
 
 } just_transfer;
 
-typedef struct result{
-    int result_numb;
-    uint64_t * result;
-    int empty;
-}result;
 
-typedef struct job_big{
-    char * line;
-    List_of_Tables* master_table;
-    result* res;
-}job_big;
 
 typedef struct jobqueue_big{
     job_big* jobs;

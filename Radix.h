@@ -9,13 +9,13 @@
 #define  quick_short 500
 #define  SizeofDataFileName 100
 #define  middle__size 1000
-#define sort_threads 1//<-
-#define join_threads 1//<-
-#define big_threads 2
-#define do_big_thread 1//if is 1 sort threads and join threads must be 1
+#define sort_threads 0//<-
+#define join_threads 0//<- really slow
+#define big_threads 5
+#define do_big_thread 1//if is 1 sort threads and join threads must be 0
 #define join_pieces 1
-#define do_join_thread 0//really slow
-#define print_in_line 0//only if big thread =1
+#define total_threads 10// for skedjuler
+#define print_in_line 1//only if big thread =1
 pthread_mutex_t mutexsum;
 pthread_mutex_t mutex;
 
@@ -125,10 +125,34 @@ typedef struct job_r2{
 
 
 
-}job_r2;
+}job_sort;
+
+
+
+typedef struct Row_Table{
+
+    uint64_t *Column;
+
+}Row_table;
+
+
+
+
+
+typedef struct Single_Table{
+    uint64_t column_num;
+    uint64_t tube_num;
+    Row_table* Full_Table;
+    //  int* id_table;
+    int table_name;
+    statistics* stats;
+}Single_Table;
+
 
 typedef struct jobqueue_sort{
-    job_r2* jobs;
+    job_sort* first;//skedj
+    job_sort* last;//skedj
+    job_sort* jobs;
     int size;
     int used;
     int thread_num;
@@ -140,7 +164,24 @@ typedef struct hold_more{
     int id;
 }hold_more;
 
+typedef struct result{
+    int result_numb;
+    uint64_t * result;
+    int empty;
+}result;
 
+typedef struct Tables_Table{
+    int num_of_tables;
+    int work_file;
+    struct Single_Table* tables;
+
+}List_of_Tables;
+
+typedef struct job_big{
+    char * line;
+    List_of_Tables* master_table;
+    result* res;
+}job_big;
 typedef struct job_join{
     results* A;
     results* B;
@@ -157,9 +198,30 @@ typedef struct jobqueue_join{
     int size;
     int used;
     int thread_num;
-   // hold_more* hold_all;
+    job_sort* first;//skedj
+    job_sort* last;//skedj
 }jobqueue_join;
 
+typedef struct main_struct{
+
+    jobqueue_join* join_queue;
+    jobqueue_sort* sort_queue;
+    job_big* big_queue;
+    int big_jobs;
+    int sort_jobs;
+    int join_jobs;
+    pthread_mutex_t mutex1;
+    pthread_mutex_t mutex2;
+    pthread_cond_t cond1;
+    pthread_cond_t cond2;
+    int mut1;
+    int mut2;
+    int used;
+    int start_together;
+    int totaljobs;
+    pthread_t tid ;
+    int done;
+}main_struct;
 
 
 

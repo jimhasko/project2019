@@ -1,4 +1,4 @@
-# Project Part 2 <h1>
+# Project Part 3 το README βρίσκετε μέσα στο repo σε .pdf<h1>
 
 ## Στοιχεία Φοιτητών: <h2>
 

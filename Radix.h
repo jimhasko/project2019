@@ -11,7 +11,7 @@
 #define  middle__size 1000
 #define sort_threads 0//<-
 #define join_threads 0//<- really slow
-#define big_threads 5
+#define big_threads 4
 #define do_big_thread 1//if is 1 sort threads and join threads must be 0
 #define join_pieces 1
 #define total_threads 10// for skedjuler

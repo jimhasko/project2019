@@ -8,11 +8,14 @@
 //#include "relations.h"
 #define  quick_short 500
 #define  SizeofDataFileName 100
-#define  middle__size 500
-#define sort_threads 3
-#define join_threads 3
+#define  middle__size 1000
+#define sort_threads 1//<-
+#define join_threads 1//<-
 #define big_threads 2
-#define do_big_thread 0
+#define do_big_thread 1//if is 1 sort threads and join threads must be 1
+#define join_pieces 1
+#define do_join_thread 0//really slow
+#define print_in_line 0//only if big thread =1
 pthread_mutex_t mutexsum;
 pthread_mutex_t mutex;
 
@@ -154,7 +157,7 @@ typedef struct jobqueue_join{
     int size;
     int used;
     int thread_num;
-    hold_more* hold_all;
+   // hold_more* hold_all;
 }jobqueue_join;
 
 

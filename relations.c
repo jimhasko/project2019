@@ -141,7 +141,7 @@ int do_the_work(List_of_Tables* master_table, int argc, char* argv[]) {
    // batches =0;
 
 
-    int wut,i;
+    int wut,i,j;
 
     jobqueue_big* jobquery;
 
@@ -170,7 +170,8 @@ if(do_big_thread==0) {
 
      bad_word = run_filters(master_table, test);
 
-     athrisma(bad_word, test, master_table);
+     athrisma(bad_word, test, master_table,print_in_line);
+     //exit(1);
 }else {
     jobquery->jobs[lines].line = (char *) malloc(sizeof(char) * strlen(line));
     strcpy(jobquery->jobs[lines].line, line);
@@ -199,11 +200,30 @@ if(do_big_thread==0) {
 
         for (i = 0; i < big_threads; i++)
             pthread_join(thread_matrix_big[i], NULL);
-
-        for (i = 0; i < lines; i++){
-           free( jobquery->jobs[lines].line);
+if(print_in_line==1) {
+    for (i = 0; i < lines; i++) {
+        for (j = 0; j < jobquery->jobs[i].res->result_numb; j++) {
+            if (jobquery->jobs[i].res->empty == 0) {
+                printf("%"PRIu64 " ", jobquery->jobs[i].res->result[j]);
+            } else {
+                printf("NULL ");
+            }
         }
+        printf("\n");
+    }
 
+
+    for (i = 0; i < lines; i++) {
+        if (i == 43) {
+            int brolk = 0;
+        }
+        if (jobquery->jobs[i].res->empty == 0) {
+            free(jobquery->jobs[i].res->result);
+        }
+        free(jobquery->jobs[i].res);
+        // free( jobquery->jobs[i].line);
+    }
+}
         free(thread_matrix_big);
         free(jobquery->jobs);
         free(jobquery);
@@ -304,8 +324,6 @@ while(now<priority_number){
         printf(" j:%d ,ptr: %s size:%d \n",k,prior[k].command,(int)prior[k].size);
     }*/
 }
-
-
 
 
 /*
@@ -1143,20 +1161,29 @@ void midle_scan(middle* midle,priority* prior,List_of_Tables* master_table){
 
 }
 
-void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table){
+result* athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table,int print){
     int i,j,k,MT,CL,HT,ins_id,table_id;
     uint64_t * column;
     uint64_t * sums;
     ins_id=0;
    // printf("ADDING!!\n");
     FILE * fptrs = NULL;
+    result* res;
+    if(print==1){
+
+        res=(result*)malloc(sizeof(result));
+        res->result_numb=transfer->suma_size;
+        res->empty=0;
+
+    }
+
 
     if (master_table->work_file == false) {
 
         fptrs = fopen (work_slave,"w");
         if (fptrs == NULL) {
             printf("\n\nCant write to save file!\n");
-            return;
+            return NULL;
         }
         else {
             master_table->work_file = true;
@@ -1168,7 +1195,7 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
 
         if (fptrs == NULL) {
             printf("\n\nCant write to save file!\n");
-            return;
+            return NULL;
         }
     }
 
@@ -1200,27 +1227,41 @@ void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table
                 }
 
             }
+        if(print==0){
+            printf("%"PRIu64 " ",  sums[i]);}
 
-            printf("%"PRIu64 " ",  sums[i]);
+
+
+
+
+
             fprintf (fptrs, "%"PRIu64 " ",  sums[i]);
 
 
         }
-        free(sums);
+        //free(sums);
+        if(print==1){
+            res->result=sums;
+        }
     }else{
         for(j=0;j<transfer->suma_size;j++) {
+           if(print==0)
             printf("NULL ");
+           if(print==1)
+               res->empty=1;
             fprintf(fptrs, "NULL ");
         }
     }
-
+    if(print==0)
     printf("\n");
     fprintf(fptrs, "\n");
 
     fclose(fptrs);
     free_transfer(transfer);
     free_midle(midle);
-
+if(print==1){
+    return res;
+}
 }
 
 
@@ -1890,7 +1931,7 @@ void* big_thread(void* kk){
 
             bad_word = run_filters(Queue->jobs[i].master_table, test);
 
-            athrisma(bad_word, test, Queue->jobs[i].master_table);
+            Queue->jobs[i].res= athrisma(bad_word, test, Queue->jobs[i].master_table,print_in_line);
 
         } else {
             break;

@@ -79,11 +79,16 @@ typedef struct just_transfer {
 
 } just_transfer;
 
-
+typedef struct result{
+    int result_numb;
+    uint64_t * result;
+    int empty;
+}result;
 
 typedef struct job_big{
     char * line;
     List_of_Tables* master_table;
+    result* res;
 }job_big;
 
 typedef struct jobqueue_big{
@@ -124,7 +129,7 @@ int do_the_work(List_of_Tables* master_table, int argc, char* argv[]);
 
 void free_list(int** list,int size);
 void free_midle_table(middle* midle);
-void athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table);
+result* athrisma(middle* midle,just_transfer* transfer,List_of_Tables* master_table,int print);
 void free_midle(middle* midle);
 void free_big(List_of_Tables* master);
 void free_transfer(just_transfer* transfer);

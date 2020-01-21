@@ -442,6 +442,8 @@ Table_Info *get_table(uint64_t* col,int** idlist,int colums,int rows,int needed 
             retur->TableA[j][i] = idlist[j][i];
 
         }
+        colum_orig=idlist[needed][i];
+
        retur->TableA[colums][i]=col[idlist[needed][i]];//retur->TableA[i][colums]=col[i];
       //  printf(",%"PRIu64 "\n",retur->TableA[i][colums]);
 
@@ -709,56 +711,125 @@ void free_table(Table_Info *table) {            // self explanatory
 }
 
 //=================================================================================================================
+
 int** join_matrices(results* A, results* B,int needed,int middle_matrix_size ,int* size) {  //join_matrices
+    int** table;
+if(do_join_thread==1) {
+    int i, j, k, wtf, wut;
+    int *test;
+    int added = 0;
+    middle *midle;
+    // midle=(middle*)malloc(sizeof(middle));
+    // midle->table=NULL;
 
 
-    int i,j,k,wtf,wut;
-    int* test;
-int added=0;
-    middle* midle;
-   // midle=(middle*)malloc(sizeof(middle));
-   // midle->table=NULL;
 
 
 
+    wtf = A->rows / join_pieces;
 
+    jobqueue_join *jobquery;
 
-wtf=A->rows/10;
-
-    jobqueue_join* jobquery;
-
-    jobquery=(jobqueue_join*)malloc(sizeof(jobqueue_join));
-    jobquery->jobs=(job_join*)malloc(sizeof(job_join)*10);
-    jobquery->size=0;
-    jobquery->used=0;
-    jobquery->thread_num=0;
-    pthread_t* thread_matrix;
-    thread_matrix=(pthread_t*)malloc(sizeof(pthread_t)*join_threads);
+    jobquery = (jobqueue_join *) malloc(sizeof(jobqueue_join));
+    jobquery->jobs = (job_join *) malloc(sizeof(job_join) * join_pieces);
+    jobquery->size = 0;
+    jobquery->used = 0;
+    jobquery->thread_num = 0;
+    pthread_t *thread_matrix;
+    thread_matrix = (pthread_t *) malloc(sizeof(pthread_t) * join_threads);
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_init(&mutexsum, NULL);
     pthread_cond_init(&cond, NULL);
 
 
-    for(i=0;i<10;i++){
+    for (i = 0; i < join_pieces; i++) {
+        jobquery->jobs[i].new_middle = NULL;
+        jobquery->jobs[i].middle_matrix_size = middle_matrix_size / join_pieces;
+        jobquery->jobs[i].needed = needed;
+        jobquery->jobs[i].A = A;
+        jobquery->jobs[i].B = B;
+        jobquery->jobs[i].from = i * wtf;
+        jobquery->jobs[i].to = (i + 1) * wtf;
+        jobquery->jobs[i].added = 0;
+        jobquery->size++;
+    }
+    jobquery->jobs[join_pieces - 1].to = A->rows;
+//////////////
 
-        jobquery->jobs[i].middle_matrix_size=middle_matrix_size/10;
-        jobquery->jobs[i].needed=needed;
-        jobquery->jobs[i].A=A;
-        jobquery->jobs[i].B=B;
-        jobquery->jobs[i].from=i*wtf;
-        jobquery->jobs[i].to=(i+1)*wtf;
+///////////////////
 
 
+    for (i = 0; i < join_threads; i++) {
+
+        wut = pthread_create(&thread_matrix[i], NULL, join_thread, (void *) jobquery);
     }
 
-//////////////
- /*
-    int added=0;
+
+    for (i = 0; i < join_threads; i++)
+        pthread_join(thread_matrix[i], NULL);
+
+
+    int columns = A->columns + B->columns;
+    free_results(A);
+    free_results(B);
+
+
+    for (i = 0; i < join_pieces; i++) {
+
+        added += jobquery->jobs[i].added;
+
+    }
+    for (i = 0; i < join_pieces; i++) {
+        //printf("added %d from %d to %d \n",jobquery->jobs[i].added,jobquery->jobs[i].from,jobquery->jobs[i].to);
+    }
+    *size = added;
+
+
+
+    table = (int **) malloc(sizeof(int *) * columns);
+
+    for (i = 0; i < columns; i++)
+        table[i] = (int *) malloc(sizeof(int) * added);//middle [columns][rows]
+    int add = 0;
+    for (i = 0; i < join_pieces; i++) {
+        for (j = 0; j < jobquery->jobs[i].added; j++) {
+            for (k = 0; k < columns; k++)
+                table[k][j + add] = jobquery->jobs[i].new_middle[k][j];
+
+
+        }
+        add += jobquery->jobs[i].added;
+    }
+
+    for (i = 0; i < join_pieces; i++) {
+
+        for (k = 0; k < columns; k++) {
+            free(jobquery->jobs[i].new_middle[k]);
+        }
+        free(jobquery->jobs[i].new_middle);
+    }
+    free(jobquery->jobs);
+    free(jobquery);
+    free(thread_matrix);
+}else {
+    int i,j,k,wtf;
+    int* test;
     uint64_t targetIDA, targetIDB,targetA, targetB;
     int  current_looked;
+    middle* midle;
+    // midle=(middle*)malloc(sizeof(middle));
+    // midle->table=NULL;
+    int columns=A->columns+B->columns;
+
+    table=(int**)malloc(sizeof(int*)*columns);
+
+    for(i=0;i<(A->columns+B->columns);i++)
+        table[i]=(int*)malloc(sizeof(int)*middle_matrix_size);//middle [columns][rows]
+
+
     current_looked = 0;
-int** table;
-   for (i = 0; i < A->rows; i++) {
+    int added=0;
+    for (i = 0; i < A->rows; i++) {
 
         targetA = A->matrix[i][A->columns];
         targetIDA = A->matrix[i][needed];
@@ -772,24 +843,23 @@ int** table;
                     for(k=0;k<A->columns;k++){
 
                         table[k][added]=(int)A->matrix[i][k];
-
-                    }
-                   // for(k=A->columns;k<(A->columns+B->columns);k++)
+                        wtf=table[k][added];}
+                    // for(k=A->columns;k<(A->columns+B->columns);k++)
                     //    table[k][added]=(int)B->matrix[j][k];
-                   // for(k=A->columns;k<(A->columns+1);k++)
-                        table[A->columns][added]=(int)B->matrix[j][0];
+                    // for(k=A->columns;k<(A->columns+1);k++)
+                    table[A->columns][added]=(int)B->matrix[j][0];
 
                 }else{
-                                            ///realloc if no space////////
+                    ///realloc if no space////////
                     middle_matrix_size=2*middle_matrix_size;
-                     for(k=0;k<(A->columns+B->columns);k++){
-                    test=(int*)realloc(table[k],(size_t)middle_matrix_size*sizeof(int));
-                    if(test==0){
-                        printf("MIDLE MATRIX REALLOC=NULL \n");
-                        exit(1);
+                    for(k=0;k<(A->columns+B->columns);k++){
+                        test=(int*)realloc(table[k],(size_t)middle_matrix_size*sizeof(int));
+                        if(test==0){
+                            printf("MIDLE MATRIX REALLOC=NULL \n");
+                            exit(1);
+                        }
+                        table[k]=test;
                     }
-                    table[k]=test;
-                     }
 
 
 
@@ -801,15 +871,15 @@ int** table;
 
                 }
                 added++;
-               // list_insert(list, targetIDA, targetIDB, &cur_node);
+                // list_insert(list, targetIDA, targetIDB, &cur_node);
                 //printf("%d \n",list->start->size);
             }
             else if ((targetA < targetB)&&(i<A->rows-1)) {
-                 if(A->matrix[i][A->columns]<A->matrix[i+1][A->columns]){
-                 current_looked = j;
-             //   printf(" looked :%d \n", j);
-                 break;}
-                    else{
+                if(A->matrix[i][A->columns]<A->matrix[i+1][A->columns]){
+                    current_looked = j;
+                    //   printf(" looked :%d \n", j);
+                    break;}
+                else{
 
                     break;
                 }
@@ -818,62 +888,22 @@ int** table;
 
             }
         }
-    }*/
-///////////////////
-
-
-    for(i=0;i<sort_threads;i++) {
-
-        wut = pthread_create(&thread_matrix[i], NULL, join_thread, (void *) jobquery);
     }
-
-
-
-    for(i=0;i<sort_threads;i++)
-        pthread_join(thread_matrix[i], NULL);
-
-
 
     free_results(A);
     free_results(B);
+    //printf("\n  added: %d\n", added);
 
-
-    for(i=0;i<10;i++){
-
-        added+=jobquery->jobs[i].added;
-
-    }
+    //midle->columns=columns;
     *size=added;
 
-    int columns=A->columns+B->columns;
-    int** table;
-    table=(int**)malloc(sizeof(int*)*columns);
-
-    for(i=0;i<(A->columns+B->columns);i++)
-        table[i]=(int*)malloc(sizeof(int)*added);//middle [columns][rows]
-
-    for(i=0;i<10;i++){
-for(j=0;j<jobquery->jobs[i].added;j++) {
-    for(k=0;k<(A->columns+B->columns);k++)
-    table[k][j]=jobquery->jobs[i].new_middle[k][j];
-
-        }
 
 
-    }
-
-for(i=0;i<10;i++){
-    for(k=0;k<jobquery->jobs[i].added;k++){
-        free(jobquery->jobs[i].new_middle[k]);
-    }
-    free(jobquery->jobs[i].new_middle);
 }
-free(jobquery->jobs);
-free(jobquery);
-free(thread_matrix);
-
     return table;
 }
+
+
 
 //=================================================================================================================
 
@@ -992,7 +1022,7 @@ void* short_thread(void* kk){
 
 
 void* join_thread(void* kk){
-    int i;
+    int i=0;
 
 
     pthread_mutex_lock(&mutex_join);
@@ -1035,7 +1065,7 @@ void* join_thread(void* kk){
             // pthread_mutex_lock (&mutexsum);
             // i = Queue->used;
             //  Queue->used++;
-join_test(&Queue->jobs[i]);
+        join_test(&Queue->jobs[i]);
 
          //   radix_Sort2(Queue->jobs[i].table,Queue->jobs[i].time,Queue->jobs[i].use_this,Queue->jobs[i].from,Queue->jobs[i].to);
 
@@ -1079,7 +1109,7 @@ void*join_test(job_join* join){
 
         targetA = A->matrix[i][A->columns];
         targetIDA = A->matrix[i][needed];
-        for (j = current_looked;  j < B->rows ; j++) {
+        for (j = 0;  j < B->rows ; j++) {
 
             targetB = B->matrix[j][B->columns];
             targetIDB = B->matrix[j][0];
@@ -1089,10 +1119,9 @@ void*join_test(job_join* join){
                     for(k=0;k<A->columns;k++){
 
                         table[k][added]=(int)A->matrix[i][k];
-                       }
-                    // for(k=A->columns;k<(A->columns+B->columns);k++)
-                    //    table[k][added]=(int)B->matrix[j][k];
-                    // for(k=A->columns;k<(A->columns+1);k++)
+
+                    }
+
                     table[A->columns][added]=(int)B->matrix[j][0];
 
                 }else{
@@ -1117,13 +1146,12 @@ void*join_test(job_join* join){
 
                 }
                 added++;
-                // list_insert(list, targetIDA, targetIDB, &cur_node);
-                //printf("%d \n",list->start->size);
+
             }
-            else if ((targetA < targetB)&&(i<A->rows-1)) {
+            else if ((targetA < targetB)&&(i<to-1)) {
                 if(A->matrix[i][A->columns]<A->matrix[i+1][A->columns]){
                     current_looked = j;
-                    //   printf(" looked :%d \n", j);
+
                     break;}
                 else{
 
@@ -1138,6 +1166,7 @@ void*join_test(job_join* join){
 
 join->new_middle=table;
 join->added=added;
+join->middle_matrix_size=middle_matrix_size;
 }
 
 
